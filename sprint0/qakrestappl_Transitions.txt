@@ -1,0 +1,2 @@
+{"actor":"incinerator", "msgType":"dispatch", "curstate":"s0", "nextstate":"handleStartBurning", "msgId":"startBurning"}
+{"actor":"incinerator", "msgType":"dispatch", "curstate":"handleEndBurning", "nextstate":"handleStartBurning", "msgId":"startBurning"}

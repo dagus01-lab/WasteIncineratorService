@@ -1,0 +1,95 @@
+/** Modello per l'analisi dei requisiti del problema WasteIncineratorService */
+
+System waste_incinerator_service
+
+//Messaggi per la gestione del burning dell'Incinerator
+Dispatch startBurning : startBurning(N)
+Event 	 endBurning : endBurning(N)
+
+//Messaggi per muovere il BasicRobot
+Dispatch cmd    : cmd( MOVE )  "MOVE = a|d|l|r|h   "
+Request step       : step(TIME)	
+Reply stepdone     : stepdone(V)                 for step
+Reply stepfailed   : stepfailed(DURATION, CAUSE) for step
+
+//Messaggio generale per aggiornare la GUI
+Dispatch updategui : updategui(N)
+
+//Definizione dei tre contesti (service, basicRobot e RaspBerry)
+Context ctx_waste_incinerator_service ip [host="localhost" port=8125]
+Context ctxbasicrobot ip [host="127.0.0.1"  port=8120] 
+Context ctxrasp ip[host="127.0.0.2" port=8122]
+
+//Attore "esterno" BasicRobot
+ExternalQActor basicrobot context ctxbasicrobot
+
+//Attore OpRobot
+QActor op_robot context ctx_waste_incinerator_service{
+	State s0 initial{
+		println("$name STARTS") color blue
+		request basicrobot -m  step : step(335)
+		forward basicrobot -m cmd : cmd(l) 
+		forward incinerator -m startBurning : startBurning(1)
+		forward service_status_gui -m updategui : updategui(1)
+	}
+}
+
+//Attore Incinerator
+QActor incinerator context ctx_waste_incinerator_service{
+	State s0 initial{
+		println("$name STARTS") color red
+		
+		[# val BTIME = 10000L; var stato = 0; #]
+	}
+	Transition t0 whenMsg startBurning -> handleStartBurning
+	
+	//Stato per gestire l'inizio di burning
+	State handleStartBurning{
+		println("Incinerator is burning...") color red
+		forward service_status_gui -m updategui : updategui(1) //aggiorno la GUI
+	}
+	Transition t0 whenTimeVar BTIME -> handleEndBurning
+	
+	//Stato per gestire la fine di burning
+	State handleEndBurning{
+		println("Incinerator has finished to burn") color red
+		forward service_status_gui -m updategui : updategui(0) //aggiorno la GUI
+		emit endBurning : endBurning(1) //emette il segnale di fine burning
+	}
+	Transition t0 whenMsg startBurning -> handleStartBurning
+}
+
+//Attore WasteStorage container
+QActor waste_storage context ctx_waste_incinerator_service{
+	State s0 initial{
+		println("$name STARTS")
+		forward service_status_gui -m updategui : updategui(1)
+		
+		[# val CAPACITA_MASSIMA = 999999; var pesoAttuale = 0; #]
+	}
+}
+
+//Attore AshStorage container
+QActor ash_storage context ctx_waste_incinerator_service{
+	State s0 initial{
+		println("$name STARTS") color magenta
+		forward service_status_gui -m updategui : updategui(1)
+		
+		[# val CAPACITA_MASSIMA = 4; var capienza_attuale = 0; #]
+	}
+}
+
+//Attore MonitoringDevice
+QActor monitoring_device context ctxrasp{
+	State s0 initial{
+		println("$name STARTS") color yellow
+	}
+}
+
+//Attore ServiceStatusGUI
+QActor service_status_gui context ctx_waste_incinerator_service{
+	State s0 initial{
+		println("$name STARTS") color green
+	}
+}
+

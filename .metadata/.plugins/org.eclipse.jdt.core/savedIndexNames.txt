@@ -1,0 +1,9 @@
+INDEX VERSION 1.134+C:\Users\Bryan\Desktop\ingegneria_dei_sistemi_software\TemaFinale24\.metadata\.plugins\org.eclipse.jdt.core
+3593468975.index
+2328269416.index
+1074061742.index
+486528892.index
+1542889413.index
+2821234298.index
+740284781.index
+2625055010.index

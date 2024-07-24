@@ -1,0 +1,129 @@
+/** Modello per l'analisi dei requisiti del problema coldStorage */
+
+System cold_storage_service
+
+//Messaggi per la prenotazione di scarico merci
+Request store : store(N)
+Reply storeAccepted : storeAccepted(motivazione) for store
+Reply storeRefused : storeRefused(motivazione)	 for store
+
+//Messaggi per lo scarico effettivo della merce
+Request scarica : scarica(N)
+Reply scaricaAccepted : scaricaAccepted(motivazione) for scarica
+Reply scaricaRefused : scaricaRefused(motivazione)	 for scarica
+
+Context ctx_cold_storage_service ip [host="localhost" port=8125]
+
+//Attore che simula il comportamento del sistema
+QActor coldstorageservice context ctx_cold_storage_service{
+	[# val MAX_CAPACITA = 50; var capienzaAttuale = 0 //rappresentazione della coldRoom
+	
+	//Per il momento mappo un ticket come una variabile "temporale", ma in realtà dovrei gestire più tempi diversi (uno per ogni ticket)
+		var StartTime = 0L
+		val MAX_DURATA_TICKET = 10000L
+		var TempoTrascorso = 0L //tempo trascorso da quando è stato emesso il ticket
+	#]
+	
+	State s0 initial{
+		println("$name STARTS") color blue
+	}
+	Transition t0 whenRequest store -> handleStore
+				  whenRequest scarica -> handleScarica
+	
+	//Stato per gestire una richiesta di scarico
+	State handleStore{
+		onMsg ( store : store(N) ){
+			[ # var FW = payloadArg(0).toInt() #] //recupero la quantità dichiarata dal camionista
+			
+			if [# capienzaAttuale + FW <= MAX_CAPACITA #]{
+				//Se c'è ancora spazio nella coldRoom, fornisco il ticket
+				replyTo store with storeAccepted : storeAccepted(1)
+				memoCurrentTime StartTime //associo il tempo now() a StartTime
+			}
+			else{
+				//altrimenti rifiuto la richiesta
+				replyTo store with storeRefused : storeRefused(1)
+			}
+		}
+	}
+	Transition t0 whenRequest store -> handleStore
+				  whenRequest scarica -> handleScarica
+				  
+	//Stato per gestire un effettivo scarico
+	State handleScarica{
+		onMsg ( scarica : scarica(N) ){
+			[ # var FW = payloadArg(0).toInt() #] //recupero la quantità dichiarata dal camionista
+			setDuration TempoTrascorso from StartTime //recupero il tempo trascorso dall'emissione del ticket
+			
+			if [# (capienzaAttuale + FW <= MAX_CAPACITA) && TempoTrascorso <= MAX_DURATA_TICKET #]{
+				//Se c'è ancora spazio nella coldRoom e il ticket è valido, scarico la quantità
+				[#  capienzaAttuale += FW; 
+					var capienzaRimanente = MAX_CAPACITA - capienzaAttuale 
+				#]
+				replyTo scarica with scaricaAccepted : scaricaAccepted(1)
+				println("Capienza rimanente : $capienzaRimanente") color blue
+			}
+			else{
+				//altrimenti rifiuto la richiesta
+				replyTo scarica with scaricaRefused : scaricaRefused(1)
+			}
+		}
+	}
+	Transition t0 whenRequest store -> handleStore
+				  whenRequest scarica -> handleScarica
+}
+
+//Attore che simula un driver
+QActor drivermock context ctx_cold_storage_service{
+	
+	State s0 initial{
+		println("$name STARTS") color red
+	}
+	Goto effettuaRichiesta
+	
+	//Stato per effettuare una richiesta di scarico
+	State effettuaRichiesta{
+		println("Effettuo una richiesta di scarico.") color red
+		request coldstorageservice -m store : store(5)
+	}
+	Transition t0 whenReply storeAccepted -> handleStoreAccepted
+				  whenReply storeRefused -> handleStoreRefused
+	
+	//Stato per gestire una richiesta di scarico accettata			  
+	State handleStoreAccepted{
+		println("Richiesta di scarico accettata. Mi metto in marcia per la consegna.") color red
+		delay 5000
+	}
+	Goto effettuaScarico
+	
+	//Stato per gestire una richiesta di scarico rifiutata
+	State handleStoreRefused{
+		println("Richiesta di scarico rifiutata. Aspetto un po' e riprovo.") color red
+		delay 10000
+		request coldstorageservice -m store : store(5)
+	}
+	Goto effettuaRichiesta
+	
+	//Stato per effettuare lo scarico effettivo della merce
+	State effettuaScarico{
+		request coldstorageservice -m scarica : scarica(5)
+	}
+	Transition t0 whenReply scaricaAccepted -> handleScaricaAccepted
+				  whenReply scaricaRefused -> handleScaricaRefused
+				  
+	//Stato per gestire uno scarico accettato
+	State handleScaricaAccepted{
+		println("Scarico accettato. Deposito la merce.") color red
+		delay 25000
+		[ #System.exit(0)# ]
+	}
+	
+	//Stato per gestire uno scarico rifiutato
+	State handleScaricaRefused{
+		println("Scarico rifiutato. Rieffettuo la richiesta.") color red
+		delay 4000
+	}
+	Goto effettuaRichiesta
+				  
+	
+}
