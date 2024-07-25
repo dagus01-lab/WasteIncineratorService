@@ -1,2 +1,7 @@
+{"actor":"op_robot", "msgType":"dispatch", "curstate":"s0", "nextstate":"handleCmd", "msgId":"todocmd"}
+{"actor":"op_robot", "msgType":"dispatch", "curstate":"handleCmd", "nextstate":"handleCmd", "msgId":"todocmd"}
+{"actor":"op_robot", "msgType":"dispatch", "curstate":"handleEndBurning", "nextstate":"handleCmd", "msgId":"todocmd"}
+{"actor":"op_robot", "msgType":"dispatch", "curstate":"doJob", "nextstate":"handleCmd", "msgId":"todocmd"}
+{"actor":"op_robot", "msgType":"dispatch", "curstate":"turnAndgo", "nextstate":"handleCmd", "msgId":"todocmd"}
 {"actor":"incinerator", "msgType":"dispatch", "curstate":"s0", "nextstate":"handleStartBurning", "msgId":"startBurning"}
 {"actor":"incinerator", "msgType":"dispatch", "curstate":"handleEndBurning", "nextstate":"handleStartBurning", "msgId":"startBurning"}

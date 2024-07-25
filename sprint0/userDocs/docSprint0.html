@@ -273,7 +273,7 @@ che parte dalle coordinate <b>(0, lf)</b> e ha una lunghezza di tot unità robot
 <p>La porta di <b>AshOUT</b> viene modellata come un segmento (non ha area in quanto è una porta che da verso l'esterno della Service Area)
 che parte dalle coordinate <b>(lu - tot*dr, lf)</b> e ha una lunghezza di tot unità robotiche (tot * DR) non specificate nei requisiti.</p>
 <br>
-Di seguito un'immagine che riassume la locazione dei componenti nella Service Area:<br>
+Di seguito un'immagine che riassume la locazione dei componenti nella Service Area: (il posizionamento e la dimensione del Incinerator e la dimensione delle porte WasteIN e AshOUT sono solo indicative)<br> 
 <a href="./img/struttura_Building.png"><img src="./img/struttura_Building.png"/></a>
 <br><br>
 
@@ -309,22 +309,26 @@ Esso è composto da un Sonar e da un Led che lavorano su un RaspberryPi.</p>
 	<li><b>MonitoringDevice:</b> Attore, in quanto è un componente attivo e deve poter osservare lo stato del Incinerator e del AshStorage.<br>
 	Nel modello dei requisiti non ci preoccupiamo della sua architettura (Sonar + Led), ma lo consideriamo come un singolo componente.
 	</li>
-</ul> 
+</ul>
+	Il <b>WIS</b> viene rappresentato come un Attore che ha il compito di controllare l'OpRobot.<br>
 	Infine, andiamo a discutere la rappresentazione del <b>OpRobot</b> e della <b>ServiceStatusGUI</b>.<br>
 	Nel nostro modello dei requisiti, modelliamo il robot come un'entità astratta 
 	<b><a href=./BasicRobot24.html>BasicRobot</a></b> che quindi non dipenderà dallo specifico robot fisico (DDR Robot) che ci fornirà il committente. <br>
 	I messaggi che l'attore OpRobot invierà al BasicRobot sono in linguaggio aril e definiscono delle mosse elementari per muovere il robot nella stanza.
 	OpRobot quindi incapsula la logica di movimento del robot, mentre BasicRobot è solo un semplice esecutore dei movimenti.<br>
 	La ServiceStatusGUI viene rappresentata come un Attore in quanto deve poter osservare lo stato del sistema ed essere aggiornata da quest'ultimo.<br><br>
+	
 
 
 <h4>Architettura dei requisiti</h4>
 <p>Definiamo ora un <a href=../src/WasteIncineratorService.qak>modello</a> che descrive come i componenti elencati in precedenza interagiscono tra loro.<br>
-<a href="./img/waste_incinerator_servicearch.png"><img src="./img/waste_incinerator_servicearch.png" width="800" height="800"/></a><br>
+<a href="./img/waste_incinerator_servicearch.png"><img src="./img/waste_incinerator_servicearch.png" width="1000" height="800"/></a><br>
 <span class="slidekp">Discussione sui tipi di messaggio</span><br>
 Il messaggio <b>startBurning</b> è il comando di attivazione che viene impartito all'Incinerator e già dai requisiti si evince che è di tipo <i>Dispatch</i> in quanto non necessita di una risposta.<br>
-	Nei requisiti non viene specificato quale attore abbia il compito di impartire tale comando. Per il momento supponiamo che sia esclusivamente compito dell'OpRobot farlo.<br>
+	Nei requisiti non viene specificato quale entità abbia il compito di impartire tale comando. Per il momento supponiamo che sia esclusivamente compito del WIS farlo.<br>
 	La notifica che la fase di burning è terminata, viene modellata come un messaggio <b>endBurning</b> di tipo <i>Event</i> (deducibile dal testo) osservabile dal OpRobot e dal WIS. <br><br>
+	Il messaggio <b>todocmd</b> viene introdotto per permettere al WIS di impartire comandi al OpRobot (come richiesto dai requisiti).<br>
+	Nella fase di analisi del problema, si andrà poi a discutere su chi abbia effettivamente la responsabilità di muovere l'OpRobot (se il wis o l'OpRobot stesso)<br><br>
 	I messaggi <b>cmd</b> e <b>step</b> sono rispettivamente di tipo <i>Dispatch</i> e <i>Request</i> e vengono inviati dal OpRobot per impartire comandi al BasicRobot.<br><br>
 	Il messaggio generale <b>updategui</b> viene inviato dai vari componenti per notificare la ServiceStatusGUI delle modifiche al sistema.
 	<br>Questo comportamento si potrebbe modellare attraverso il pattern Observer, rendendo i vari componenti osservabili dalla GUI (e quindi mappare le informazioni di interesse come Eventi), ma tale possibile implementazione verrà discussa nelle fasi sucessive.
@@ -334,6 +338,7 @@ Il messaggio <b>startBurning</b> è il comando di attivazione che viene impartit
 Notiamo come il sistema è distribuito su almeno tre nodi computazionali differenti.<br>
 Si dovranno sviluppare i macro-componenti: 
 <ul>
+	<li><i>wis</i></li>
 	<li><i>monitoring_device</i></li>
 	<li><i>op_robot</i></li>
 	<li><i>incinerator</i></li>
@@ -349,10 +354,10 @@ Il componente BasicRobot ci viene già fornito quindi non è necessario implemen
 
 <div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
 Bryan Bertoni : bryan.bertoni@studio.unibo.it <br>
-Membro 2 : mail <br>
-Membro 3 : mail <br><br>
+Gabriele Daga : gabriele.daga@studio.unibo.it <br>
+Emanuele D'Arsié : emanuele.darsie@studio.unibo.it <br><br>
 
-GIT repo: https://github.com/bryanber102/issLab24
+GIT repo: https://github.com/bryanber102/TemaFinale24
 </div> 
 </body>
 </html>

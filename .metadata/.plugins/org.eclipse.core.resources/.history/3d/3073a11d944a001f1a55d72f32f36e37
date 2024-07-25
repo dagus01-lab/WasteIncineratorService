@@ -3,7 +3,7 @@
 System waste_incinerator_service
 
 //Messaggi per la gestione del burning dell'Incinerator
-Dispatch startBurning : startBurning(N)
+Dispatch activate : activate(N)
 Event 	 endBurning : endBurning(N)
 
 //Messaggio per impartire comando al OpRobot
@@ -31,7 +31,7 @@ QActor wis context ctx_waste_incinerator_service{
 	State s0 initial{
 		println("$name STARTS")
 		//Invia comando di attivazione del Incinerator
-		forward incinerator -m startBurning : startBurning(1)
+		forward incinerator -m activate : activate(1)
 		//Comando di movimento al OpRobot
 		forward op_robot -m todocmd : todocmd(1)
 	}

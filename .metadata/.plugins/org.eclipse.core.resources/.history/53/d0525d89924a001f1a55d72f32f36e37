@@ -6,9 +6,6 @@ System waste_incinerator_service
 Dispatch startBurning : startBurning(N)
 Event 	 endBurning : endBurning(N)
 
-//Messaggio per impartire comando al OpRobot
-Dispatch todocmd : todocmd(N)
-
 //Messaggi per muovere il BasicRobot
 Dispatch cmd    : cmd( MOVE )  "MOVE = a|d|l|r|h   "
 Request step       : step(TIME)	
@@ -26,69 +23,15 @@ Context ctxrasp ip[host="127.0.0.2" port=8122]
 //Attore "esterno" BasicRobot
 ExternalQActor basicrobot context ctxbasicrobot
 
-//Attore WIS
-QActor wis context ctx_waste_incinerator_service{
-	State s0 initial{
-		println("$name STARTS")
-		//Invia comando di attivazione del Incinerator
-		forward incinerator -m startBurning : startBurning(1)
-		//Comando di movimento al OpRobot
-		forward op_robot -m todocmd : todocmd(1)
-	}
-	Transition t0 whenEvent endBurning -> handleEndBurning
-	
-	//Stato per gestire l'evento di endBurning
-	State handleEndBurning{
-		println("Incinerator has finished to burn")
-	}
-	Transition t0 whenEvent endBurning -> handleEndBurning
-}
-
 //Attore OpRobot
 QActor op_robot context ctx_waste_incinerator_service{
 	State s0 initial{
 		println("$name STARTS") color blue
-	}
-	Transition t0 whenMsg todocmd -> handleCmd
-	
-	State handleCmd{
-		//Messaggi per comandare il BasicRobot
 		request basicrobot -m  step : step(335)
 		forward basicrobot -m cmd : cmd(l) 
-		//Messaggio per aggiornare la GUI
+		forward incinerator -m startBurning : startBurning(1)
 		forward service_status_gui -m updategui : updategui(1)
 	}
-	Transition t0 whenEvent endBurning -> handleEndBurning
-				  whenReply stepdone    -> doJob
-	    		  whenReply stepfailed  -> turnAndgo
-	    		  whenMsg todocmd -> handleCmd
-	    		  
-	 //Stato per gestire l'evento di endBurning
-	State handleEndBurning{
-		println("Incinerator has finished to burn")
-	}
-	Transition t0 whenEvent endBurning -> handleEndBurning
-				  whenReply stepdone    -> doJob
-	    		  whenReply stepfailed  -> turnAndgo
-	    		  whenMsg todocmd -> handleCmd
-	    		  
-	//Stato per gestire il messaggio di stepDone
-	State doJob{
-		//Logica di business da definire negli sprint successivi
-	}
-	Transition t0 whenEvent endBurning -> handleEndBurning
-				  whenReply stepdone    -> doJob
-	    		  whenReply stepfailed  -> turnAndgo
-	    		  whenMsg todocmd -> handleCmd
-	
-	//Stato per gestire il messaggio di stepFailed
-	State turnAndgo{
-		//Logica di business da definire negli sprint successivi
-	}
-	Transition t0 whenEvent endBurning -> handleEndBurning
-				  whenReply stepdone    -> doJob
-	    		  whenReply stepfailed  -> turnAndgo
-	    		  whenMsg todocmd -> handleCmd
 }
 
 //Attore Incinerator

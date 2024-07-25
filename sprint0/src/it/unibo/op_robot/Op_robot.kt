@@ -25,15 +25,64 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outblue("$name STARTS")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t02",targetState="handleCmd",cond=whenDispatch("todocmd"))
+				}	 
+				state("handleCmd") { //this:State
+					action { //it:State
 						request("step", "step(335)" ,"basicrobot" )  
 						forward("cmd", "cmd(l)" ,"basicrobot" ) 
-						forward("startBurning", "startBurning(1)" ,"incinerator" ) 
 						forward("updategui", "updategui(1)" ,"service_status_gui" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
+					 transition(edgeName="t03",targetState="handleEndBurning",cond=whenEvent("endBurning"))
+					transition(edgeName="t04",targetState="doJob",cond=whenReply("stepdone"))
+					transition(edgeName="t05",targetState="turnAndgo",cond=whenReply("stepfailed"))
+					transition(edgeName="t06",targetState="handleCmd",cond=whenDispatch("todocmd"))
+				}	 
+				state("handleEndBurning") { //this:State
+					action { //it:State
+						CommUtils.outblack("Incinerator has finished to burn")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t07",targetState="handleEndBurning",cond=whenEvent("endBurning"))
+					transition(edgeName="t08",targetState="doJob",cond=whenReply("stepdone"))
+					transition(edgeName="t09",targetState="turnAndgo",cond=whenReply("stepfailed"))
+					transition(edgeName="t010",targetState="handleCmd",cond=whenDispatch("todocmd"))
+				}	 
+				state("doJob") { //this:State
+					action { //it:State
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t011",targetState="handleEndBurning",cond=whenEvent("endBurning"))
+					transition(edgeName="t012",targetState="doJob",cond=whenReply("stepdone"))
+					transition(edgeName="t013",targetState="turnAndgo",cond=whenReply("stepfailed"))
+					transition(edgeName="t014",targetState="handleCmd",cond=whenDispatch("todocmd"))
+				}	 
+				state("turnAndgo") { //this:State
+					action { //it:State
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t015",targetState="handleEndBurning",cond=whenEvent("endBurning"))
+					transition(edgeName="t016",targetState="doJob",cond=whenReply("stepdone"))
+					transition(edgeName="t017",targetState="turnAndgo",cond=whenReply("stepfailed"))
+					transition(edgeName="t018",targetState="handleCmd",cond=whenDispatch("todocmd"))
 				}	 
 			}
 		}

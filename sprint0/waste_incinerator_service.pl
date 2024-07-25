@@ -3,6 +3,7 @@
 %====================================================================================
 dispatch( startBurning, startBurning(N) ).
 event( endBurning, endBurning(N) ).
+dispatch( todocmd, todocmd(N) ).
 dispatch( cmd, cmd(MOVE) ). %MOVE = a|d|l|r|h   
 request( step, step(TIME) ).
 reply( stepdone, stepdone(V) ).  %%for step
@@ -13,6 +14,8 @@ context(ctx_waste_incinerator_service, "localhost",  "TCP", "8125").
 context(ctxbasicrobot, "127.0.0.1",  "TCP", "8120").
 context(ctxrasp, "127.0.0.2",  "TCP", "8122").
  qactor( basicrobot, ctxbasicrobot, "external").
+  qactor( wis, ctx_waste_incinerator_service, "it.unibo.wis.Wis").
+ static(wis).
   qactor( op_robot, ctx_waste_incinerator_service, "it.unibo.op_robot.Op_robot").
  static(op_robot).
   qactor( incinerator, ctx_waste_incinerator_service, "it.unibo.incinerator.Incinerator").
