@@ -1,0 +1,394 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <!--
+<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+<script type="text/javascript" src="../css/issStyle.js"></script>
+-->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.4/dist/css/foundation.min.css" crossorigin="anonymous">
+		<script src="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.4/dist/js/foundation.min.js"crossorigin="anonymous"></script> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/templateISS.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/main.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/navbar.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/table.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/code.css">
+        <!-- <script type="text/javascript" src="./commons/resources/scripts/myScripts.js"></script> -->
+<style type="text/css">
+body
+{
+    margin-left:  30px;
+    margin-right: 30px;
+};
+
+P
+{
+    font-family: Tahoma;
+    font-size: 10pt;
+};
+
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+	font-size: 93%;
+}
+
+a:hover {
+    background-color: #cccccc;
+}
+
+
+hr {
+    clear: both;
+    height: 1px;
+    color: #242424;
+    background-color: transparent;
+}
+
+h1, h2, h3 {
+    color: #242424;
+    clear: left;
+    font: 100% Tahoma, Helvetica, Arial, sans-serif;
+    margin-bottom: 0.5em;
+    padding-top: 0.5em;
+	border-radius: 10px;
+	padding: 5px;
+}
+
+top {
+	width: 100%;
+}
+
+
+#i {
+    color: #ff1010;
+}
+tt{
+	font-family: "Arial";
+    font-size: 90%;
+	color: #006600;
+}
+em{
+	font-family: "Arial";
+    font-size: 80%;
+	font-weight: bold;
+	border-style:solid;
+	border-color: #abe876;
+    color: #1632cc;
+}
+bc{
+	font-family: "Arial";
+	font-size: 90%;
+	font-weight: bold;
+    color: #990000;
+	background-color: #fcf8c7;
+}
+ks{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #0000CD	;
+	font-size: 90%;
+}
+kc{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #008000	;
+	font-size: 90%;
+}
+pre{
+	font-family: "Consolas";
+	font-size: 85%;
+	background-color: #f5f5f5;
+	border: 1.5px solid silver;
+	padding: 5px;
+}
+m{
+	font-family: "Helvetica";
+	line-height: 100%;
+ 	font-size: 75%;
+}
+div.body{
+	 
+    font-size: 18px;
+}
+k{
+    color: #990000;
+	font-weight: bold;
+	font-size: 90%;
+}
+h1 {
+    font-size: 150%;
+    background-color: #b2c0ff;
+	padding: 10px;
+}
+
+h2 {
+    background-color: #9ed8ff;
+    font-size: 130%;
+}
+
+h3 {
+	background-color: #e6ccff;
+    font-size: 100%;
+}
+h4 {
+    background-color: #ccffcc;
+    font-size: 100%;
+	width: 95%;
+	border-radius: 5px;
+	padding: 2px;
+}
+h5 {
+    background-color: #d5ffb0;
+    font-size: 100%;
+
+}
+div.req{
+	background-color: #d9ffb3;
+    font-size: 18px;
+	width: 700px;
+    border: 3px solid green;
+    padding: 15px;
+    margin: 10px;
+}
+div.remark{
+	background-color: #E3F2FD;
+    border: 1.5px solid #d5f2ed;
+    padding: 15px;
+    margin: 10px;
+	border-radius: 25px;
+}
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+ol, ul, li {
+  margin: 0;
+  margin-left: 10px;
+  padding: 0;
+  padding-bottom: 5px;
+}
+
+table, th, td {
+	border: 1px solid black;
+}
+
+img {
+	border: 1.5px solid #d5f2ed
+
+}
+
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+}
+
+div.wrapdesc{
+	width: 90%;
+	margin: auto;
+}
+
+div.imagedesc{
+	width: 85%;
+	margin: auto;
+}
+
+.slidekp{
+    background-color: hsl(332, 77%, 86%);
+    border-radius: 10px;
+    border: 1px solid blue;
+    font-size: 18px; 
+    font-weight: bold;
+    line-height: 1.5;
+    padding: 3px
+  } 
+</style>
+    
+ 
+   
+</head>
+	<title>Documento Sprint0</title>
+</head>
+
+<body>
+<div id="top">
+<h1>WASTE INCINERATOR SERVICE - Sprint 0 <font size="5"></font> </h1>
+</div>  
+
+<div class="body"> 
+<h2>Introduzione</h2>
+
+<p>Un'azienda intende realizzare un <b>WasteIncineratorService</b> per trattare i rifiuti bruciandoli e necessita di un servizio di sistema software 
+	(WIS) che controlli un robot (chiamato OpRobot) per spostare i rifiuti.</p>
+ 
+<h2>Requisiti</h2>
+<p>Il seguente link porta al documento dei requisiti fornito dal cliente. <br> <a href=./TemaFinale24.html>Documento requisiti</a> </p>
+
+<h2>Analisi dei requisiti</h2>
+<h4>Parte strutturale</h4>
+<p>In questa prima parte dell'analisi dei requisiti, andiamo a modellare i componenti della parte "strutturale" dell'edificio.</p>
+<span class="slidekp">Modello della Service Area</span>
+<p>La <b>Service Area</b> è uno spazio piano Euclideo delimitato da bordi.<br>
+    L'area è vista come un sistema di coordinate che parte dal punto in alto a sinistra, indicato come (0,0). 
+	La coordinata X(ascisse) cresce verso destra, mentre la coordinata Y(ordinata) cresce verso il basso.</p>
+<blockquote>
+<div><table class="docutils align-default" style="width: 100%">
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 70%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><a class="reference internal image-reference" href="./img/ModelloStanza.png"><img alt="./img/ModelloStanza.png" class="align-center" src="./img/ModelloStanza.png" style="width: 100%;" /></a>
+</td>
+<td>
+	<ul class="simple">
+		<li><p>Il <span class="blue">Bordo perimetrale</span> ha lunghezza <code class="docutils literal notranslate"><span class="pre">lf+ld+lr+lu</span></code>.</p></li>
+		<li><p>Poichè la stanza è rettangolare, si ha <code class="docutils literal notranslate"><span class="pre">lf==lr</span> <span class="pre">&amp;&amp;</span> <span class="pre">ld==lu</span></code></p></li>
+		<li><p><code class="docutils literal notranslate"><span class="pre">DR=2R</span></code>, essendo <code class="docutils literal notranslate"><span class="pre">R</span></code> il raggio del cerchio in cui può essere racchiuso il Robot</span></p></li>
+	</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+
+<span class="slidekp">La locazione Home</span>
+<p>Lo Stato iniziale del OpRobot è l’angolo superiore sinistro, detto <code class="docutils literal notranslate"><span class="pre">Home</span></code>. (coordinate (0,0))</p>
+
+<span class="slidekp">Incinerator</span>
+<p><b>Incinerator</b> è dotato di un proprio comportamento, in quanto deve poter essere attivato da remoto e comunicare al OpRobot e al sistema quando è terminatala fase di burning.<br>
+Per semplicità, la sua rappresentazione all'interno della Service Area è data da un rettangolo, caratterizzato quindi di quattro coordinate che rappresentano i suoi vertici.<br>
+Esso è dotato di due porte (<b>BurnIN</b> e <b>BurnOUT</b>) che vengono mappate rispettivamente come lato sinistro e lato basso del Incinerator.<br>
+</p>
+
+<span class="slidekp">Porta di WasteIN</span>
+<p>La porta di <b>WasteIN</b> viene modellata come un segmento (non ha area in quanto è una porta che da verso l'esterno della Service Area)
+che parte dalle coordinate <b>(0, lf)</b> e ha una lunghezza di tot unità robotiche (tot * DR) non specificate nei requisiti.</p>
+
+<span class="slidekp">Porta di AshOUT</span>
+<p>La porta di <b>AshOUT</b> viene modellata come un segmento (non ha area in quanto è una porta che da verso l'esterno della Service Area)
+che parte dalle coordinate <b>(lu - tot*dr, lf)</b> e ha una lunghezza di tot unità robotiche (tot * DR) non specificate nei requisiti.</p>
+<br>
+Di seguito un'immagine che riassume la locazione dei componenti nella Service Area: (il posizionamento e la dimensione del Incinerator e la dimensione delle porte WasteIN e AshOUT sono solo indicative)<br> 
+<a href="./img/struttura_Building.png"><img src="./img/struttura_Building.png"/></a><br>
+La suddivisione della stanza in celle è un possibile modello in quanto il committente ci fornisce un DDR Robot e quest'ultimo ci permette di definire un'unità di misura per la stanza.
+Tale unità di misura è <b>l'unità robotica (DR)</b>. Ogni cella misura quindi un DR.<br>
+La dimensione della <b>Home</b> non viene specificata nei requisiti e quindi per semplicità la immaginiamo di area 1 DR (una cella).
+<br><br>
+
+<span class="slidekp">WasteStorage container</span>
+<p>Il contenitore <b>WasteStorage</b> è esterno alla ServiceArea, quindi non necessita di coordinate per essere mappato.<br>
+La capacità massima del container non è specificata nei requisiti, quindi in questa prima fase si considera "illimitata".<br>
+La bilancia <b>Scale</b> di cui è dotato il WasteStorage viene inglobata all'interno di quest'ultimo in quanto l'unico compito della bilancia è
+misurare il peso totale dei <b>Roll Packets</b> attualmente presenti nel container.</p>
+
+<span class="slidekp">AshStorage container</span>
+<p>Il contenitore <b>AshStorage</b> è esterno alla ServiceArea, quindi non necessita di coordinate per essere mappato.<br>
+La capacità del container è fissata alla cenere di circa 3 o 4 Roll Packets.</p>
+
+<span class="slidekp">MonitoringDevice</span>
+<p>Il <b>MonitoringDevice</b> è esterno alla ServiceArea, quindi non necessita di coordinate per essere mappato.<br>
+Esso è composto da un Sonar e da un Led che lavorano su un RaspberryPi.</p>
+
+<h4>Formalizzazione dei componenti</h4>
+<p>Dobbiamo ora rappresentare i componenti descritti nella sezione precedente a livello software. <br>
+Dall'ingegneria del software, sappiamo che un'entità può essere modellata come una funzione, un POJO o un processo.<br>
+Analizzando però i requisiti e prendendo come esempio <b>Incinerator</b>, notiamo che esso per definizione deve poter ricevere e inviare messaggi con altre entità del sistema.<br>
+Abbiamo quindi un <u>abstraction Gap</u> tra la definizione di Incinerator e i modi che conosciamo per rappresentarlo, in quanto né una funzione nè un POJO e nemmeno un processo ha intrinsicamente il concetto di scambio di messaggi.<br>
+Pensiamo dunque di modellare Incinerator come un Service.<br>
+Anche in questo caso però abbiamo un problema, in quanto per rappresentare un servizio dobbiamo conoscerne la tecnologia, ma a questo livello non vogliamo essere <u>tecnology dependent</u>.<br>
+Per fortuna, la nostra software house ci fornisce un linguaggio di modellazione(ovvero un <b>meta-modello</b>, chiamato <b><a href=./QakActors24.html>QAK</a></b>) che ci permette di definire degli <b>Attori</b>.<br>
+Forniti ora anche di questo concetto, andiamo a modellare i componenti descritti in precedenza:
+<ul>
+	<li><b>Incinerator:</b> Attore, in quanto deve poter scambiare informazioni con il sistema e con l'OpRobot. 
+	Esso è dotato di uno stato (0 = non sta bruciando, 1 = sta bruciando). </li>
+	<li><b>WasteStorage container:</b> Si è deciso di non modellare questa entità in quanto mero contenitore di RP, e quindi non avente alcun comportamento significativo all'interno del sistema.<br>
+	Ciò che invece si decide di modellare è la <b>Scale</b>, in quanto entità che si occupa di rilevare la presenza di RP all'interno dell'area suddetta nonchè il peso complessivo. <br>
+	Non vengono fornite ancora informazioni a sufficienza per poter stabilire se modellare la bilancia come attore o come POJO, 
+	e per questo motivo si demanderà la decisione all'analisi del problema.
+	</li>
+	<li><b>AshStorage container:</b> Si è deciso di non modellare questa entità in quanto mero contenitore di cenere, e quindi non avente alcun comportamento significativo all'interno del sistema.<br>
+	</li>
+	<li><b>MonitoringDevice:</b> Attore, che fa uso del sonar per rilevare l'altezza della pila di cenere contenuta all'interno dell'AshStorage, e del led per comunicarne lo stato.<br>
+	Nel modello dei requisiti non ci preoccupiamo della sua architettura (Sonar + Led), ma lo consideriamo come un singolo componente, in quanto
+	non si hanno ancora dati a sufficienza dal solo documento dei requisiti e si demanderà una discussione più approfondita nell'analisi del problema.
+	</li>
+</ul>
+	Il <b>WIS</b> viene rappresentato come un Attore che ha il compito di controllare l'OpRobot.<br>
+	Infine, andiamo a discutere la rappresentazione del <b>OpRobot</b>.<br>
+	
+	Dal documento dei requisiti non c'è nulla che mi induca a modellarlo come attore o come POJO. <br>
+	Tra le due opzioni, in realtà, sembrerebbe più opportuno vederlo come entità passiva che riceve gli ordini dal WIS e li esegue, 
+	in quanto non traspare mai l'idea che comunichi con le altre entità tramite messaggi oppure che possa avere un flusso di esecuzione indipendente.<br>
+	In ogni caso, si decide di demandare la decisione ad uno stadio successivo di analisi del problema.<br>
+	
+	Nel nostro modello dei requisiti, sfruttiamo il <b><a href=./BasicRobot24.html>BasicRobot</a></b> che ci viene dato e che non dipenderà dallo specifico robot fisico (DDR Robot) che ci fornirà il committente.
+	<br>
+</p>	
+
+
+<h4>Architettura dei requisiti</h4>
+<p>Definiamo ora un <a href=../src/WasteIncineratorService_v1.qak>modello</a> che descrive come i componenti elencati in precedenza interagiscono tra loro.<br>
+<a href="./img/waste_incinerator_servicearch_v1.png"><img src="./img/waste_incinerator_servicearch_v1.png" width="1000" height="800"/></a><br>
+
+<span class="slidekp">Discussione sui tipi di messaggio</span><br>
+Gli attori QAK permettono di definire tre tipologie di messaggio:
+<ul>
+	<li><b>Dispatch</b>: un messaggio inviato a un preciso destinatario senza attesa di una risposta (in modo detto anche fire-and-forget);</li>
+	<li><b>Request</b>: un messaggio inviato a un preciso destinatario aspettandosi da parte di questi una reply logicamente correlata alla richiesta;</li>
+	<li><b>Event</b>: un messaggio inviato a chiunque sia in grado di elaborarlo</li>
+</ul>
+
+Il messaggio <b>activationCommand</b> è il comando di attivazione che viene impartito all'Incinerator e già dai requisiti si evince che è di tipo <i>Dispatch</i> in quanto non necessita di una risposta.
+Infatti, per capire se Incinerator si è attivato ci basta "osservarlo" e quindi una sua eventuale risposta sarebbe non influente.<br>
+	Nei requisiti non viene specificato quale entità abbia il compito di impartire tale comando. 
+	Dopo una discussione con il committente, ci ha confermato che è compito del WIS farlo all'avvio del sistema.<br><br>
+	La notifica che la fase di burning è terminata, viene modellata come un messaggio <b>endBurning</b> di tipo <i>Event</i>.<br>
+	Tale scelta è dovuta dal fatto che si associa bene al requisito di emissione di un segnale da parte del Incinerator.
+	<br>
+	<br>
+<span class="slidekp">Note sulla architettura e sui componenti da realizzare</span><br>
+Notiamo come il sistema è distribuito su almeno tre nodi computazionali differenti.<br>
+Si dovranno sviluppare i macro-componenti: 
+<ul>
+	<li><i>wis</i></li>
+	<li><i>monitoring_device</i></li>
+	<li><i>incinerator</i></li>
+</ul>
+Il componente BasicRobot ci viene già fornito quindi non è necessario implementarlo.
+</p>
+
+<h2>Piano di test</h2>
+<p>Già nella prima fase di analisi dei requisiti si decide di predisporre un <b>piano di test funzionale</b>.<br>
+A tal fine si prevede di verificare il corretto comportamento del sistema soltanto osservandolo ai morsetti. <br>
+In particolare, occorre verificare, che, avendo dei pacchetti in ingresso, dopo un tempo > BURNTIME, si trovi della cenere in uscita. <br>
+Più nello specifico, se si ha un numero arbitrario di pacchetti nel WasteStorage, la cenere nell'AshStorage (ammesso che nessuno nel frattempo la svuoti) sia della quantità corrispondente a quei pacchetti.<br>
+Non essendo ancora riusciti, per mancanza di informazioni nel documento dei requisiti, a creare un modello completo e pienamente funzionante (di conseguenza non testabile), non è ancora possibile verificare sperimentalmente quanto detto sopra. <br>
+Di conseguenza, si demanda la fase di testing vera e propria agli stadi successivi del progetto.
+</p>
+
+<h2>Sprint futuri</h2>
+Nel prossimo sprint si prevede di fornire un primo prototipo funzionante che ricopra la logica principale del sistema. <br>
+In particolare, si prevede di modellare l'inceneritore e l'interazione tra il robot e il WIS.
+</div>  
+<br>
+
+<div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
+Bryan Bertoni : bryan.bertoni@studio.unibo.it <br>
+Gabriele Daga : gabriele.daga@studio.unibo.it <br>
+Emanuele D'Arsié : emanuele.darsie@studio.unibo.it <br><br>
+
+GIT repo: https://github.com/bryanber102/TemaFinale24
+</div> 
+</body>
+</html>
+ 
+
+ 
+
+
+ 
