@@ -229,6 +229,7 @@ div.imagedesc{
 <p>Il seguente link porta al documento dei requisiti fornito dal cliente. <br> <a href=./TemaFinale24.html>Documento requisiti</a> </p>
 
 <h2>Analisi dei requisiti</h2>
+
 <h4>Parte strutturale</h4>
 <p>In questa prima parte dell'analisi dei requisiti, andiamo a modellare i componenti della parte "strutturale" dell'edificio.</p>
 <span class="slidekp">Modello della Service Area</span>
@@ -255,12 +256,11 @@ div.imagedesc{
 </tbody>
 </table>
 </div></blockquote>
-
 <span class="slidekp">La locazione Home</span>
 <p>Lo Stato iniziale del OpRobot è l’angolo superiore sinistro, detto <code class="docutils literal notranslate"><span class="pre">Home</span></code>.</p>
 
 <span class="slidekp">Incinerator</span>
-<p><b>Incinerator</b> è modellato come un rettangolo all'interno della Service Area, dotato quindi di quattro coordinate che rappresentano i suoi vertici.<br>
+<p><b>Incinerator</b> è modellato come un rettangolo  all'interno della Service Area, dotato quindi di quattro coordinate che rappresentano i suoi vertici.<br>
 Esso è dotato di due porte (<b>BurnIN</b> e <b>BurnOUT</b>) che vengono mappate rispettivamente come lato sinistro e lato basso del rettangolo Incinerator.<br>
 Inoltre, Incinerator è dotato di un proprio comportamento, in quanto deve poter essere attivato da remoto e comunicare al OpRobot e al sistema quando è terminata
 la fase di burning.</p>
@@ -351,12 +351,12 @@ Il componente BasicRobot ci viene già fornito quindi non è necessario implemen
 
 <h2>Test plans</h2>
 <ul>
-	<li><b>test activate incinerator</b>: quando viene mandato il segnale di attivazione, l'inceneritore inizia a bruciare</li>
-	<li><b>test end burning</b>: quando l'inceneritore finisce di bruciare, l'OpRobot passa a raccogliere la cenere</li>
-	<li><b>test ash storage full</b>: se l'ash storage è pieno, l'OpRobot rimane in attesa</li>
-	<li><b>test waste storage not empty</b>: se il waste storage non è vuoto, l'OpRobot deve prelevare un RP</li>
+	<li><b>test activate incinerator</b>: quando viene mandato il segnale di attivazione l'inceneritore inizia a bruciare</li>
+	<li><b>test end burning</b>: quando l'inceneritore finisce di bruciare il robot passa a raccogliere la cenere</li>
+	<li><b>test ash storage full</b>: se l'ash storage pieno si rimane in attesa</li>
+	<li><b>test waste storage not empty</b>: se il waste storage non è vuoto  il robot deve prelevare un RP</li>
 </ul>
-<h2>Sprint futuri</h2>
+<h2>Sviluppi futuri</h2>
 Nel prossimo sprint si prevede di effettuare un'analisi più approfondita in merito all'OpRobot e al WIS, nonchè alla loro interazione.
 </div>  
 <br>

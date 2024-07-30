@@ -25,8 +25,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outblack("$name STARTS")
-						forward("startBurning", "startBurning(1)" ,"incinerator" ) 
-						forward("todocmd", "todocmd(1)" ,"op_robot" ) 
+						forward("activationCommand", "activationCommand(1)" ,"incinerator" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

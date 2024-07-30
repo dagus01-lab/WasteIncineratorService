@@ -31,12 +31,20 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t019",targetState="handleStartBurning",cond=whenDispatch("startBurning"))
+					 transition(edgeName="t02",targetState="turnOn",cond=whenDispatch("activationCommand"))
+				}	 
+				state("turnOn") { //this:State
+					action { //it:State
+						CommUtils.outred("Incinerator is on. Waiting for RPs to burn...")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 				}	 
 				state("handleStartBurning") { //this:State
 					action { //it:State
 						CommUtils.outred("Incinerator is burning...")
-						forward("updategui", "updategui(1)" ,"service_status_gui" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -44,19 +52,18 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 				 	 		stateTimer = TimerActor("timer_handleStartBurning", 
 				 	 					  scope, context!!, "local_tout_"+name+"_handleStartBurning", BTIME )  //OCT2023
 					}	 	 
-					 transition(edgeName="t020",targetState="handleEndBurning",cond=whenTimeout("local_tout_"+name+"_handleStartBurning"))   
+					 transition(edgeName="t03",targetState="handleEndBurning",cond=whenTimeout("local_tout_"+name+"_handleStartBurning"))   
 				}	 
 				state("handleEndBurning") { //this:State
 					action { //it:State
 						CommUtils.outred("Incinerator has finished to burn")
-						forward("updategui", "updategui(0)" ,"service_status_gui" ) 
 						emit("endBurning", "endBurning(1)" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t021",targetState="handleStartBurning",cond=whenDispatch("startBurning"))
+					 transition(edgeName="t04",targetState="handleStartBurning",cond=whenDispatch("activationCommand"))
 				}	 
 			}
 		}
