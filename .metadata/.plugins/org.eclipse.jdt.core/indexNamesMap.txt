@@ -1,3 +1,1 @@
 INDEX VERSION 1.134
-file:/C:/Users/Bryan/Desktop/ingegneria_dei_sistemi_software/TemaFinale24/.metadata/.plugins/org.eclipse.jdt.core/1865797976.index
-meta_index

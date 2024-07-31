@@ -1,0 +1,329 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <!--
+<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+<script type="text/javascript" src="../css/issStyle.js"></script>
+-->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.4/dist/css/foundation.min.css" crossorigin="anonymous">
+		<script src="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.4/dist/js/foundation.min.js"crossorigin="anonymous"></script> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/templateISS.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/main.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/navbar.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/table.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/code.css">
+        <!-- <script type="text/javascript" src="./commons/resources/scripts/myScripts.js"></script> -->
+<style type="text/css">
+body
+{
+    margin-left:  30px;
+    margin-right: 30px;
+};
+
+P
+{
+    font-family: Tahoma;
+    font-size: 10pt;
+};
+
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+	font-size: 93%;
+}
+
+a:hover {
+    background-color: #cccccc;
+}
+
+
+hr {
+    clear: both;
+    height: 1px;
+    color: #242424;
+    background-color: transparent;
+}
+
+h1, h2, h3 {
+    color: #242424;
+    clear: left;
+    font: 100% Tahoma, Helvetica, Arial, sans-serif;
+    margin-bottom: 0.5em;
+    padding-top: 0.5em;
+	border-radius: 10px;
+	padding: 5px;
+}
+
+top {
+	width: 100%;
+}
+
+
+#i {
+    color: #ff1010;
+}
+tt{
+	font-family: "Arial";
+    font-size: 90%;
+	color: #006600;
+}
+em{
+	font-family: "Arial";
+    font-size: 80%;
+	font-weight: bold;
+	border-style:solid;
+	border-color: #abe876;
+    color: #1632cc;
+}
+bc{
+	font-family: "Arial";
+	font-size: 90%;
+	font-weight: bold;
+    color: #990000;
+	background-color: #fcf8c7;
+}
+ks{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #0000CD	;
+	font-size: 90%;
+}
+kc{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #008000	;
+	font-size: 90%;
+}
+pre{
+	font-family: "Consolas";
+	font-size: 85%;
+	background-color: #f5f5f5;
+	border: 1.5px solid silver;
+	padding: 5px;
+}
+m{
+	font-family: "Helvetica";
+	line-height: 100%;
+ 	font-size: 75%;
+}
+div.body{
+	 
+    font-size: 18px;
+}
+k{
+    color: #990000;
+	font-weight: bold;
+	font-size: 90%;
+}
+h1 {
+    font-size: 150%;
+    background-color: #b2c0ff;
+	padding: 10px;
+}
+
+h2 {
+    background-color: #9ed8ff;
+    font-size: 130%;
+}
+
+h3 {
+	background-color: #e6ccff;
+    font-size: 100%;
+}
+h4 {
+    background-color: #ccffcc;
+    font-size: 100%;
+	width: 95%;
+	border-radius: 5px;
+	padding: 2px;
+}
+h5 {
+    background-color: #d5ffb0;
+    font-size: 100%;
+
+}
+div.req{
+	background-color: #d9ffb3;
+    font-size: 18px;
+	width: 700px;
+    border: 3px solid green;
+    padding: 15px;
+    margin: 10px;
+}
+div.remark{
+	background-color: #E3F2FD;
+    border: 1.5px solid #d5f2ed;
+    padding: 15px;
+    margin: 10px;
+	border-radius: 25px;
+}
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+ol, ul, li {
+  margin: 0;
+  margin-left: 10px;
+  padding: 0;
+  padding-bottom: 5px;
+}
+
+table, th, td {
+	border: 1px solid black;
+}
+
+img {
+	border: 1.5px solid #d5f2ed
+
+}
+
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+}
+
+div.wrapdesc{
+	width: 90%;
+	margin: auto;
+}
+
+div.imagedesc{
+	width: 85%;
+	margin: auto;
+}
+
+.slidekp{
+    background-color: hsl(332, 77%, 86%);
+    border-radius: 10px;
+    border: 1px solid blue;
+    font-size: 18px; 
+    font-weight: bold;
+    line-height: 1.5;
+    padding: 3px
+  } 
+</style>
+    
+ 
+   
+</head>
+	<title>Documento Sprint1</title>
+</head>
+
+<body>
+<div id="top">
+<h1>WASTE INCINERATOR SERVICE - Sprint 1 <font size="5"></font> </h1>
+</div>  
+
+<div class="body"> 
+<h2>Introduzione</h2>
+
+<p>Un'azienda intende realizzare un <b>WasteIncineratorService</b> per trattare i rifiuti bruciandoli e necessita di un servizio di sistema software 
+	(WIS) che controlli un robot (chiamato OpRobot) per spostare i rifiuti.</p>
+ 
+<h2>Requisiti</h2>
+<p>Il seguente link porta al documento dei requisiti fornito dal cliente. <br> <a href=./TemaFinale24.html>Documento requisiti</a> </p>
+
+<h2>Sprint precedente</h2>
+<p>Il seguente link porta al documento dello SPRINT precedente nel quale si è effettuata l'analisi dei requisiti.<br> 
+<a href=../../sprint0/userDocs/docSprint0-rev1.html>SPRINT 0</a> </p>
+<h4>Architettura iniziale di riferimento</h4>
+<p>Di seguito viene mostrata un'immagine che rappresenta l'architettura finale dello sprint precedente, che sarà quindi l'architettura iniziale di questo sprint.<br>
+<a href="./img/architetturaIniziale.png"><img src="./img/architetturaIniziale.png" width="1000" height="800"/></a><br>
+</p>
+
+<h2>GOAL</h2>
+<p>
+	In questo SPRINT verranno affrontati i seguenti requisiti:
+	<ul>
+		<li>Interazione WIS - OpRobot</li>
+		<li>Interazione WIS/OpRobot - Incinerator</li>
+	</ul>
+	Si rimandano quindi a SPRINT futuri l'interazione del WIS con il Sonar del MonitoringDevice e con la Scale del WasteStorage.
+</p>
+
+<h2>Analisi del problema</h2>
+<h4>Interazione WIS - OpRobot</h4>
+<p>
+Le principali problematiche dell'interazione WIS - OpRobot sono le seguenti:
+<ul>
+	<li><span class="slidekp">P1</span> Come modelliamo l'entità OpRobot? Come un attore a sè stante o come un POJO all'interno del WIS?</li>
+	<li><span class="slidekp">P2</span> OpRobot conosce lo stato della stanza e quindi autonomamente si muove al suo interno, o necessita di comandi da parte del WIS?</li>
+</ul>
+<u>Nota:</u> con stato della stanza si intende lo stato dell'Incinerator (se sta bruciando oppure no), del WasteStorage (presenza o meno di RP) e del AshStorage (se il contenitore è pieno oppure no).<br>
+<br>
+Concentrandoci su P1, una prima soluzione è quella di definire l'OpRobot come un attore.<br>
+Il vantaggio di tale soluzione è che possiamo "alleggerire" i compiti del WIS, in quanto si può demandare al OpRobot l'impartizione dei comandi di movimento al BasicRobot.<br>
+Invece, se scegliessimo di modellarlo come un POJO all'interno del WIS, avremmo come vantaggio di non dover gestire un attore in più
+(e quindi i possibili messaggi che può ricevere), ma "pagando" il prezzo di un WIS più "pesante" che si deve occupare anche dell'interazione con il BasicRobot.<br>
+<br>
+Per P2, una prima soluzione è quella di iniettare lo stato della stanza all'interno del OpRobot.<br>
+Il vantaggio di tale soluzione è di avere OpRobot autonomo nei movimenti, in quanto ad ogni istante sa come comportarsi.<br>
+Invece, se scegliessimo di mantenere lo stato della stanza all'interno del WIS, avremmo un WIS "orchestratore" che ad ogni istante si occupa di impartire determinati comandi al OpRobot.<br>
+<br>
+Come soluzione per P1, <u>si ritiene più opportuno modellare OpRobot come un Attore</u> per avere il principale vantaggio della gestione dei comandi per il BasicRobot da parte del OpRobot.<br>
+Come soluzione per P2, <u>si ritiene più oppurtuno mantenere la conoscenza dello stato della stanza nel WIS</u>, per dare a ciascun componente soltanto le responsabilità necessarie.<br>
+Infatti, logicamente OpRobot ha soltanto il compito di impartire i comandi di movimento effettivi al BasicRobot, mentre è compito del WIS monitorare lo stato della stanza
+e guidare OpRobot a fare le azioni opportune.
+</p>
+
+<h4>Interazione WIS/OpRobot - Incinerator</h4>
+<p>
+Le principali problematiche dell'interazione WIS/OpRobot - Incinerator sono le seguenti:
+<ul>
+	<li><span class="slidekp">P3</span> Come modellare il fatto che il robot depositi un RP nell'Incinerator e quindi quest'ultimo inizi la fase di burning?</li>
+	<li><span class="slidekp">P4</span> Come far raggiungere al OpRobot i vari punti della stanza, in particolare quelli di interesse come l'Incinerator?</li>
+</ul>
+<br>
+Incominciamo analizzando il problema P3.<br>
+Dai requisiti viene specificato che l'Incinerator inizia a bruciare appena OpRobot deposita un RP nella porta di BURNIN.<br>
+A livello software è necessario modellare tale evento, quindi <u>si ritiene oppurtuno introdurre un nuovo messaggio <b>startBurning</b> che faccia transitare l'attore Incinerator nel nuovo stato di burning di un RP.</u><br>
+Tale messaggio è identificabile come un <i>Dispatch</i> in quanto non necessitiamo di una reply, ma l'effettiva informazione che sta bruciando ci viene data dal MonitoringDevice.<br>
+<br>
+Prendendo in considerazione il problema P4, si deve trovare un modo per "mappare" la stanza, e quindi dotare il WIS di un <b>piano</b> di movimento per OpRobot
+in modo che partendo da un punto di partenza (ad esempio, la HOME) possa raggiungere un punto di arrivo (ad esempio, la porta di WasteIn).<br>
+Per fortuna, la nostra software house è dotata di un <b><a href=./MapBuilder24.html>MapBuilder</a></b> e di un <b><a href=./Planner.html>Planner</a></b> 
+che ci permettono rispettivamente di costruire una mappa della stanza e un piano di movimento per raggiungere un punto B partendo da un punto A.
+</p>	
+
+
+<h4>Architettura logica del problema</h4>
+<p>Definiamo ora un <a href=../src/WasteIncineratorService_v1.qak>modello</a> che descrive come i componenti elencati in precedenza interagiscono tra loro.<br>
+<a href="./img/waste_incinerator_servicearch_v1.png"><img src="./img/waste_incinerator_servicearch_v1.png" width="1000" height="800"/></a><br>
+
+<span class="slidekp">Discussione sulle entità</span><br>
+L'attore <b>monitoring_device_mok</b> viene introdotto per simulare il comportamento del vero MonitoringDevice, senza però preoccuparci della sua effettiva realizzazione. (che verrà affrontata in SPRINT successivi)<br>
+In questo modello ha il solo compito di notificare al WIS, tramite il messaggio <b>DA DEFINIRE</b>, il livello della cenere nel AshStorage.<br>
+
+
+</p>
+
+<h2>Piano di test</h2>
+<p>
+</p>
+
+<h2>Sprint futuri</h2>
+
+
+</div>  
+<br>
+
+<div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
+Bryan Bertoni : bryan.bertoni@studio.unibo.it <br>
+Gabriele Daga : gabriele.daga@studio.unibo.it <br>
+Emanuele D'Arsié : emanuele.darsie@studio.unibo.it <br><br>
+
+GIT repo: https://github.com/bryanber102/TemaFinale24
+</div> 
+</body>
+</html>
+ 
+
+ 
+
+
+ 
