@@ -1,0 +1,1 @@
+{"actor":"incinerator", "msgType":"dispatch", "curstate":"s0", "nextstate":"turnOn", "msgId":"activationCommand"}

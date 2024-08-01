@@ -287,7 +287,7 @@ Tale messaggio è identificabile come un <i>Dispatch</i> in quanto non necessiti
 Prendendo in considerazione il problema P4, si deve trovare un modo per "mappare" la stanza, e quindi dotare il WIS di un <b>piano</b> di movimento per OpRobot
 in modo che partendo da un punto di partenza (ad esempio, la HOME) possa raggiungere un punto di arrivo (ad esempio, la porta di WasteIn).<br>
 Per fortuna, la nostra software house è dotata di un <b><a href=./MapBuilder24.html>MapBuilder</a></b> e di un <b><a href=./Planner.html>Planner</a></b> 
-che ci permettono rispettivamente di costruire una mappa della stanza e un piano di movimento per raggiungere un punto B partendo da un punto A.
+che ci permettono di costruire una mappa della stanza e un piano di movimento per raggiungere un punto B partendo da un punto A.
 </p>	
 
 
@@ -298,6 +298,9 @@ che ci permettono rispettivamente di costruire una mappa della stanza e un piano
 <span class="slidekp">Discussione sulle entità</span><br>
 L'attore <b>monitoring_device_mok</b> viene introdotto per simulare il comportamento del vero MonitoringDevice, senza però preoccuparci della sua effettiva realizzazione. (che verrà affrontata in SPRINT successivi)<br>
 In questo modello ha il solo compito di notificare al WIS, tramite il messaggio <b>DA DEFINIRE</b>, il livello della cenere nel AshStorage.<br>
+<br>
+Il dato sui numeri di RP presenti nel WasteStorage è mantenuto come variabile all'interno dell'attore WIS, in quanto non si è ancora valutato come rappresentare
+la Scale (se come POJO nel WIS o come Attore). Infatti, tale discussione verrà affrontata nei prossimi SPRINT.<br>
 
 
 </p>

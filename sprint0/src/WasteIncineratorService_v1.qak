@@ -63,7 +63,7 @@ QActor incinerator context ctx_waste_incinerator_service{
 		println("Incinerator has finished to burn") color red
 		emit endBurning : endBurning(1) //emette il segnale di fine burning
 	}
-	Transition t0 whenMsg activationCommand -> handleStartBurning
+	//Transition t0 whenMsg startBurning -> handleStartBurning
 }
 
 
