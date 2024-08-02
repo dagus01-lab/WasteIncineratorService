@@ -21,14 +21,12 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
-		 var RP = 0 ; var statoIncinerator = 0  
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						delay(500) 
-						CommUtils.outblack("$name STARTS")
+						CommUtils.outgreen("$name STARTS")
 						forward("activationCommand", "activationCommand(1)" ,"incinerator" ) 
-						observeResource("localhost","8125","ctx_waste_incinerator_service","incinerator","statoIncinerator")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -38,49 +36,39 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				}	 
 				state("waitingRP") { //this:State
 					action { //it:State
-						CommUtils.outblack("Waiting new RP...")
-						delay(10000) 
-						forward("arrived_RP", "arrived_RP(1)" ,name ) 
+						CommUtils.outgreen("Waiting for a new RP...")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t00",targetState="handleEndBurning",cond=whenEvent("endBurning"))
-					transition(edgeName="t01",targetState="handleUpdateStatoIncinerator",cond=whenDispatch("statoIncinerator"))
-					transition(edgeName="t02",targetState="handleRP",cond=whenDispatch("arrived_RP"))
+					 transition(edgeName="t00",targetState="handleRP",cond=whenDispatch("arrived_RP"))
 				}	 
 				state("handleRP") { //this:State
 					action { //it:State
-						CommUtils.outblack("New RP is arrived")
-						 RP++  
-						if(  statoIncinerator == 0 && RP >= 1  
-						 ){forward("startBurning", "startBurning(1)" ,"incinerator" ) 
-						}
+						CommUtils.outgreen("New RP is arrived")
+						forward("arrived_RP", "arrived_RP(1)" ,"oprobot" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="waitingRP", cond=doswitch() )
+					 transition(edgeName="t01",targetState="handleRPInBurnin",cond=whenDispatch("rpInBurnin"))
 				}	 
-				state("handleUpdateStatoIncinerator") { //this:State
+				state("handleRPInBurnin") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("statoIncinerator(N)"), Term.createTerm("statoIncinerator(N)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								 statoIncinerator = payloadArg(0).toInt()  
-						}
+						CommUtils.outgreen("An RP is ready to be burnt")
+						forward("startBurning", "startBurning(1)" ,"incinerator" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="waitingRP", cond=doswitch() )
+					 transition(edgeName="t02",targetState="handleEndBurning",cond=whenEvent("endBurning"))
 				}	 
 				state("handleEndBurning") { //this:State
 					action { //it:State
-						CommUtils.outblack("Incinerator has finished to burn")
-						 statoIncinerator = 0  
+						CommUtils.outgreen("Incinerator has finished to burn")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

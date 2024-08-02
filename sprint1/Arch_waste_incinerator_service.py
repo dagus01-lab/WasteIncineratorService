@@ -27,9 +27,14 @@ with Diagram('waste_incinerator_serviceArch', show=False, outformat='png', graph
 ### see https://renenyffenegger.ch/notes/tools/Graphviz/attributes/label/HTML-like/index
      with Cluster('ctx_waste_incinerator_service', graph_attr=nodeattr):
           wis=Custom('wis','./qakicons/symActorSmall.png')
+          oprobot=Custom('oprobot','./qakicons/symActorSmall.png')
           incinerator=Custom('incinerator','./qakicons/symActorSmall.png')
+          scalemock=Custom('scalemock','./qakicons/symActorSmall.png')
      sys >> Edge( label='endBurning', **evattr, decorate='true', fontcolor='darkgreen') >> wis
+     sys >> Edge( label='endBurning', **evattr, decorate='true', fontcolor='darkgreen') >> oprobot
      incinerator >> Edge( label='endBurning', **eventedgeattr, decorate='true', fontcolor='red') >> sys
-     incinerator >> Edge(color='blue', style='solid',  decorate='true', label='<statoIncinerator &nbsp; >',  fontcolor='blue') >> wis
+     oprobot >> Edge(color='blue', style='solid',  decorate='true', label='<rpInBurnin &nbsp; >',  fontcolor='blue') >> wis
+     scalemock >> Edge(color='blue', style='solid',  decorate='true', label='<arrived_RP &nbsp; >',  fontcolor='blue') >> wis
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<activationCommand &nbsp; startBurning &nbsp; >',  fontcolor='blue') >> incinerator
+     wis >> Edge(color='blue', style='solid',  decorate='true', label='<arrived_RP &nbsp; >',  fontcolor='blue') >> oprobot
 diag
