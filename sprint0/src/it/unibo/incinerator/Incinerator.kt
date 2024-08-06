@@ -21,11 +21,11 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
+		 val BTIME = 10000L; var stato = 0;  
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outred("$name STARTS")
-						 val BTIME = 10000L; var stato = 0;  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

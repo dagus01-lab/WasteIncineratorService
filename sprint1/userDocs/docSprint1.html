@@ -292,12 +292,13 @@ che ci permettono di costruire una mappa della stanza e un piano di movimento pe
 
 
 <h4>Architettura logica del problema</h4>
-<p>Definiamo ora un <a href=../src/WasteIncineratorService_v1.qak>modello</a> che descrive come i componenti elencati in precedenza interagiscono tra loro.<br>
-<a href="./img/waste_incinerator_servicearch_v1.png"><img src="./img/waste_incinerator_servicearch_v1.png" width="1000" height="800"/></a><br>
+<p>Definiamo ora un <a href=../src/WasteIncineratorService.qak>modello</a> che descrive come i componenti elencati in precedenza interagiscono tra loro.<br>
+<a href="./img/waste_incinerator_servicearch.png"><img src="./img/waste_incinerator_servicearch.png" width="1000" height="800"/></a><br>
 
 <span class="slidekp">Discussione sulle entità</span><br>
 L'attore <b>monitoring_device_mok</b> viene introdotto per simulare il comportamento del vero MonitoringDevice, senza però preoccuparci della sua effettiva realizzazione. (che verrà affrontata in SPRINT successivi)<br>
-In questo modello ha il solo compito di notificare al WIS, tramite il messaggio <b>DA DEFINIRE</b>, il livello della cenere nel AshStorage.<br>
+In questo modello ha il solo compito di notificare al WIS il livello della cenere nel AshStorage.
+In particolare, è il WIS che fa da "Observer" al monitoring_device_mok per ricevere aggiornamenti sullo stato del container.<br>
 <br>
 Per simulare i dati sugli RP riportati dalla Scale, introduciamo un attore <b>scale_mok</b> che ha il compito di notificare tale dato al WIS.<br>
 Come per il monitoring_device_mok, questo ci permette di ragionare sull'interazione tra i componenti senza doverli progettare sin da subito nel dettaglio.<br>

@@ -21,11 +21,13 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
+		 var statoAshStorage = 0  
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						delay(500) 
 						CommUtils.outgreen("$name STARTS")
+						observeResource("localhost","8125","ctx_waste_incinerator_service","monitoring_device_mok","statoAshStorage")
 						forward("activationCommand", "activationCommand(1)" ,"incinerator" ) 
 						//genTimer( actor, state )
 					}
@@ -36,7 +38,6 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				}	 
 				state("waitingRP") { //this:State
 					action { //it:State
-						CommUtils.outgreen("Waiting for a new RP...")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -74,7 +75,34 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="waitingRP", cond=doswitch() )
+					 transition(edgeName="t03",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
+				}	 
+				state("handleUpdateStatoAshStorage") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("statoAshStorage(N)"), Term.createTerm("statoAshStorage(N)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								 statoAshStorage = payloadArg(0).toInt()  
+								CommUtils.outgreen("AshStorageStatus: $statoAshStorage")
+						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="waitingRP", cond=doswitchGuarded({ statoAshStorage == 0  
+					}) )
+					transition( edgeName="goto",targetState="waitingAshesToBeRemoved", cond=doswitchGuarded({! ( statoAshStorage == 0  
+					) }) )
+				}	 
+				state("waitingAshesToBeRemoved") { //this:State
+					action { //it:State
+						CommUtils.outgreen("WIS is waiting an operator to remove ashes in AshStorage...")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t04",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
 				}	 
 			}
 		}

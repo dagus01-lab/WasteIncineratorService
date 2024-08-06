@@ -30,17 +30,29 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="startHome", cond=doswitch() )
+					 transition( edgeName="goto",targetState="engage", cond=doswitch() )
 				}	 
-				state("startHome") { //this:State
+				state("engage") { //this:State
 					action { //it:State
-						CommUtils.outyellow("$name is in HOME position")
+						CommUtils.outyellow("$name | $MyName engaging ... ")
+						request("engage", "engage($MyName,330)" ,"basicrobot" )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t03",targetState="takeRP",cond=whenDispatch("arrived_RP"))
+					 transition(edgeName="t05",targetState="waitingWorking",cond=whenReply("engagedone"))
+					transition(edgeName="t06",targetState="end",cond=whenReply("engagerefused"))
+				}	 
+				state("waitingWorking") { //this:State
+					action { //it:State
+						CommUtils.outyellow("$name is in HOME position waiting for working")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t07",targetState="takeRP",cond=whenDispatch("arrived_RP"))
 				}	 
 				state("takeRP") { //this:State
 					action { //it:State
@@ -51,17 +63,27 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t04",targetState="bringAshOut",cond=whenEvent("endBurning"))
+					 transition(edgeName="t08",targetState="bringAshOut",cond=whenEvent("endBurning"))
 				}	 
 				state("bringAshOut") { //this:State
 					action { //it:State
 						CommUtils.outyellow("The ash has been taken out")
+						forward("newAshes", "newAshes(1)" ,"monitoring_device_mok" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="startHome", cond=doswitch() )
+					 transition( edgeName="goto",targetState="waitingWorking", cond=doswitch() )
+				}	 
+				state("end") { //this:State
+					action { //it:State
+						CommUtils.outyellow("$name | ENDS ")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 				}	 
 			}
 		}

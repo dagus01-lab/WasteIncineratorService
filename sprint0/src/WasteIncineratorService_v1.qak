@@ -39,10 +39,10 @@ QActor wis context ctx_waste_incinerator_service{
 
 //Attore Incinerator
 QActor incinerator context ctx_waste_incinerator_service{
+	[# val BTIME = 10000L; var stato = 0; #]
+	
 	State s0 initial{
 		println("$name STARTS") color red
-		
-		[# val BTIME = 10000L; var stato = 0; #]
 	}
 	Transition t0 whenMsg activationCommand -> turnOn
 	
