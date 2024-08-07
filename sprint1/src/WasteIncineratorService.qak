@@ -27,6 +27,11 @@ Request engage        : engage(OWNER, STEPTIME)
 Reply   engagedone    : engagedone(ARG)    for engage
 Reply   engagerefused : engagerefused(ARG) for engage
 Dispatch disengage    : disengage(ARG)
+
+Request  doplan     : doplan( PATH, STEPTIME )
+Reply doplandone    : doplandone( ARG )    for doplan
+Reply doplanfailed  : doplanfailed( ARG )  for doplan
+
 Dispatch cmd    : cmd( MOVE )  "MOVE = a|d|l|r|h   "
 Dispatch end       	: end(ARG)
 Request step       : step(TIME)	
@@ -35,7 +40,7 @@ Reply stepfailed   : stepfailed(DURATION, CAUSE) for step
 
 //Definizione dei due contesti (service e basicRobot)
 Context ctx_waste_incinerator_service ip [host="localhost" port=8125]
-Context ctxbasicrobot ip [host="127.0.0.1" port=8120]
+Context ctxbasicrobot ip [host="127.0.0.1" port=8020]
 
 //Attore "esterno" BasicRobot
 ExternalQActor basicrobot context ctxbasicrobot
@@ -100,6 +105,24 @@ QActor wis context ctx_waste_incinerator_service{
 
 //----------------------------------------Attore OpRobot-----------------------------------------------------
 QActor oprobot context ctx_waste_incinerator_service{
+	import "unibo.planner23.*"
+	[#	
+		var planner     = Planner23Util()
+		planner.initAI()
+		planner.loadRoomMap("mapCompleteWithObst23ok")
+		var HOMEx = 0
+		var HOMEy = 0
+		var WASTEINx = 0
+		var WASTEINy = 4
+		var BURNINx = 3
+		var BURNINy = 2
+		var BURNOUTx = 4
+		var BURNOUTy = 3
+		var ASHOUTx = 6
+		var ASHOUTy = 4
+		planner.setGoal(HOMEx,HOMEy)
+		var CurPlan = planner.doPlanCompact()
+	#]
 	State s0 initial{
 		println("$name STARTS") color yellow
 	}
@@ -110,12 +133,18 @@ QActor oprobot context ctx_waste_incinerator_service{
 		println("$name | $MyName engaging ... ") color yellow 
 		request basicrobot -m engage : engage($MyName,330)
 	}
-	Transition t0 whenReply engagedone   -> waitingWorking
+	Transition t0 whenTime 1000 -> noResponse
+				  whenReply engagedone   -> waitingWorking
  	              whenReply engagerefused -> end
+ 	          
+ 	//stato che rappresenta l'assenza di risposta da parte del basicrobot
+ 	State noResponse{
+ 		println("BasicRobot did not answer!") color yellow
+ 	}
+ 	Goto end
 	
 	//Stato che rappresenta il robot in attesa di lavoro
 	State waitingWorking{
-		//TODO: move the robot in HOME position
 		println("$name is in HOME position waiting for working") color yellow
 	}
 	Transition t0 whenMsg arrived_RP -> takeRP
@@ -123,24 +152,87 @@ QActor oprobot context ctx_waste_incinerator_service{
 	//Stato che rappresenta il robot che va a recuperare un RP dal WasteStorage
 	State takeRP{
 		//TODO: move the robot to WasteIn port, take an RP and bring it to BURNIN port
+		[#
+			planner.setGoal(WASTEINx,WASTEINy)
+			CurPlan = planner.doPlanCompact()
+			planner.doPathOnMap(CurPlan)
+		#]
+		request basicrobot -m doplan:doplan($CurPlan, 330)
+	}
+	Transition t0 whenReply doplandone -> bringRPtoBURNIN
+				  whenReply doplanfailed -> exit
+	//Stato che rappresenta il robot che porta l'RP recuperato dal WasteStorage nella porta BURNIN
+	State bringRPtoBURNIN{
+		delay 2000 //simulazione del prelievo di un RP dal WasteStorage
+		[#
+			planner.setGoal(BURNINx,BURNINy)
+			CurPlan = planner.doPlanCompact()
+			planner.doPathOnMap(CurPlan)
+		#]
+		request basicrobot -m doplan:doplan($CurPlan, 330)
+	}
+	Transition t0 whenReply doplandone -> returnHOME
+				  whenReply doplanfailed -> exit
+	//Stato che rappresenta lo spostamento in HOME del robottino una volta che l'RP è stato messo nell'inceneritore
+	State returnHOME{
 		forward wis -m rpInBurnin : rpInBurnin(1)
 		println("An RP is in BURNIN port") color yellow
+		[#
+			planner.setGoal(HOMEx,HOMEy)
+			CurPlan = planner.doPlanCompact()
+			planner.doPathOnMap(CurPlan)
+		#]
+		request basicrobot -m doplan:doplan($CurPlan, 330)
 		//then, return HOME
 	}
-	Transition t0 whenEvent endBurning -> bringAshOut
+	Transition t0 whenEvent endBurning -> takeAshFromBURNOUT
 	
-	//Stato che rappresenta il robot che va a depositare la cenere nel AshStorage
-	State bringAshOut{
+	//Stato che rappresenta il robot che preleva la cenere dalla porta BURNOUT
+	State takeAshFromBURNOUT{
 		//TODO: move the robot to BURNOUT port and bring ash to ASHOUT port
+		[#
+			planner.setGoal(BURNOUTx,BURNOUTy)
+			CurPlan = planner.doPlanCompact()
+			planner.doPathOnMap(CurPlan)
+		#]
+		request basicrobot -m doplan:doplan($CurPlan, 330)
+	}
+	Transition t0 whenReply doplandone -> bringAshtoASHOUT
+				  whenReply doplanfailed -> exit
+	//Stato che rappresenta il robot che va a depositare la cenere raccolta dall'inceneritore
+	State bringAshtoASHOUT{
+		delay 2000 //simulo il prelievo della cenere da BURNOUT
+		[#
+			planner.setGoal(ASHOUTx,ASHOUTy)
+			CurPlan = planner.doPlanCompact()
+			planner.doPathOnMap(CurPlan)
+		#]
+		request basicrobot -m doplan:doplan($CurPlan, 330)
+	}
+	Transition t0 whenReply doplandone -> restartJob
+				  whenReply doplanfailed -> exit
+	//Stato che rappresenta il robot che torna in HOME dopo aver scaricato le ceneri nell'AshStorage
+	State restartJob{
+		delay 2000 //simulo lo scaricamento della cenere
 		println("The ash has been taken out") color yellow
 		//mando notifica di nuova cenere al mok del MonitoringDevice
 		forward monitoring_device_mok -m newAshes : newAshes(1)
+		[#
+			planner.setGoal(HOMEx,HOMEy)
+			CurPlan = planner.doPlanCompact()
+			planner.doPathOnMap(CurPlan)
+		#]
+		request basicrobot -m doplan:doplan($CurPlan, 330)
 	}
-	Goto waitingWorking
+	Transition t0 whenReply doplandone -> waitingWorking
+				  whenReply doplanfailed -> exit
 	
 	//Stato di fine, nel caso l'engage del BasicRobot non fosse andata a buon fine
 	State end{
 		println("$name | ENDS ") color yellow
+	}
+	State exit{
+		println("$name has been terminated") color yellow
 	}
 }
 //-----------------------------------------------------------------------------------------------------------

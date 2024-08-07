@@ -13,6 +13,9 @@ request( engage, engage(OWNER,STEPTIME) ).
 reply( engagedone, engagedone(ARG) ).  %%for engage
 reply( engagerefused, engagerefused(ARG) ).  %%for engage
 dispatch( disengage, disengage(ARG) ).
+request( doplan, doplan(PATH,STEPTIME) ).
+reply( doplandone, doplandone(ARG) ).  %%for doplan
+reply( doplanfailed, doplanfailed(ARG) ).  %%for doplan
 dispatch( cmd, cmd(MOVE) ). %MOVE = a|d|l|r|h   
 dispatch( end, end(ARG) ).
 request( step, step(TIME) ).
@@ -20,7 +23,7 @@ reply( stepdone, stepdone(V) ).  %%for step
 reply( stepfailed, stepfailed(DURATION,CAUSE) ).  %%for step
 %====================================================================================
 context(ctx_waste_incinerator_service, "localhost",  "TCP", "8125").
-context(ctxbasicrobot, "127.0.0.1",  "TCP", "8120").
+context(ctxbasicrobot, "127.0.0.1",  "TCP", "8020").
  qactor( basicrobot, ctxbasicrobot, "external").
   qactor( wis, ctx_waste_incinerator_service, "it.unibo.wis.Wis").
  static(wis).

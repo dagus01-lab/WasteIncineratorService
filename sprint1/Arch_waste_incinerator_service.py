@@ -36,7 +36,7 @@ with Diagram('waste_incinerator_serviceArch', show=False, outformat='png', graph
      sys >> Edge( label='endBurning', **evattr, decorate='true', fontcolor='darkgreen') >> wis
      sys >> Edge( label='endBurning', **evattr, decorate='true', fontcolor='darkgreen') >> oprobot
      incinerator >> Edge( label='endBurning', **eventedgeattr, decorate='true', fontcolor='red') >> sys
-     oprobot >> Edge(color='magenta', style='solid', decorate='true', label='<engage<font color="darkgreen"> engagedone engagerefused</font> &nbsp; >',  fontcolor='magenta') >> basicrobot
+     oprobot >> Edge(color='magenta', style='solid', decorate='true', label='<engage<font color="darkgreen"> engagedone engagerefused</font> &nbsp; doplan<font color="darkgreen"> doplandone doplanfailed</font> &nbsp; >',  fontcolor='magenta') >> basicrobot
      oprobot >> Edge(color='blue', style='solid',  decorate='true', label='<rpInBurnin &nbsp; >',  fontcolor='blue') >> wis
      scalemock >> Edge(color='blue', style='solid',  decorate='true', label='<arrived_RP &nbsp; >',  fontcolor='blue') >> wis
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<activationCommand &nbsp; startBurning &nbsp; >',  fontcolor='blue') >> incinerator
