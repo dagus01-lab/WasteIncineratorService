@@ -122,6 +122,11 @@ QActor oprobot context ctx_waste_incinerator_service{
 		var ASHOUTy = 4
 		planner.setGoal(HOMEx,HOMEy)
 		var CurPlan = planner.doPlanCompact()
+		fun updateCurPlan(x:Int, y:Int){
+			planner.setGoal(x,y)
+			CurPlan = planner.doPlanCompact()
+			planner.doPathOnMap(CurPlan)
+		}
 	#]
 	State s0 initial{
 		println("$name STARTS") color yellow
@@ -153,9 +158,7 @@ QActor oprobot context ctx_waste_incinerator_service{
 	State takeRP{
 		//TODO: move the robot to WasteIn port, take an RP and bring it to BURNIN port
 		[#
-			planner.setGoal(WASTEINx,WASTEINy)
-			CurPlan = planner.doPlanCompact()
-			planner.doPathOnMap(CurPlan)
+			updateCurPlan(WASTEINx,WASTEINy)
 		#]
 		request basicrobot -m doplan:doplan($CurPlan, 330)
 	}
@@ -165,9 +168,7 @@ QActor oprobot context ctx_waste_incinerator_service{
 	State bringRPtoBURNIN{
 		delay 2000 //simulazione del prelievo di un RP dal WasteStorage
 		[#
-			planner.setGoal(BURNINx,BURNINy)
-			CurPlan = planner.doPlanCompact()
-			planner.doPathOnMap(CurPlan)
+			updateCurPlan(BURNINx,BURNINy) 
 		#]
 		request basicrobot -m doplan:doplan($CurPlan, 330)
 	}
@@ -175,15 +176,20 @@ QActor oprobot context ctx_waste_incinerator_service{
 				  whenReply doplanfailed -> exit
 	//Stato che rappresenta lo spostamento in HOME del robottino una volta che l'RP è stato messo nell'inceneritore
 	State returnHOME{
+		delay 2000 //simulazione del rilascio di un RP in BURNIN
 		forward wis -m rpInBurnin : rpInBurnin(1)
 		println("An RP is in BURNIN port") color yellow
 		[#
-			planner.setGoal(HOMEx,HOMEy)
-			CurPlan = planner.doPlanCompact()
-			planner.doPathOnMap(CurPlan)
+			updateCurPlan(HOMEx,HOMEy)
 		#]
 		request basicrobot -m doplan:doplan($CurPlan, 330)
 		//then, return HOME
+	}
+	Transition t0 whenReply doplandone -> waitingForIncinerator
+				  whenReply doplanfailed -> exit
+				 
+	State waitingForIncinerator{
+		println("Waiting for incinerator to finish its job") color yellow
 	}
 	Transition t0 whenEvent endBurning -> takeAshFromBURNOUT
 	
@@ -191,9 +197,7 @@ QActor oprobot context ctx_waste_incinerator_service{
 	State takeAshFromBURNOUT{
 		//TODO: move the robot to BURNOUT port and bring ash to ASHOUT port
 		[#
-			planner.setGoal(BURNOUTx,BURNOUTy)
-			CurPlan = planner.doPlanCompact()
-			planner.doPathOnMap(CurPlan)
+			updateCurPlan(BURNOUTx,BURNOUTy)
 		#]
 		request basicrobot -m doplan:doplan($CurPlan, 330)
 	}
@@ -203,9 +207,7 @@ QActor oprobot context ctx_waste_incinerator_service{
 	State bringAshtoASHOUT{
 		delay 2000 //simulo il prelievo della cenere da BURNOUT
 		[#
-			planner.setGoal(ASHOUTx,ASHOUTy)
-			CurPlan = planner.doPlanCompact()
-			planner.doPathOnMap(CurPlan)
+			updateCurPlan(ASHOUTx,ASHOUTy)
 		#]
 		request basicrobot -m doplan:doplan($CurPlan, 330)
 	}
@@ -218,9 +220,7 @@ QActor oprobot context ctx_waste_incinerator_service{
 		//mando notifica di nuova cenere al mok del MonitoringDevice
 		forward monitoring_device_mok -m newAshes : newAshes(1)
 		[#
-			planner.setGoal(HOMEx,HOMEy)
-			CurPlan = planner.doPlanCompact()
-			planner.doPathOnMap(CurPlan)
+			updateCurPlan(HOMEx,HOMEy)
 		#]
 		request basicrobot -m doplan:doplan($CurPlan, 330)
 	}
