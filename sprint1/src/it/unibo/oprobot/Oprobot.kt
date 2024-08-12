@@ -166,14 +166,26 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t018",targetState="restartJob",cond=whenReply("doplandone"))
+					 transition(edgeName="t018",targetState="ashTakenOut",cond=whenReply("doplandone"))
 					transition(edgeName="t019",targetState="exit",cond=whenReply("doplanfailed"))
 				}	 
-				state("restartJob") { //this:State
+				state("ashTakenOut") { //this:State
 					action { //it:State
 						delay(2000) 
 						CommUtils.outyellow("The ash has been taken out")
 						forward("newAshes", "newAshes(1)" ,"monitoring_device_mok" ) 
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+				 	 		stateTimer = TimerActor("timer_ashTakenOut", 
+				 	 					  scope, context!!, "local_tout_"+name+"_ashTakenOut", 100.toLong() )  //OCT2023
+					}	 	 
+					 transition(edgeName="t020",targetState="restartJob",cond=whenTimeout("local_tout_"+name+"_ashTakenOut"))   
+					transition(edgeName="t021",targetState="takeRP",cond=whenDispatch("arrived_RP"))
+				}	 
+				state("restartJob") { //this:State
+					action { //it:State
 						
 									updateCurPlan(HOMEx,HOMEy)
 						request("doplan", "doplan($CurPlan,330)" ,"basicrobot" )  
@@ -182,8 +194,8 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t020",targetState="waitingWorking",cond=whenReply("doplandone"))
-					transition(edgeName="t021",targetState="exit",cond=whenReply("doplanfailed"))
+					 transition(edgeName="t022",targetState="waitingWorking",cond=whenReply("doplandone"))
+					transition(edgeName="t023",targetState="exit",cond=whenReply("doplanfailed"))
 				}	 
 				state("end") { //this:State
 					action { //it:State

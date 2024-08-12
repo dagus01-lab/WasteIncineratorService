@@ -156,7 +156,6 @@ QActor oprobot context ctx_waste_incinerator_service{
 	
 	//Stato che rappresenta il robot che va a recuperare un RP dal WasteStorage
 	State takeRP{
-		//TODO: move the robot to WasteIn port, take an RP and bring it to BURNIN port
 		[#
 			updateCurPlan(WASTEINx,WASTEINy)
 		#]
@@ -195,7 +194,6 @@ QActor oprobot context ctx_waste_incinerator_service{
 	
 	//Stato che rappresenta il robot che preleva la cenere dalla porta BURNOUT
 	State takeAshFromBURNOUT{
-		//TODO: move the robot to BURNOUT port and bring ash to ASHOUT port
 		[#
 			updateCurPlan(BURNOUTx,BURNOUTy)
 		#]
@@ -203,6 +201,7 @@ QActor oprobot context ctx_waste_incinerator_service{
 	}
 	Transition t0 whenReply doplandone -> bringAshtoASHOUT
 				  whenReply doplanfailed -> exit
+				  
 	//Stato che rappresenta il robot che va a depositare la cenere raccolta dall'inceneritore
 	State bringAshtoASHOUT{
 		delay 2000 //simulo il prelievo della cenere da BURNOUT
@@ -211,14 +210,21 @@ QActor oprobot context ctx_waste_incinerator_service{
 		#]
 		request basicrobot -m doplan:doplan($CurPlan, 330)
 	}
-	Transition t0 whenReply doplandone -> restartJob
+	Transition t0 whenReply doplandone -> ashTakenOut
 				  whenReply doplanfailed -> exit
-	//Stato che rappresenta il robot che torna in HOME dopo aver scaricato le ceneri nell'AshStorage
-	State restartJob{
+	
+	//Stato che rappresenta il robot che scarica le ceneri nell'AshStorage	  
+	State ashTakenOut{
 		delay 2000 //simulo lo scaricamento della cenere
 		println("The ash has been taken out") color yellow
 		//mando notifica di nuova cenere al mok del MonitoringDevice
 		forward monitoring_device_mok -m newAshes : newAshes(1)
+	}
+	
+	Transition t0 	whenTime 100 -> restartJob
+					whenMsg arrived_RP -> takeRP
+	//Stato che rappresenta il robot che torna in HOME dopo aver scaricato le ceneri nell'AshStorage
+	State restartJob{
 		[#
 			updateCurPlan(HOMEx,HOMEy)
 		#]
