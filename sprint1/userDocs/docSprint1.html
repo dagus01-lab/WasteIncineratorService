@@ -305,11 +305,25 @@ Come per il monitoring_device_mok, questo ci permette di ragionare sull'interazi
 
 </p>
 
+<h2>Progetto</h2>
+
 <h2>Piano di test</h2>
+
+<h2>Deployment</h2>
 <p>
+	Per poter provare questo primo prototipo del sistema, occorre eseguire i seguenti componenti nel seguente ordine:
+	<ol>
+		<li>Ambiente di simulazione <b>VirtualRobot:</b> posizionarsi nella cartella "it.unibo.virtualRobot2023", aprire un terminale e lanciare il comando <b>docker compose -f .\virtualRobot23.yaml up</b>;</li>
+		<li><b>BasicRobot</b>: posizionarsi nella cartella "unibo.basicrobot24", aprire un terminale e lanciare il comando <b>gradlew run</b>;</li>
+		<li><b>WasteIncineratorService</b>: posizionarsi nella cartella "sprint1", aprire un terminale e lanciare il comando <b>gradlew run</b>;</li>
+	</ol>
+	Il risultato sarà la visualizzazione del robot virtuale che si muove nella stanza, seguendo la logica definita nei requisiti.
 </p>
 
 <h2>Sprint futuri</h2>
+<p>
+	Nel prossimo sprint si prevede di sostituire il mok con il vero e proprio MonitoringDevice, andando quindi ad introdurre il Sonar e il Led del RaspberryPi.
+</p>
 
 
 </div>  
