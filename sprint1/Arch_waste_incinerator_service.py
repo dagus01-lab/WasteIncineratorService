@@ -35,7 +35,6 @@ with Diagram('waste_incinerator_serviceArch', show=False, outformat='png', graph
           basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
      sys >> Edge( label='endBurning', **evattr, decorate='true', fontcolor='darkgreen') >> wis
      sys >> Edge( label='endBurning', **evattr, decorate='true', fontcolor='darkgreen') >> oprobot
-     oprobot >> Edge( label='alarm', **eventedgeattr, decorate='true', fontcolor='red') >> sys
      incinerator >> Edge( label='endBurning', **eventedgeattr, decorate='true', fontcolor='red') >> sys
      oprobot >> Edge(color='magenta', style='solid', decorate='true', label='<engage<font color="darkgreen"> engagedone engagerefused</font> &nbsp; doplan<font color="darkgreen"> doplandone doplanfailed</font> &nbsp; >',  fontcolor='magenta') >> basicrobot
      oprobot >> Edge(color='blue', style='solid',  decorate='true', label='<rpInBurnin &nbsp; >',  fontcolor='blue') >> wis

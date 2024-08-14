@@ -38,13 +38,6 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 				var ASHOUTy = 4
 				planner.setGoal(HOMEx,HOMEy)
 				var CurPlan = planner.doPlanCompact()
-				fun updateCurPlan(x:Int, y:Int){
-					planner.setGoal(x,y)
-					CurPlan = planner.doPlanCompact()
-					planner.doPathOnMap(CurPlan)
-				}
-				
-				var rpReady=false
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -83,12 +76,6 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 				}	 
 				state("waitingWorking") { //this:State
 					action { //it:State
-						 
-									if (!rpReady){
-										planner.doPathOnMap(CurPlan)
-									}  else {
-										rpReady = false
-									}
 						CommUtils.outyellow("$name is in HOME position waiting for working")
 						//genTimer( actor, state )
 					}
@@ -99,13 +86,11 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 				}	 
 				state("takeRP") { //this:State
 					action { //it:State
-						CommUtils.outyellow("OpRobot is going to take an RP..")
 						
-									updateCurPlan(WASTEINx,WASTEINy)
-						if(CurPlan!="") 
+									planner.setGoal(WASTEINx,WASTEINy)
+									CurPlan = planner.doPlanCompact()
+									planner.doPathOnMap(CurPlan)
 						request("doplan", "doplan($CurPlan,330)" ,"basicrobot" )  
-						else 
-						forward("cmd", "cmd(d)" ,name ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -113,74 +98,69 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					}	 	 
 					 transition(edgeName="t09",targetState="bringRPtoBURNIN",cond=whenReply("doplandone"))
 					transition(edgeName="t010",targetState="exit",cond=whenReply("doplanfailed"))
-					transition(edgeName="t011",targetState="bringRPtoBURNIN",cond=whenDispatch("cmd"))
 				}	 
 				state("bringRPtoBURNIN") { //this:State
 					action { //it:State
 						delay(2000) 
 						
-									updateCurPlan(BURNINx,BURNINy) 
+									planner.setGoal(BURNINx,BURNINy)
+									CurPlan = planner.doPlanCompact()
+									planner.doPathOnMap(CurPlan)
 						request("doplan", "doplan($CurPlan,330)" ,"basicrobot" )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t012",targetState="returnHOME",cond=whenReply("doplandone"))
-					transition(edgeName="t013",targetState="exit",cond=whenReply("doplanfailed"))
+					 transition(edgeName="t011",targetState="returnHOME",cond=whenReply("doplandone"))
+					transition(edgeName="t012",targetState="exit",cond=whenReply("doplanfailed"))
 				}	 
 				state("returnHOME") { //this:State
 					action { //it:State
-						delay(2000) 
 						forward("rpInBurnin", "rpInBurnin(1)" ,"wis" ) 
 						CommUtils.outyellow("An RP is in BURNIN port")
 						
-									updateCurPlan(HOMEx,HOMEy)
+									planner.setGoal(HOMEx,HOMEy)
+									CurPlan = planner.doPlanCompact()
+									planner.doPathOnMap(CurPlan)
 						request("doplan", "doplan($CurPlan,330)" ,"basicrobot" )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t014",targetState="waitingForIncinerator",cond=whenReply("doplandone"))
-					transition(edgeName="t015",targetState="exit",cond=whenReply("doplanfailed"))
-				}	 
-				state("waitingForIncinerator") { //this:State
-					action { //it:State
-						CommUtils.outyellow("Waiting for incinerator to finish its job")
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t016",targetState="takeAshFromBURNOUT",cond=whenEvent("endBurning"))
+					 transition(edgeName="t013",targetState="takeAshFromBURNOUT",cond=whenEvent("endBurning"))
 				}	 
 				state("takeAshFromBURNOUT") { //this:State
 					action { //it:State
 						
-									updateCurPlan(BURNOUTx,BURNOUTy)
+									planner.setGoal(BURNOUTx,BURNOUTy)
+									CurPlan = planner.doPlanCompact()
+									planner.doPathOnMap(CurPlan)
 						request("doplan", "doplan($CurPlan,330)" ,"basicrobot" )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t017",targetState="bringAshtoASHOUT",cond=whenReply("doplandone"))
-					transition(edgeName="t018",targetState="exit",cond=whenReply("doplanfailed"))
+					 transition(edgeName="t014",targetState="bringAshtoASHOUT",cond=whenReply("doplandone"))
+					transition(edgeName="t015",targetState="exit",cond=whenReply("doplanfailed"))
 				}	 
 				state("bringAshtoASHOUT") { //this:State
 					action { //it:State
 						delay(2000) 
 						
-									updateCurPlan(ASHOUTx,ASHOUTy)
+									planner.setGoal(ASHOUTx,ASHOUTy)
+									CurPlan = planner.doPlanCompact()
+									planner.doPathOnMap(CurPlan)
 						request("doplan", "doplan($CurPlan,330)" ,"basicrobot" )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t019",targetState="restartJob",cond=whenReply("doplandone"))
-					transition(edgeName="t020",targetState="exit",cond=whenReply("doplanfailed"))
+					 transition(edgeName="t016",targetState="restartJob",cond=whenReply("doplandone"))
+					transition(edgeName="t017",targetState="exit",cond=whenReply("doplanfailed"))
 				}	 
 				state("restartJob") { //this:State
 					action { //it:State
@@ -190,60 +170,15 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 						
 									planner.setGoal(HOMEx,HOMEy)
 									CurPlan = planner.doPlanCompact()
+									planner.doPathOnMap(CurPlan)
 						request("doplan", "doplan($CurPlan,330)" ,"basicrobot" )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t021",targetState="takeRpBeforeFinishPlan",cond=whenDispatch("arrived_RP"))
-					transition(edgeName="t022",targetState="waitingWorking",cond=whenReply("doplandone"))
-					transition(edgeName="t023",targetState="exit",cond=whenReply("doplanfailed"))
-				}	 
-				state("takeRpBeforeFinishPlan") { //this:State
-					action { //it:State
-						CommUtils.outyellow("A new RP has arrived before OpRobot returned HOME")
-						rpReady=true 
-						emit("alarm", "alarm(X)" ) 
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t024",targetState="handlePlanDone",cond=whenReply("doplandone"))
-					transition(edgeName="t025",targetState="handlePlanFailed",cond=whenReply("doplanfailed"))
-				}	 
-				state("handlePlanFailed") { //this:State
-					action { //it:State
-						CommUtils.outcyan("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
-						 	   
-						if( checkMsgContent( Term.createTerm("doplanfailed(ARG)"), Term.createTerm("doplanfailed(ARG)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								
-												var Plan = payloadArg(0).toString()
-												var PlanDone = CurPlan.substring(0,(CurPlan.length - Plan.length)) 
-								planner.doPathOnMap(PlanDone) 
-						}
-						delay(1000) 
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="takeRP", cond=doswitch() )
-				}	 
-				state("handlePlanDone") { //this:State
-					action { //it:State
-						CommUtils.outcyan("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
-						 	   
-						planner.doPathOnMap(CurPlan) 
-						delay(1000) 
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="takeRP", cond=doswitch() )
+					 transition(edgeName="t018",targetState="waitingWorking",cond=whenReply("doplandone"))
+					transition(edgeName="t019",targetState="exit",cond=whenReply("doplanfailed"))
 				}	 
 				state("end") { //this:State
 					action { //it:State
