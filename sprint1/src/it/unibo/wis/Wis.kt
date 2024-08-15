@@ -44,6 +44,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					sysaction { //it:State
 					}	 	 
 					 transition(edgeName="t00",targetState="handleRP",cond=whenDispatch("arrived_RP"))
+					transition(edgeName="t01",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
 				}	 
 				state("handleRP") { //this:State
 					action { //it:State
@@ -54,7 +55,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t01",targetState="handleRPInBurnin",cond=whenDispatch("rpInBurnin"))
+					 transition(edgeName="t02",targetState="handleRPInBurnin",cond=whenDispatch("rpInBurnin"))
 				}	 
 				state("handleRPInBurnin") { //this:State
 					action { //it:State
@@ -65,7 +66,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t02",targetState="handleEndBurning",cond=whenEvent("endBurning"))
+					 transition(edgeName="t03",targetState="handleEndBurning",cond=whenEvent("endBurning"))
 				}	 
 				state("handleEndBurning") { //this:State
 					action { //it:State
@@ -75,7 +76,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t03",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
+					 transition(edgeName="t04",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
 				}	 
 				state("handleUpdateStatoAshStorage") { //this:State
 					action { //it:State
@@ -102,7 +103,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t04",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
+					 transition(edgeName="t05",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
 				}	 
 			}
 		}

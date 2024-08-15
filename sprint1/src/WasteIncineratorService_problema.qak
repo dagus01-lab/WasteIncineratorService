@@ -30,15 +30,9 @@ Reply   engagedone    : engagedone(ARG)    for engage
 Reply   engagerefused : engagerefused(ARG) for engage
 Dispatch disengage    : disengage(ARG)
 
-Request  doplan     : doplan( PATH, STEPTIME )
-Reply doplandone    : doplandone( ARG )    for doplan
-Reply doplanfailed  : doplanfailed( ARG )  for doplan
-
-Dispatch cmd    : cmd( MOVE )  "MOVE = a|d|l|r|h   "
-Dispatch end       	: end(ARG)
-Request step       : step(TIME)	
-Reply stepdone     : stepdone(V)                 for step
-Reply stepfailed   : stepfailed(DURATION, CAUSE) for step
+Request moverobot    :  moverobot(TARGETX, TARGETY)  
+Reply moverobotdone  :  moverobotok(ARG)                    for moverobot
+Reply moverobotfailed:  moverobotfailed(PLANDONE, PLANTODO) for moverobot
 
 //Definizione dei due contesti (service e basicRobot)
 Context ctx_waste_incinerator_service ip [host="localhost" port=8125]
@@ -65,6 +59,7 @@ QActor wis context ctx_waste_incinerator_service{
 	State waitingRP{
 	}
 	Transition t0 whenMsg arrived_RP ->  handleRP
+				  whenMsg statoAshStorage -> handleUpdateStatoAshStorage
 				
 	//Stato per gestire l'arrivo di un nuovo RP nel WasteStorage
 	State handleRP{
@@ -107,11 +102,7 @@ QActor wis context ctx_waste_incinerator_service{
 
 //----------------------------------------Attore OpRobot-----------------------------------------------------
 QActor oprobot context ctx_waste_incinerator_service{
-	import "unibo.planner23.*"
 	[#	
-		var planner     = Planner23Util()
-		planner.initAI()
-		planner.loadRoomMap("mapCompleteWithObst23ok")
 		var HOMEx = 0
 		var HOMEy = 0
 		var WASTEINx = 0
@@ -122,15 +113,6 @@ QActor oprobot context ctx_waste_incinerator_service{
 		var BURNOUTy = 3
 		var ASHOUTx = 6
 		var ASHOUTy = 4
-		planner.setGoal(HOMEx,HOMEy)
-		var CurPlan = planner.doPlanCompact()
-		fun updateCurPlan(x:Int, y:Int){
-			planner.setGoal(x,y)
-			CurPlan = planner.doPlanCompact()
-			planner.doPathOnMap(CurPlan)
-		}
-		
-		var rpReady=false
 	#]
 	State s0 initial{
 		println("$name STARTS") color yellow
@@ -154,54 +136,34 @@ QActor oprobot context ctx_waste_incinerator_service{
 	
 	//Stato che rappresenta il robot in attesa di lavoro
 	State waitingWorking{
-		[# 
-			if (!rpReady){
-				planner.doPathOnMap(CurPlan)
-			}  else {
-				rpReady = false
-			}
-		#]
 		println("$name is in HOME position waiting for working") color yellow
 	}
 	Transition t0 whenMsg arrived_RP -> takeRP
-	 
+	
 	//Stato che rappresenta il robot che va a recuperare un RP dal WasteStorage
 	State takeRP{
 		println("OpRobot is going to take an RP..") color yellow
-		[#
-			updateCurPlan(WASTEINx,WASTEINy)
-		#]
-		[#if(CurPlan!="")#]
-			request basicrobot -m doplan:doplan($CurPlan, 330)
-		[#else#]
-			autodispatch cmd:cmd(d)
+		request basicrobot -m moverobot:moverobot($WASTEINx,$WASTEINy)
 	}
-	Transition t0 whenReply doplandone -> bringRPtoBURNIN  
-				  whenReply doplanfailed -> exit
-				  whenMsg cmd -> bringRPtoBURNIN
+	Transition t0 whenReply moverobotdone -> bringRPtoBURNIN
+				  whenReply moverobotfailed -> exit
 	//Stato che rappresenta il robot che porta l'RP recuperato dal WasteStorage nella porta BURNIN
 	State bringRPtoBURNIN{
 		delay 2000 //simulazione del prelievo di un RP dal WasteStorage
-		[#
-			updateCurPlan(BURNINx,BURNINy) 
-		#]
-		request basicrobot -m doplan:doplan($CurPlan, 330)
+		request basicrobot -m moverobot:moverobot($BURNINx, $BURNINy)
 	}
-	Transition t0 whenReply doplandone -> returnHOME
-				  whenReply doplanfailed -> exit
+	Transition t0 whenReply moverobotdone -> returnHOME
+				  whenReply moverobotfailed -> exit
 	//Stato che rappresenta lo spostamento in HOME del robottino una volta che l'RP è stato messo nell'inceneritore
 	State returnHOME{
 		delay 2000 //simulazione del rilascio di un RP in BURNIN
 		forward wis -m rpInBurnin : rpInBurnin(1)
 		println("An RP is in BURNIN port") color yellow
-		[#
-			updateCurPlan(HOMEx,HOMEy)
-		#]
-		request basicrobot -m doplan:doplan($CurPlan, 330)
+		request basicrobot -m moverobot:moverobot($HOMEx, $HOMEy)
 		//then, return HOME
 	}
-	Transition t0 whenReply doplandone -> waitingForIncinerator
-				  whenReply doplanfailed -> exit
+	Transition t0 whenReply moverobotdone -> waitingForIncinerator
+				  whenReply moverobotfailed -> exit
 				 
 	State waitingForIncinerator{
 		println("Waiting for incinerator to finish its job") color yellow
@@ -210,74 +172,41 @@ QActor oprobot context ctx_waste_incinerator_service{
 	
 	//Stato che rappresenta il robot che preleva la cenere dalla porta BURNOUT
 	State takeAshFromBURNOUT{
-		//TODO: move the robot to BURNOUT port and bring ash to ASHOUT port
-		[#
-			updateCurPlan(BURNOUTx,BURNOUTy)
-		#]
-		request basicrobot -m doplan:doplan($CurPlan, 330)
+		request basicrobot -m moverobot:moverobot($BURNOUTx, $BURNOUTy)
 	}
-	Transition t0 whenReply doplandone -> bringAshtoASHOUT
-				  whenReply doplanfailed -> exit
+	Transition t0 whenReply moverobotdone -> bringAshtoASHOUT
+				  whenReply moverobotfailed -> exit
 	//Stato che rappresenta il robot che va a depositare la cenere raccolta dall'inceneritore
 	State bringAshtoASHOUT{
 		delay 2000 //simulo il prelievo della cenere da BURNOUT
-		[#
-			updateCurPlan(ASHOUTx,ASHOUTy)
-		#]
-		request basicrobot -m doplan:doplan($CurPlan, 330)
+		request basicrobot -m moverobot:moverobot($ASHOUTx, $ASHOUTy)
 	}
-	Transition t0 whenReply doplandone -> restartJob 
-				  whenReply doplanfailed -> exit
+	Transition t0 whenReply moverobotdone -> restartJob 
+				  whenReply moverobotfailed -> exit
 	//Stato che rappresenta il robot che torna in HOME dopo aver scaricato le ceneri nell'AshStorage
 	State restartJob{
 		delay 2000 //simulo lo scaricamento della cenere
 		println("The ash has been taken out") color yellow
 		//mando notifica di nuova cenere al mok del MonitoringDevice
 		forward monitoring_device_mok -m newAshes : newAshes(1)
-		[#
-			planner.setGoal(HOMEx,HOMEy)
-			CurPlan = planner.doPlanCompact()
-		#]
-		request basicrobot -m doplan:doplan($CurPlan, 330)
+		request basicrobot -m moverobot:moverobot($HOMEx, $HOMEy)    
 	}
 	Transition t0 whenMsg arrived_RP -> takeRpBeforeFinishPlan
-				  whenReply doplandone -> waitingWorking
-				  whenReply doplanfailed -> exit
+				  whenReply moverobotdone -> waitingWorking
+				  whenReply moverobotfailed -> exit
 	
 	State takeRpBeforeFinishPlan{
 		println("A new RP has arrived before OpRobot returned HOME") color yellow
-		[#rpReady=true#]
-		emit alarm : alarm(X) 
+		delay 500
+		emit alarm:alarm(1) 
 	}
-	Transition t0 whenReply doplandone -> handlePlanDone
-				  whenReply doplanfailed -> handlePlanFailed
-				  
-	State handlePlanFailed{
-		printCurrentMessage
-		
-		//vedi riga 450,452 basicrobot.qak
-		onMsg(doplanfailed: doplanfailed(ARG)){  //ARG corrisponde al piano mancante da percorrere
-			[#
-				var Plan = payloadArg(0).toString()
-				var PlanDone = CurPlan.substring(0,(CurPlan.length - Plan.length)) 
-			#]
-			//println("$PlanDone") color magenta
-			[#planner.doPathOnMap(PlanDone)#] //aggiorno la mappa con quanto effettivamente percorso rispetto al CurPlan
-		}
-		delay 1000
+	Transition t0 whenReply moverobotdone -> testko
+				  whenReply moverobotfailed -> takeRP
+	
+	State testko{
+		println("BasicRobot ignored alarm!!") color yellow
 	}
 	Goto takeRP
-
-	State handlePlanDone{
-		printCurrentMessage
-		
-		[#planner.doPathOnMap(CurPlan)#] //aggiorno la mappa con il piano eseguito
-		
-		delay 1000
-	}
-	Goto takeRP
-	
-	
 	//Stato di fine, nel caso l'engage del BasicRobot non fosse andata a buon fine
 	State end{
 		println("$name | ENDS ") color yellow
@@ -315,7 +244,7 @@ QActor incinerator context ctx_waste_incinerator_service{
 		emit endBurning : endBurning(1) //emette il segnale di fine burning
 		[# stato = 0 #]
 	}
-	Transition t0 whenMsg startBurning -> handleStartBurning
+	Transition t0 whenMsg startBurning -> handleStartBurning 
 }
 //-----------------------------------------------------------------------------------------------------------
 
@@ -329,8 +258,8 @@ QActor scalemock context ctx_waste_incinerator_service{
 	State simulateRP {
 		delay 5000
 		forward wis -m arrived_RP : arrived_RP(1)
-		delay 38000
-		forward wis -m arrived_RP : arrived_RP(1)
+		/*delay 38000
+		forward wis -m arrived_RP : arrived_RP(1)*/
 	}
 	Goto simulateRP
 }

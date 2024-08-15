@@ -34,6 +34,8 @@ Request moverobot    :  moverobot(TARGETX, TARGETY)
 Reply moverobotdone  :  moverobotok(ARG)                    for moverobot
 Reply moverobotfailed:  moverobotfailed(PLANDONE, PLANTODO) for moverobot
 
+Request info: info(X)
+Reply inforeply: inforeply(X) for info
 //Definizione dei due contesti (service e basicRobot)
 Context ctx_waste_incinerator_service ip [host="localhost" port=8125]
 Context ctxbasicrobot ip [host="127.0.0.1" port=8020]
@@ -49,7 +51,7 @@ QActor wis context ctx_waste_incinerator_service{
 		delay 500
 		println("$name STARTS") color green
 		//Si mette ad osservare lo stato del AshStorage fornito dal MonitoringDevice
-		observeResource monitoring_device_mok msgid statoAshStorage
+		//observeResource monitoring_device_mok msgid statoAshStorage
 		//mando messaggio di attivazione del Incinerator
 		forward incinerator -m activationCommand : activationCommand(1)
 	}
@@ -59,6 +61,7 @@ QActor wis context ctx_waste_incinerator_service{
 	State waitingRP{
 	}
 	Transition t0 whenMsg arrived_RP ->  handleRP
+				  whenMsg statoAshStorage -> handleUpdateStatoAshStorage
 				
 	//Stato per gestire l'arrivo di un nuovo RP nel WasteStorage
 	State handleRP{
@@ -187,7 +190,7 @@ QActor oprobot context ctx_waste_incinerator_service{
 		delay 2000 //simulo lo scaricamento della cenere
 		println("The ash has been taken out") color yellow
 		//mando notifica di nuova cenere al mok del MonitoringDevice
-		forward monitoring_device_mok -m newAshes : newAshes(1)
+		forward wistester -m newAshes : newAshes(1)
 		request basicrobot -m moverobot:moverobot($HOMEx, $HOMEy)    
 	}
 	Transition t0 whenMsg arrived_RP -> takeRpBeforeFinishPlan
@@ -243,10 +246,36 @@ QActor incinerator context ctx_waste_incinerator_service{
 		emit endBurning : endBurning(1) //emette il segnale di fine burning
 		[# stato = 0 #]
 	}
-	Transition t0 whenMsg startBurning -> handleStartBurning 
+	Transition t0 whenMsg startBurning -> handleStartBurning   
 }
 //-----------------------------------------------------------------------------------------------------------
 
+QActor wistester context ctx_waste_incinerator_service{
+	State s0 initial{
+		println("$name STARTS") color blue
+	}
+	Transition t0 whenRequest info -> handleinfo
+	
+	State handleinfo{
+		println("$name: new test request arrived") color blue
+		forward wis -m arrived_RP : arrived_RP(1)
+	}
+	
+	Transition t0 	whenTime 70000 -> failure
+					whenMsg newAshes -> success
+	State success {
+		replyTo info with inforeply:inforeply(1)
+	}
+	Transition t0 whenRequest info -> handleinfo
+	
+	State failure {
+		replyTo info with inforeply:inforeply(0)
+	}
+	Transition t0 whenRequest info -> handleinfo
+	
+				  
+}
+/*
 //-----------------------Attore mock che simula il comportamento della Scale---------------------------------
 QActor scalemock context ctx_waste_incinerator_service{
 	State s0 initial {
@@ -257,8 +286,8 @@ QActor scalemock context ctx_waste_incinerator_service{
 	State simulateRP {
 		delay 5000
 		forward wis -m arrived_RP : arrived_RP(1)
-		/*delay 38000
-		forward wis -m arrived_RP : arrived_RP(1)*/
+		//delay 38000
+		//forward wis -m arrived_RP : arrived_RP(1)
 	}
 	Goto simulateRP
 }
@@ -299,3 +328,4 @@ QActor monitoring_device_mok context ctx_waste_incinerator_service{
 	Transition t0 whenMsg newAshes -> handleAshes
 }
 //-----------------------------------------------------------------------------------------------------------
+*/
