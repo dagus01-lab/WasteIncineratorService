@@ -306,17 +306,24 @@ Come per il monitoring_device_mok, questo ci permette di ragionare sull'interazi
 </p>
 
 <h2>Progetto</h2>
-Al fine di poter avere un sistema testabile, si è deciso di sostituire i mock della bilancia e del monitoring device con un attore che permetta ad
-un'unità di testing esterna di mandargli un messaggio apposito (info), in modo tale che questo attore possa notificare l'arrivo di un RP e verificare che, dopo un lasso di tempo inferiore al tempo di lavoro del robot, il sistema produca della cenere in output.
-<a href="../src/WasteIncineratorService_progetto.qak">Qui</a> si può trovare il modello appena descritto.<br>
-<a href="./img/waste_incinerator_project_servicearch.png"><img src="./img/waste_incinerator_project_servicearch.png" width="1000" height="800"/></a><br>
+<p>
+Al fine di poter avere un sistema testabile, si è deciso di sostituire i mock della bilancia e del monitoring device con un attore
+<b>wistester</b> che permetta ad un'unità di testing esterna di mandargli un messaggio apposito (info), in modo tale che questo attore 
+possa notificare l'arrivo di un RP e verificare che, dopo un lasso di tempo inferiore al tempo di lavoro del robot, il sistema produca della cenere in output.
+<br><a href="../src/WasteIncineratorService_progetto.qak">Qui</a> si può trovare il modello appena descritto.<br>
+<a href="./img/waste_incinerator_project_servicearch.png"><img src="./img/waste_incinerator_project_servicearch.png" width="1000" height="800"/></a>
+</p>
 
 <h2>Piano di test</h2>
+<p>
 Per poter effettuare un piano di testing automatizzato si è deciso di sfruttare JUnit. In particolare è stata creata una classe che avvia il
 sistema sfruttando gradle e che effettua due test:
-- verifica che, dato l'invio di un RP, venga prodotta della cenere in uscita (ammesso che l'AshStorage non sia pieno)
-- verifica che, dato l'invio di un RP se l'AshStorage è pieno, non venga prodotta cenere in uscita
+<ul>
+	<li>verifica che, dato l'invio di un RP, venga prodotta della cenere in uscita (ammesso che l'AshStorage non sia pieno)</li>
+	<li>verifica che, dato l'invio di un RP se l'AshStorage è pieno, non venga prodotta cenere in uscita</li>
+</ul>
 Il test può essere trovato <a href="../src/main/java/test/TestWISOutput.java">qui</a>.
+</p>
 
 <h2>Deployment</h2>
 <p>

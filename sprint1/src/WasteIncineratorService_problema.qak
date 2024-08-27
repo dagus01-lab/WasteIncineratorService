@@ -147,6 +147,7 @@ QActor oprobot context ctx_waste_incinerator_service{
 	}
 	Transition t0 whenReply moverobotdone -> bringRPtoBURNIN
 				  whenReply moverobotfailed -> exit
+				  
 	//Stato che rappresenta il robot che porta l'RP recuperato dal WasteStorage nella porta BURNIN
 	State bringRPtoBURNIN{
 		delay 2000 //simulazione del prelievo di un RP dal WasteStorage
@@ -154,6 +155,7 @@ QActor oprobot context ctx_waste_incinerator_service{
 	}
 	Transition t0 whenReply moverobotdone -> returnHOME
 				  whenReply moverobotfailed -> exit
+				  
 	//Stato che rappresenta lo spostamento in HOME del robottino una volta che l'RP è stato messo nell'inceneritore
 	State returnHOME{
 		delay 2000 //simulazione del rilascio di un RP in BURNIN
@@ -164,7 +166,8 @@ QActor oprobot context ctx_waste_incinerator_service{
 	}
 	Transition t0 whenReply moverobotdone -> waitingForIncinerator
 				  whenReply moverobotfailed -> exit
-				 
+				  
+	//Stato che rappresenta l'attesa del incinerator che sta bruciando			 
 	State waitingForIncinerator{
 		println("Waiting for incinerator to finish its job") color yellow
 	}
@@ -176,6 +179,7 @@ QActor oprobot context ctx_waste_incinerator_service{
 	}
 	Transition t0 whenReply moverobotdone -> bringAshtoASHOUT
 				  whenReply moverobotfailed -> exit
+				  
 	//Stato che rappresenta il robot che va a depositare la cenere raccolta dall'inceneritore
 	State bringAshtoASHOUT{
 		delay 2000 //simulo il prelievo della cenere da BURNOUT
@@ -183,6 +187,7 @@ QActor oprobot context ctx_waste_incinerator_service{
 	}
 	Transition t0 whenReply moverobotdone -> restartJob 
 				  whenReply moverobotfailed -> exit
+				  
 	//Stato che rappresenta il robot che torna in HOME dopo aver scaricato le ceneri nell'AshStorage
 	State restartJob{
 		delay 2000 //simulo lo scaricamento della cenere
@@ -207,10 +212,12 @@ QActor oprobot context ctx_waste_incinerator_service{
 		println("BasicRobot ignored alarm!!") color yellow
 	}
 	Goto takeRP
+	
 	//Stato di fine, nel caso l'engage del BasicRobot non fosse andata a buon fine
 	State end{
 		println("$name | ENDS ") color yellow
 	}
+	
 	State exit{
 		println("$name has been terminated") color yellow
 	}

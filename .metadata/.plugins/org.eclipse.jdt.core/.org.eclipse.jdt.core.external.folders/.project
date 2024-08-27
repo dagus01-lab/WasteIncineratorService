@@ -10,6 +10,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>.link1</name>
+			<type>2</type>
+			<location>C:/Users/Bryan/Desktop/ingegneria_dei_sistemi_software/TemaFinale24/unibolibs</location>
+		</link>
+		<link>
 			<name>.link2</name>
 			<type>2</type>
 			<location>C:/Users/Bryan/Desktop/ingegneria_dei_sistemi_software/TemaFinale24/unibolibs</location>
