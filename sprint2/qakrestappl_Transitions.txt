@@ -1,0 +1,13 @@
+{"actor":"wis", "msgType":"dispatch", "curstate":"waitingRP", "nextstate":"handleRP", "msgId":"arrived_RP"}
+{"actor":"wis", "msgType":"dispatch", "curstate":"waitingRP", "nextstate":"handleUpdateStatoAshStorage", "msgId":"statoAshStorage"}
+{"actor":"wis", "msgType":"dispatch", "curstate":"handleRP", "nextstate":"handleRPInBurnin", "msgId":"rpInBurnin"}
+{"actor":"wis", "msgType":"dispatch", "curstate":"handleEndBurning", "nextstate":"handleUpdateStatoAshStorage", "msgId":"statoAshStorage"}
+{"actor":"wis", "msgType":"dispatch", "curstate":"waitingAshesToBeRemoved", "nextstate":"handleUpdateStatoAshStorage", "msgId":"statoAshStorage"}
+{"actor":"oprobot", "msgType":"dispatch", "curstate":"waitingWorking", "nextstate":"takeRP", "msgId":"arrived_RP"}
+{"actor":"oprobot", "msgType":"dispatch", "curstate":"restartJob", "nextstate":"takeRpBeforeFinishPlan", "msgId":"arrived_RP"}
+{"actor":"incinerator", "msgType":"dispatch", "curstate":"s0", "nextstate":"turnOn", "msgId":"activationCommand"}
+{"actor":"incinerator", "msgType":"dispatch", "curstate":"turnOn", "nextstate":"handleStartBurning", "msgId":"startBurning"}
+{"actor":"incinerator", "msgType":"dispatch", "curstate":"handleEndBurning", "nextstate":"handleStartBurning", "msgId":"startBurning"}
+{"actor":"monitoring_device_mok", "msgType":"dispatch", "curstate":"s0", "nextstate":"handleAshes", "msgId":"newAshes"}
+{"actor":"monitoring_device_mok", "msgType":"dispatch", "curstate":"handleAshes", "nextstate":"handleAshes", "msgId":"newAshes"}
+{"actor":"monitoring_device_mok", "msgType":"dispatch", "curstate":"simulateRemoveAshes", "nextstate":"handleAshes", "msgId":"newAshes"}
