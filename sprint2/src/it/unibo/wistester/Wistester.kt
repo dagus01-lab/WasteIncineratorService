@@ -30,7 +30,7 @@ class Wistester ( name: String, scope: CoroutineScope, isconfined: Boolean=false
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t030",targetState="handleinfo",cond=whenRequest("info"))
+					 transition(edgeName="t032",targetState="handleinfo",cond=whenRequest("info"))
 				}	 
 				state("handleinfo") { //this:State
 					action { //it:State
@@ -43,8 +43,8 @@ class Wistester ( name: String, scope: CoroutineScope, isconfined: Boolean=false
 				 	 		stateTimer = TimerActor("timer_handleinfo", 
 				 	 					  scope, context!!, "local_tout_"+name+"_handleinfo", 70000.toLong() )  //OCT2023
 					}	 	 
-					 transition(edgeName="t031",targetState="failure",cond=whenTimeout("local_tout_"+name+"_handleinfo"))   
-					transition(edgeName="t032",targetState="success",cond=whenDispatch("newAshes"))
+					 transition(edgeName="t033",targetState="failure",cond=whenTimeout("local_tout_"+name+"_handleinfo"))   
+					transition(edgeName="t034",targetState="success",cond=whenDispatch("newAshes"))
 				}	 
 				state("success") { //this:State
 					action { //it:State
@@ -54,7 +54,7 @@ class Wistester ( name: String, scope: CoroutineScope, isconfined: Boolean=false
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t033",targetState="handleinfo",cond=whenRequest("info"))
+					 transition(edgeName="t035",targetState="handleinfo",cond=whenRequest("info"))
 				}	 
 				state("failure") { //this:State
 					action { //it:State
@@ -64,7 +64,7 @@ class Wistester ( name: String, scope: CoroutineScope, isconfined: Boolean=false
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t034",targetState="handleinfo",cond=whenRequest("info"))
+					 transition(edgeName="t036",targetState="handleinfo",cond=whenRequest("info"))
 				}	 
 			}
 		}

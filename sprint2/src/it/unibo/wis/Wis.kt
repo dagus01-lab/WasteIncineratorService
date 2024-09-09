@@ -27,7 +27,6 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					action { //it:State
 						delay(500) 
 						CommUtils.outgreen("$name STARTS")
-						observeResource("localhost","8125","ctx_waste_incinerator_service","monitoring_device_mok","statoAshStorage")
 						forward("activationCommand", "activationCommand(1)" ,"incinerator" ) 
 						//genTimer( actor, state )
 					}
@@ -76,7 +75,19 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t04",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
+					 transition(edgeName="t04",targetState="endRoute",cond=whenDispatch("newAshes"))
+				}	 
+				state("endRoute") { //this:State
+					action { //it:State
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+				 	 		stateTimer = TimerActor("timer_endRoute", 
+				 	 					  scope, context!!, "local_tout_"+name+"_endRoute", 100.toLong() )  //OCT2023
+					}	 	 
+					 transition(edgeName="t05",targetState="waitingRP",cond=whenTimeout("local_tout_"+name+"_endRoute"))   
+					transition(edgeName="t06",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
 				}	 
 				state("handleUpdateStatoAshStorage") { //this:State
 					action { //it:State
@@ -103,7 +114,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t05",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
+					 transition(edgeName="t07",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
 				}	 
 			}
 		}

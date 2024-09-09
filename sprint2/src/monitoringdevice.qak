@@ -1,0 +1,195 @@
+System monitoringdevice
+Event sonardata : distance(D)   "emitted  by sonardevice or (better) by datacleaner"
+Event ashStorageLevel : ashStorageLevel(D)   "emitted  by datacleaner"
+Dispatch statoAshStorage : statoAshStorage(N)  "AshStorage info: 0 is not empty, 1 otherwise"
+
+
+Dispatch led_on : led_on(N) "messaggio di accensione del led"
+Dispatch led_blink: led_blink(N) "messaggio di lampeggio del led"
+Dispatch led_off : led_off(N) "messaggio di spegnimento del led"
+Dispatch statoIncinerator : statoIncinerator(N)  "Incinerator's burning status info: 0 is not burning, 1 otherwise"
+
+
+Context ctxmonitoringdevice ip [ host= "localhost"      port= 8100 ] 
+Context ctx_waste_incinerator_service ip [host="192.168.1.110" port=8125]
+
+ExternalQActor incinerator context ctx_waste_incinerator_service
+ 
+QActor sonardevice context ctxmonitoringdevice{
+[# 
+	lateinit var reader : java.io.BufferedReader
+    lateinit var p : Process	
+    var Distance = 0
+#]	
+	State s0 initial{
+		println("$name | sonarstart") 
+	 	[#
+			p       = Runtime.getRuntime().exec("python sonar.py")
+			reader  = java.io.BufferedReader(  java.io.InputStreamReader(p.getInputStream() ))	
+		#]		
+	}
+	Goto readSonarData
+	
+	State readSonarData{
+	[# 
+		var data = reader.readLine()
+		CommUtils.outyellow("$name with python: data = $data"   ) 
+		if( data != null ){
+		try{ 
+			val vd = data.toFloat()
+			val v  = vd.toInt()
+			if( v <= 100 ){	//A first filter ...
+				Distance = v				
+			}else Distance = 0
+		}catch(e: Exception){
+				CommUtils.outred("$name readSonarDataERROR: $e "   )
+		}
+		}//if
+		
+	#]	
+		if [# Distance > 0 #] { 
+		    println("$name with python: data = $data"   ) color yellow
+			emitlocalstream sonardata : distance($Distance)			 
+		}
+		//autodispatch doread : doread(1)
+	}
+	Goto readSonarData
+
+
+}//sonardevice
+
+
+QActor datacleaner context ctxmonitoringdevice {
+	[# 
+		var D = 0; 
+		val DLIMIT = 10;
+		val DMIN = 100;
+	#]
+	State s0 initial {
+		delay 1000
+		subscribeTo sonardevice for sonardata		
+		println("$name subscribed to sonardevice") color blue
+	}
+	Transition t0 whenEvent sonardata -> filter
+	
+	State filter {
+		 println("$name D=$D") color black	
+		onMsg(sonardata : distance(D)) {
+	      	[#  D = payloadArg(0).toInt() #]	      	
+	      	println("$name D=$D") color black	
+	      	if [# D < DLIMIT #] {
+	      		println("$name emit full") color magenta	
+	 			emitlocal ashStorageLevel:ashStorageLevel("FULL")
+	     	}
+	     	else {
+	     		if [# D > DMIN #] {
+		     		println("$name emit empty") color magenta	
+		 			emitlocal ashStorageLevel:ashStorageLevel("EMPTY")
+		     	} 	
+		     	else{
+		     		println("$name neither empty nor full") color magenta
+		     		emitlocal ashStorageLevel:ashStorageLevel("NORMAL")
+		     	}
+		    }
+     	}
+	}	
+	Transition t0 whenEvent sonardata -> filter
+}
+
+QActor monitoringdevice context ctxmonitoringdevice{
+	[#
+		num class StatiAshStorage{
+		    EMPTY, FULL, NORMAL
+		}
+		var statoAshStorage=StatiAshStorage.EMPTY;
+		var statoIncinerator=0;
+	#]
+	State s0 initial{
+		delay 1000
+		println("$name STARTS")
+		observeResource incinerator msgid statoIncinerator
+	}
+	Goto wait
+	State wait{
+		
+	}
+	Transition t0 whenMsg statoIncinerator-> handleStatoIncinerator
+				whenEvent ashStorageLevel -> handleAshStorageLevel
+	State handleStatoIncinerator{
+		onMsg(statoIncinerator : statoIncinerator(D)) {
+	      	[#  D = payloadArg(0).toInt() #]
+	      	if [#D==1#]{
+	      		forward led -m led_on:led_on(1)
+	      		[#statoIncinerator=1#]
+	      	}
+	      	else{
+	      		//controllo se l'ashstorage è vuoto o pieno
+	      		[#statoIncinerator=0#]
+	      		if [#statoAshStorage==StatiAshStorage.NORMAL#]{
+	      			forward led -m led_off:led_off(1)
+	      		}
+	      		else{
+	      			forward led -m led_blink:led_blink(1)
+	      		}
+	      		
+	      	}
+	    }
+	} 
+	Goto wait
+	State handleAshStorageLevel{
+		onMsg(ashStorageLevel:ashStorageLevel(D)) {
+			[#
+				D = StatiAshStorage.valueOf(payloadArg(0))
+			#]
+			if [#statoAshStorage!=D#]{
+				if [#statoIncinerator==0#]{
+					if [#statoAshStorage==2#]{
+						forward led -m led_off:led_off(1)
+					}
+					else{
+						forward led -m led_blink:led_blink(1)
+					}
+				}
+				[#
+					statoAshStorage=D
+				#]
+				if [#statoAshStorage==StatiAshStorage.FULL#]{
+					updateResource [# "statoAshStorage(1)" #]
+				} else {
+					updateResource [# "statoAshStorage(0)" #]
+				}
+				
+			}
+		}	
+	}
+	Goto wait
+	
+}
+
+QActor led context ctxmonitoringdevice{
+	State s0 initial{
+		println("$name started") color magenta
+	}
+	Goto wait
+	State wait{
+		
+	}
+	Transition t0 whenMsg led_on -> handle_led_on 
+				whenMsg led_off-> handle_led_off
+				whenMsg led_blink -> handle_led_blink
+	State handle_led_on {
+		println("LED on") color magenta
+		[# Runtime.getRuntime().exec("python3 led_on.py") #]
+	}
+	Goto wait
+	State handle_led_off {
+		println("LED off") color magenta
+		[# Runtime.getRuntime().exec("python3 led_off.py") #]
+	}
+	Goto wait
+	State handle_led_blink {
+		println("LED blinks") color magenta
+		[# Runtime.getRuntime().exec("python3 led_blink.py") #]
+	}
+	Goto wait
+} 

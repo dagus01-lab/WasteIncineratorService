@@ -31,7 +31,7 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t026",targetState="turnOn",cond=whenDispatch("activationCommand"))
+					 transition(edgeName="t028",targetState="turnOn",cond=whenDispatch("activationCommand"))
 				}	 
 				state("turnOn") { //this:State
 					action { //it:State
@@ -41,7 +41,7 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t027",targetState="handleStartBurning",cond=whenDispatch("startBurning"))
+					 transition(edgeName="t029",targetState="handleStartBurning",cond=whenDispatch("startBurning"))
 				}	 
 				state("handleStartBurning") { //this:State
 					action { //it:State
@@ -56,18 +56,20 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 				 	 		stateTimer = TimerActor("timer_handleStartBurning", 
 				 	 					  scope, context!!, "local_tout_"+name+"_handleStartBurning", BTIME )  //OCT2023
 					}	 	 
-					 transition(edgeName="t028",targetState="handleEndBurning",cond=whenTimeout("local_tout_"+name+"_handleStartBurning"))   
+					 transition(edgeName="t030",targetState="handleEndBurning",cond=whenTimeout("local_tout_"+name+"_handleStartBurning"))   
 				}	 
 				state("handleEndBurning") { //this:State
 					action { //it:State
 						emit("endBurning", "endBurning(1)" ) 
+						updateResourceRep( "statoIncinerator(0)"  
+						)
 						 stato = 0  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t029",targetState="handleStartBurning",cond=whenDispatch("startBurning"))
+					 transition(edgeName="t031",targetState="handleStartBurning",cond=whenDispatch("startBurning"))
 				}	 
 			}
 		}
