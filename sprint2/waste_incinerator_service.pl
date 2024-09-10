@@ -22,7 +22,8 @@ reply( inforeply, inforeply(X) ).  %%for info
 %====================================================================================
 context(ctx_waste_incinerator_service, "localhost",  "TCP", "8125").
 context(ctxbasicrobot, "127.0.0.1",  "TCP", "8020").
-context(ctxmonitoringdevice, "192.168.1.1010",  "TCP", "8100").
+context(ctxmonitoringdevice, "192.168.1.101",  "TCP", "8100").
+context(ctxscale, "192.168.1.102",  "TCP", "8100").
  qactor( basicrobot, ctxbasicrobot, "external").
   qactor( monitoringdevice, ctxmonitoringdevice, "external").
   qactor( wis, ctx_waste_incinerator_service, "it.unibo.wis.Wis").

@@ -39,8 +39,8 @@ Reply inforeply: inforeply(X) for info
 //Definizione dei due contesti (service e basicRobot)
 Context ctx_waste_incinerator_service ip [host="localhost" port=8125]
 Context ctxbasicrobot ip [host="127.0.0.1" port=8020]
-Context ctxmonitoringdevice ip [host="192.168.1.1010" port=8100]
-
+Context ctxmonitoringdevice ip [host="192.168.1.101" port=8100]
+Context ctxscale ip [host="192.168.1.102" port=8100]
 //Attore "esterno" BasicRobot
 ExternalQActor basicrobot context ctxbasicrobot
 ExternalQActor monitoringdevice context ctxmonitoringdevice
