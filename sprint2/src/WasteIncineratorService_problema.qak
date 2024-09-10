@@ -60,8 +60,8 @@ QActor wis context ctx_waste_incinerator_service{
 	//Stato che simula l'attesa di un nuovo RP nel WasteStorage
 	State waitingRP{
 	}
-	Transition t0 whenMsg arrived_RP ->  handleRP
-				  whenMsg statoAshStorage -> handleUpdateStatoAshStorage
+	Transition t0 whenMsg statoAshStorage -> handleUpdateStatoAshStorage 
+				  whenMsg arrived_RP ->  handleRP
 				
 	//Stato per gestire l'arrivo di un nuovo RP nel WasteStorage
 	State handleRP{
@@ -87,7 +87,7 @@ QActor wis context ctx_waste_incinerator_service{
 	State endRoute{
 		
 	}
-	Transition t0 whenTime 100 -> waitingRP
+	Transition t0 whenTime 1000 -> waitingRP
 				whenMsg statoAshStorage -> handleUpdateStatoAshStorage
 							
 	//Stato per gestire l'aggiornamento dello stato del AshStorage

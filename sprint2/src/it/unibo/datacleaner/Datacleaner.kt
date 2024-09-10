@@ -22,9 +22,8 @@ class Datacleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		 
-				var D = 0; 
-				val DLIMIT = 10;
-				val DMIN = 100;
+				var D = 0;
+				var previous_D = 0; 
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -40,25 +39,15 @@ class Datacleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 				}	 
 				state("filter") { //this:State
 					action { //it:State
-						CommUtils.outblack("$name D=$D")
 						if( checkMsgContent( Term.createTerm("distance(D)"), Term.createTerm("distance(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								  D = payloadArg(0).toInt()  
 								CommUtils.outblack("$name D=$D")
-								if(  D < DLIMIT  
-								 ){CommUtils.outmagenta("$name emit full")
-								emitlocal("ashStorageLevel", "ashStorageLevel("FULL")" ) 
+								if( D != previous_D 
+								 ){CommUtils.outmagenta("$name emit newLevel of Ash")
+								emitlocal("ashStorageLevel", "ashStorageLevel(D)" ) 
 								}
-								else
-								 {if(  D > DMIN  
-								  ){CommUtils.outmagenta("$name emit empty")
-								 emitlocal("ashStorageLevel", "ashStorageLevel("EMPTY")" ) 
-								 }
-								 else
-								  {CommUtils.outmagenta("$name neither empty nor full")
-								  emitlocal("ashStorageLevel", "ashStorageLevel("NORMAL")" ) 
-								  }
-								 }
+								 previous_D = D;  
 						}
 						//genTimer( actor, state )
 					}

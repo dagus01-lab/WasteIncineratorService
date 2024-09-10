@@ -61,9 +61,8 @@ QActor sonardevice context ctxmonitoringdevice{
 
 QActor datacleaner context ctxmonitoringdevice {
 	[# 
-		var D = 0; 
-		val DLIMIT = 10;
-		val DMIN = 100;
+		var D = 0;
+		var previous_D = 0; 
 	#]
 	State s0 initial {
 		delay 1000
@@ -73,24 +72,14 @@ QActor datacleaner context ctxmonitoringdevice {
 	Transition t0 whenEvent sonardata -> filter
 	
 	State filter {
-		 println("$name D=$D") color black	
-		onMsg(sonardata : distance(D)) {
+     	onMsg(sonardata : distance(D)) {
 	      	[#  D = payloadArg(0).toInt() #]	      	
 	      	println("$name D=$D") color black	
-	      	if [# D < DLIMIT #] {
-	      		println("$name emit full") color magenta	
-	 			emitlocal ashStorageLevel:ashStorageLevel("FULL")
+	      	if [#D != previous_D#]{ //verificare il margine della misura
+	      		println("$name emit newLevel of Ash") color magenta
+	 			emitlocal ashStorageLevel:ashStorageLevel(D)
 	     	}
-	     	else {
-	     		if [# D > DMIN #] {
-		     		println("$name emit empty") color magenta	
-		 			emitlocal ashStorageLevel:ashStorageLevel("EMPTY")
-		     	} 	
-		     	else{
-		     		println("$name neither empty nor full") color magenta
-		     		emitlocal ashStorageLevel:ashStorageLevel("NORMAL")
-		     	}
-		    }
+	      	[# previous_D = D; #]
      	}
 	}	
 	Transition t0 whenEvent sonardata -> filter
@@ -98,11 +87,10 @@ QActor datacleaner context ctxmonitoringdevice {
 
 QActor monitoringdevice context ctxmonitoringdevice{
 	[#
-		num class StatiAshStorage{
-		    EMPTY, FULL, NORMAL
-		}
-		var statoAshStorage=StatiAshStorage.EMPTY;
+		var levelAshStorage=0;
 		var statoIncinerator=0;
+		val DLIMIT = 10;
+		val DMIN = 100;
 	#]
 	State s0 initial{
 		delay 1000
@@ -117,15 +105,14 @@ QActor monitoringdevice context ctxmonitoringdevice{
 				whenEvent ashStorageLevel -> handleAshStorageLevel
 	State handleStatoIncinerator{
 		onMsg(statoIncinerator : statoIncinerator(D)) {
-	      	[#  D = payloadArg(0).toInt() #]
-	      	if [#D==1#]{
+	      	[# statoIncinerator = payloadArg(0).toInt() #]
+	      	
+	      	if [#statoIncinerator==1#]{
 	      		forward led -m led_on:led_on(1)
-	      		[#statoIncinerator=1#]
 	      	}
 	      	else{
 	      		//controllo se l'ashstorage è vuoto o pieno
-	      		[#statoIncinerator=0#]
-	      		if [#statoAshStorage==StatiAshStorage.NORMAL#]{
+	      		if [#levelAshStorage < DMIN && levelAshStorage > DLIMIT#]{
 	      			forward led -m led_off:led_off(1)
 	      		}
 	      		else{
@@ -139,26 +126,21 @@ QActor monitoringdevice context ctxmonitoringdevice{
 	State handleAshStorageLevel{
 		onMsg(ashStorageLevel:ashStorageLevel(D)) {
 			[#
-				D = StatiAshStorage.valueOf(payloadArg(0))
+				levelAshStorage = payloadArg(0).toInt()
 			#]
-			if [#statoAshStorage!=D#]{
-				if [#statoIncinerator==0#]{
-					if [#statoAshStorage==2#]{
-						forward led -m led_off:led_off(1)
-					}
-					else{
-						forward led -m led_blink:led_blink(1)
-					}
+			
+			if [#statoIncinerator==0#]{
+				if [#levelAshStorage < DMIN && levelAshStorage > DLIMIT#]{
+					forward led -m led_off:led_off(1)
 				}
-				[#
-					statoAshStorage=D
-				#]
-				if [#statoAshStorage==StatiAshStorage.FULL#]{
-					updateResource [# "statoAshStorage(1)" #]
-				} else {
-					updateResource [# "statoAshStorage(0)" #]
+				else{
+					forward led -m led_blink:led_blink(1)
 				}
-				
+			}
+			if [#levelAshStorage <= DLIMIT#]{
+				updateResource [# "statoAshStorage(1)" #]
+			} else {
+				updateResource [# "statoAshStorage(0)" #]
 			}
 		}	
 	}

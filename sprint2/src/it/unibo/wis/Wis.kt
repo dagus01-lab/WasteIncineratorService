@@ -42,8 +42,8 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t00",targetState="handleRP",cond=whenDispatch("arrived_RP"))
-					transition(edgeName="t01",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
+					 transition(edgeName="t00",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
+					transition(edgeName="t01",targetState="handleRP",cond=whenDispatch("arrived_RP"))
 				}	 
 				state("handleRP") { //this:State
 					action { //it:State
@@ -84,7 +84,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 				 	 		stateTimer = TimerActor("timer_endRoute", 
-				 	 					  scope, context!!, "local_tout_"+name+"_endRoute", 100.toLong() )  //OCT2023
+				 	 					  scope, context!!, "local_tout_"+name+"_endRoute", 1000.toLong() )  //OCT2023
 					}	 	 
 					 transition(edgeName="t05",targetState="waitingRP",cond=whenTimeout("local_tout_"+name+"_endRoute"))   
 					transition(edgeName="t06",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))

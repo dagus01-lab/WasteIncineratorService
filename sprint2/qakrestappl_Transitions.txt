@@ -1,5 +1,5 @@
-{"actor":"wis", "msgType":"dispatch", "curstate":"waitingRP", "nextstate":"handleRP", "msgId":"arrived_RP"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"waitingRP", "nextstate":"handleUpdateStatoAshStorage", "msgId":"statoAshStorage"}
+{"actor":"wis", "msgType":"dispatch", "curstate":"waitingRP", "nextstate":"handleRP", "msgId":"arrived_RP"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"handleRP", "nextstate":"handleRPInBurnin", "msgId":"rpInBurnin"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"handleEndBurning", "nextstate":"endRoute", "msgId":"newAshes"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"endRoute", "nextstate":"handleUpdateStatoAshStorage", "msgId":"statoAshStorage"}

@@ -22,11 +22,10 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		
-				num class StatiAshStorage{
-				    EMPTY, FULL, NORMAL
-				}
-				var statoAshStorage=StatiAshStorage.EMPTY;
+				var levelAshStorage=0;
 				var statoIncinerator=0;
+				val DLIMIT = 10;
+				val DMIN = 100;
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -54,14 +53,12 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("statoIncinerator(N)"), Term.createTerm("statoIncinerator(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								  D = payloadArg(0).toInt()  
-								if( D==1 
+								 statoIncinerator = payloadArg(0).toInt()  
+								if( statoIncinerator==1 
 								 ){forward("led_on", "led_on(1)" ,"led" ) 
-								statoIncinerator=1 
 								}
 								else
-								 {statoIncinerator=0 
-								 if( statoAshStorage==StatiAshStorage.NORMAL 
+								 {if( levelAshStorage < DMIN && levelAshStorage > DLIMIT 
 								  ){forward("led_off", "led_off(1)" ,"led" ) 
 								 }
 								 else
@@ -81,19 +78,16 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 						if( checkMsgContent( Term.createTerm("ashStorageLevel(D)"), Term.createTerm("ashStorageLevel(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
-												D = StatiAshStorage.valueOf(payloadArg(0))
-								if( statoAshStorage!=D 
-								 ){if( statoIncinerator==0 
-								 ){if( statoAshStorage==2 
+												levelAshStorage = payloadArg(0).toInt()
+								if( statoIncinerator==0 
+								 ){if( levelAshStorage < DMIN && levelAshStorage > DLIMIT 
 								 ){forward("led_off", "led_off(1)" ,"led" ) 
 								}
 								else
 								 {forward("led_blink", "led_blink(1)" ,"led" ) 
 								 }
 								}
-								
-													statoAshStorage=D
-								if( statoAshStorage==StatiAshStorage.FULL 
+								if( levelAshStorage <= DLIMIT 
 								 ){updateResourceRep( "statoAshStorage(1)"  
 								)
 								}
@@ -101,7 +95,6 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 								 {updateResourceRep( "statoAshStorage(0)"  
 								 )
 								 }
-								}
 						}
 						//genTimer( actor, state )
 					}
