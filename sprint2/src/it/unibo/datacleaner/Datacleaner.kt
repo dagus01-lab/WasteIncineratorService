@@ -22,42 +22,39 @@ class Datacleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		 
-				var RPs = 0;
-				var previous_RPs = 0; 
-				val WRP = 50;
+				var D = 0;
+				var previous_D = 0; 
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						delay(1000) 
-						subscribeToLocalActor("scaledevice") 
-						CommUtils.outblue("$name subscribed to scaledevice")
+						subscribeToLocalActor("sonardevice") 
+						CommUtils.outblue("$name subscribed to sonardevice")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t00",targetState="filter",cond=whenEvent("scaledata"))
+					 transition(edgeName="t00",targetState="filter",cond=whenEvent("sonardata"))
 				}	 
 				state("filter") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("weight(W)"), Term.createTerm("weight(W)"), 
+						if( checkMsgContent( Term.createTerm("distance(D)"), Term.createTerm("distance(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								  
-									      		W = payloadArg(0).toInt() 
-									      		RPs = W/WRP
-								CommUtils.outblack("$name RPs=$RPs")
-								if( RPs >= previous_RPs 
-								 ){CommUtils.outmagenta("$name emit number of RPs in Waste Storage")
-								emitlocal("wasteStorageRPs", "wasteStorageRPs(RPs)" ) 
+								  D = payloadArg(0).toInt()  
+								CommUtils.outblack("$name D=$D")
+								if( D != previous_D 
+								 ){CommUtils.outmagenta("$name emit newLevel of Ash")
+								emitlocal("ashStorageLevel", "ashStorageLevel(D)" ) 
 								}
-								 previous_W = W;  
+								 previous_D = D;  
 						}
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t01",targetState="filter",cond=whenEvent("scaledata"))
+					 transition(edgeName="t01",targetState="filter",cond=whenEvent("sonardata"))
 				}	 
 			}
 		}

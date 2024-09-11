@@ -34,6 +34,7 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				}	 
 				state("wait") { //this:State
 					action { //it:State
+						CommUtils.outblack("Waiting info from monitoringDevice...")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

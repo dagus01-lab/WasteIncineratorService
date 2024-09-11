@@ -54,7 +54,7 @@ class Sonardevice ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 								}catch(e: Exception){
 										CommUtils.outred("$name readSonarDataERROR: $e "   )
 								}
-								}//if
+								}
 								
 						if(  Distance > 0  
 						 ){CommUtils.outyellow("$name with python: data = $data")

@@ -54,7 +54,7 @@ class Scaledevice ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 								}catch(e: Exception){
 										CommUtils.outred("$name readscaleDataERROR: $e "   )
 								}
-								}//if
+								}
 								
 						if(  Weight > 0  
 						 ){CommUtils.outyellow("$name with python: data = $data")

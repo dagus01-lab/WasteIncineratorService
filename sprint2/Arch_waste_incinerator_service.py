@@ -34,6 +34,8 @@ with Diagram('waste_incinerator_serviceArch', show=False, outformat='png', graph
           basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
      with Cluster('ctxmonitoringdevice', graph_attr=nodeattr):
           monitoringdevice=Custom('monitoringdevice(ext)','./qakicons/externalQActor.png')
+     with Cluster('ctxscale', graph_attr=nodeattr):
+          scale=Custom('scale(ext)','./qakicons/externalQActor.png')
      sys >> Edge( label='endBurning', **evattr, decorate='true', fontcolor='darkgreen') >> wis
      sys >> Edge( label='endBurning', **evattr, decorate='true', fontcolor='darkgreen') >> oprobot
      oprobot >> Edge( label='alarm', **eventedgeattr, decorate='true', fontcolor='red') >> sys
@@ -43,4 +45,5 @@ with Diagram('waste_incinerator_serviceArch', show=False, outformat='png', graph
      oprobot >> Edge(color='blue', style='solid',  decorate='true', label='<rpInBurnin &nbsp; newAshes &nbsp; >',  fontcolor='blue') >> wis
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<activationCommand &nbsp; startBurning &nbsp; >',  fontcolor='blue') >> incinerator
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<arrived_RP &nbsp; >',  fontcolor='blue') >> oprobot
+     monitoringdevice >> Edge(color='blue', style='solid',  decorate='true', label='<statoAshStorage &nbsp; >',  fontcolor='blue') >> wis
 diag

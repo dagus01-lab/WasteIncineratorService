@@ -1,4 +1,4 @@
-/** Modello per l'architettura logica dello SPRINT1 del WasteIncineratorService */
+/** Modello per l'architettura logica dello SPRINT2 del WasteIncineratorService */
 
 System waste_incinerator_service
 
@@ -36,14 +36,16 @@ Reply moverobotfailed:  moverobotfailed(PLANDONE, PLANTODO) for moverobot
 Request info: info(X)
 Reply inforeply: inforeply(X) for info
 
-//Definizione dei due contesti (service e basicRobot)
+//Definizione dei contesti
 Context ctx_waste_incinerator_service ip [host="localhost" port=8125]
 Context ctxbasicrobot ip [host="127.0.0.1" port=8020]
 Context ctxmonitoringdevice ip [host="192.168.1.101" port=8100]
-Context ctxscale ip [host="192.168.1.102" port=8100]
-//Attore "esterno" BasicRobot
+Context ctxscale ip [host="192.168.1.102" port=8101]
+
+//Attori esterni al WIS
 ExternalQActor basicrobot context ctxbasicrobot
 ExternalQActor monitoringdevice context ctxmonitoringdevice
+ExternalQActor scale context ctxscale
 
 //--------------------------------Attore WIS-----------------------------------------------------------------
 QActor wis context ctx_waste_incinerator_service{
@@ -52,6 +54,8 @@ QActor wis context ctx_waste_incinerator_service{
 	State s0 initial{
 		delay 500
 		println("$name STARTS") color green
+		//si mette ad osservare lo stato del AshStorage fornito dal MonitoringDevice
+		observeResource monitoringdevice msgid statoAshStorage
 		//mando messaggio di attivazione del Incinerator
 		forward incinerator -m activationCommand : activationCommand(1)
 	}
@@ -84,11 +88,14 @@ QActor wis context ctx_waste_incinerator_service{
 		println("Incinerator has finished to burn") color green
 	}
 	Transition t0 whenMsg newAshes -> endRoute
+	
+	//Stato per gestire la "fine del giro" di scarico del robot
 	State endRoute{
-		
+		//se entro 1 secondo non ricevo aggiornamenti sullo stato del AshStorage, 
+		//allora considero di poter bruciare un nuovo RP
 	}
 	Transition t0 whenTime 1000 -> waitingRP
-				whenMsg statoAshStorage -> handleUpdateStatoAshStorage
+				  whenMsg statoAshStorage -> handleUpdateStatoAshStorage
 							
 	//Stato per gestire l'aggiornamento dello stato del AshStorage
 	State handleUpdateStatoAshStorage{

@@ -22,8 +22,8 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		
-				var levelAshStorage=0;
-				var statoIncinerator=0;
+				var levelAshStorage = 0;
+				var statoIncinerator = 0;
 				val DLIMIT = 10;
 				val DMIN = 100;
 		return { //this:ActionBasciFsm
@@ -41,15 +41,16 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 				}	 
 				state("wait") { //this:State
 					action { //it:State
+						CommUtils.outblack("Waiting data from sonar or updates from Incinerator...")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t02",targetState="handleStatoIncinerator",cond=whenDispatch("statoIncinerator"))
+					 transition(edgeName="t02",targetState="handleUpdateStatoIncinerator",cond=whenDispatch("statoIncinerator"))
 					transition(edgeName="t03",targetState="handleAshStorageLevel",cond=whenEvent("ashStorageLevel"))
 				}	 
-				state("handleStatoIncinerator") { //this:State
+				state("handleUpdateStatoIncinerator") { //this:State
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("statoIncinerator(N)"), Term.createTerm("statoIncinerator(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList

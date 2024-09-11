@@ -1,20 +1,27 @@
+/** Modello per l'architettura logica dello SPRINT2 della scale */
+
 System scale
+
+//Messaggi inerenti lo stato del WasteStorage
 Event scaledata : weight(W)   "emitted  by scale or (better) by datacleaner"
 Event wasteStorageRPs:wasteStorageRPs(N)   "emitted  by datacleaner"
 Dispatch arrived_RP : arrived_RP(N) "command that simulate the arrival of new RP"
 
-
+//Definizione dei contesti
 Context ctxscale ip [ host= "localhost"      port= 8200 ] 
 Context ctx_waste_incinerator_service ip [host="192.168.1.110" port=8125]
 
+//Attori esterni alla scale
 ExternalQActor wis context ctx_waste_incinerator_service
- 
+
+//--------------------------------Attore scaledevice------------------------------------------------------
 QActor scaledevice context ctxscale{
 [# 
 	lateinit var reader : java.io.BufferedReader
     lateinit var p : Process	
     var Weight = 0
 #]	
+	
 	State s0 initial{
 		println("$name | scalestart") 
 	 	[#
@@ -24,6 +31,7 @@ QActor scaledevice context ctxscale{
 	}
 	Goto readscaleData
 	
+	//Stato per la lettura dei dati dalla scale fisica
 	State readscaleData{
 	[# 
 		var data = reader.readLine()
@@ -38,7 +46,7 @@ QActor scaledevice context ctxscale{
 		}catch(e: Exception){
 				CommUtils.outred("$name readscaleDataERROR: $e "   )
 		}
-		}//if
+		}
 		
 	#]	
 		if [# Weight > 0 #] { 
@@ -48,17 +56,17 @@ QActor scaledevice context ctxscale{
 		//autodispatch doread : doread(1)
 	}
 	Goto readscaleData
+}
+//--------------------------------------------------------------------------------------------------------
 
-
-}//scaledevice
-
-
-QActor scaleusage context ctxscale {
+//--------------------------------Attore scale------------------------------------------------------------
+QActor scale context ctxscale {
 	[# 
 		var RPs = 0;
 		var previous_RPs = 0; 
 		val WRP = 50;
 	#]
+	
 	State s0 initial {
 		delay 1000
 		subscribeTo scaledevice for scaledata		
@@ -66,6 +74,7 @@ QActor scaleusage context ctxscale {
 	}
 	Transition t0 whenEvent scaledata -> filter
 	
+	//Stato per gestire i dati emessi dalla scaledata
 	State filter {
      	onMsg(scaledata : weight(W)) {
 	      	[#  
@@ -73,6 +82,8 @@ QActor scaleusage context ctxscale {
 	      		RPs = W/WRP
 	      	#]	      	
 	      	println("$name RPs=$RPs") color black	
+	      	
+	      	//Se il numero di RPs è aumentato, notifico tale info al WIS
 	      	if [#RPs >= previous_RPs#]{ //verificare il margine della misura
 	      		println("$name emit number of RPs in Waste Storage") color magenta
 	      		[#
@@ -88,4 +99,5 @@ QActor scaleusage context ctxscale {
 	}	
 	Transition t0 whenEvent scaledata -> filter
 }
+//--------------------------------------------------------------------------------------------------------
 

@@ -27,6 +27,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					action { //it:State
 						delay(500) 
 						CommUtils.outgreen("$name STARTS")
+						observeResource("192.168.1.101","8100","ctxmonitoringdevice","monitoringdevice","statoAshStorage")
 						forward("activationCommand", "activationCommand(1)" ,"incinerator" ) 
 						//genTimer( actor, state )
 					}

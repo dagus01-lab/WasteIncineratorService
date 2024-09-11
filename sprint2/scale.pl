@@ -10,5 +10,5 @@ context(ctx_waste_incinerator_service, "192.168.1.110",  "TCP", "8125").
  qactor( wis, ctx_waste_incinerator_service, "external").
   qactor( scaledevice, ctxscale, "it.unibo.scaledevice.Scaledevice").
  static(scaledevice).
-  qactor( scaleusage, ctxscale, "it.unibo.scaleusage.Scaleusage").
- static(scaleusage).
+  qactor( scale, ctxscale, "it.unibo.scale.Scale").
+ static(scale).

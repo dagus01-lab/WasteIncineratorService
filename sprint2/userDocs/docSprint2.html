@@ -290,15 +290,56 @@ Il modo migliore per ottenere tale informazione è far si che il MonitoringDevic
 
 <h4>Interazione WIS - Scale</h4>
 <p>
+Le problematiche relative all'interazione WIS - Scale sono le seguenti:
+<ul>
+	<li><span class="slidekp">P4</span> Come calcolare il numero di RP dal peso rilevato dalla scale fisica?</li>
+	<li><span class="slidekp">P5</span> Come comunicare tale informazione al WIS?</li>
+</ul>
+<br>
+Partiamo analizzando il problema P4.<br>
+La principale difficoltà sta nella "conversione" del peso rilevato dalla scale fisica in numero di RP, in quanto ci viene specificato dai requisiti
+che un RP è circa <b>WRP = 50 kg</b>, ma questo "circa", unito all'errore fisico, potrebbe portare a misurazioni errate. <br>
+Inoltre, l'errore di misura può variare da bilancia a bilancia, quindi in questa prima fase di analisi si decide di semplificare la realtà,
+considerando un arrotondamento "secco" per difetto su WRP per calcolare il numero di RPs misurati: <b>RPs = W/WRP</b> con W peso rilevato dalla scale fisica.
+<br><br>
+Consideriamo ora il problema P5.<br>
+Una volta ottenuto il numero di RPs presenti nel WasteStorage, occorre comunicare tale informazione al WIS.<br>
+Un possibile approccio, simile a quanto fatto con il MonitoringDevice, è rendere la scale osservabile e farla osservare dal WIS.<br>
+Tuttavia, per sfruttare quanto fatto negli sprint precedenti, si decide di comunicare il numero di RPs nel modo seguente:
+<ol>
+	<li>l'attore scale, dopo aver convertito da peso a numero di RP, calcola soltanto la differenza con il numero di RP precedenti.</li>
+	<li>sempre l'attore scale manda un Dispatch <b>arrived_rp</b>, per ciascuna unità calcolata, al WIS.</li>
+	<li>l'attore WIS, per capire se sono presenti o meno degli RPs, non fa altro che consumare i messaggi arrived_rp dalla propria coda di messaggi ricevuti.</li>
+</ol>
+Grazie a questo approccio, non dobbiamo toccare l'architettura del WIS, e quindi dover aggiungere una variabile lato WIS che memorizzi il numero di RPs, e inoltre
+sfruttiamo appieno la gestione della coda dei messaggi di cui sono dotati gli attori qak.
 </p>
 
 <h4>Architettura logica del problema</h4>
-<p>Definiamo ora un <a href=../src/WasteIncineratorService_problema.qak>modello</a> che descrive come i componenti elencati in precedenza interagiscono tra loro.<br>
-<a href="./img/waste_incinerator_problem_servicearch.png"><img src="./img/waste_incinerator_problem_servicearch.png" width="1000" height="800"/></a><br>
+<p>
+Definiamo ora un modello, composto da tre file distinti .qak, che descrive come i componenti elencati in precedenza interagiscono tra loro:
+<ul>
+	<li>
+		<b><a href="../src/WasteIncineratorService_problema.qak">WIS</a></b><br>
+		<a href="./img/waste_incinerator_problem_servicearch.png"><img src="./img/waste_incinerator_problem_servicearch.png" width="1000" height="800"/></a>
+	</li>
+	<li>
+		<b><a href="../src/monitoringdevice.qak">MonitoringDevice</a></b><br>
+		<a href="./img/monitoringdevicearch.png"><img src="./img/monitoringdevicearch.png" width="1000" height="800"/></a>
+	</li>
+	<li>
+		<b><a href="../src/scale.qak">Scale</a></b><br>
+		<a href="./img/scalearch.png"><img src="./img/scalearch.png" width="1000" height="800"/></a>
+	</li>
+</ul>
 
 <span class="slidekp">Discussione sulle entità</span><br>
-
-
+Notiamo, come già descritto nell'analisi sull'architettura del MonitoringDevice, che il monitoringdevice delega i vari compiti al sonardevice, datacleaner e led,
+mostrandosi come unico componente verso l'esterno.<br>
+In particolare, il datacleaner ha il compito di pulire i tanti dati ricevuti dal sonardevice e inviare soltanto le variazioni al monitoringdevice che ha il compito
+di interpretare la distanza ricevuta per capire se considerare il contenitore vuoto, pieno o "normale" (nè pieno nè vuoto).<br>
+Configurazione simile la abbiamo per la Scale, che delega il raccoglimento delle misurazioni a scaledevice. 
+Dopodichè, la scale effettua la conversione dei dati e l'invio al WIS come descritto in precedenza.
 </p>
 
 <h2>Progetto</h2>
