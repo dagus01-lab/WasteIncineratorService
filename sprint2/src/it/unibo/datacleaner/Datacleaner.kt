@@ -45,7 +45,7 @@ class Datacleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 								CommUtils.outblack("$name D=$D")
 								if( D != previous_D 
 								 ){CommUtils.outmagenta("$name emit newLevel of Ash")
-								emitlocal("ashStorageLevel", "ashStorageLevel(D)" ) 
+								emitLocalStreamEvent("ashStorageLevel", "ashStorageLevel($D)" ) 
 								}
 								 previous_D = D;  
 						}

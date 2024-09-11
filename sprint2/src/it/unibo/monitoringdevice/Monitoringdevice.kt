@@ -32,6 +32,7 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 						delay(1000) 
 						CommUtils.outblack("$name STARTS")
 						observeResource("192.168.1.110","8125","ctx_waste_incinerator_service","incinerator","statoIncinerator")
+						subscribeToLocalActor("datacleaner") 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

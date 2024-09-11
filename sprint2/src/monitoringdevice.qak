@@ -88,7 +88,7 @@ QActor datacleaner context ctxmonitoringdevice {
 	      	println("$name D=$D") color black	
 	      	if [#D != previous_D#]{ //verificare il margine della misura
 	      		println("$name emit newLevel of Ash") color magenta
-	 			emitlocal ashStorageLevel:ashStorageLevel(D)
+	 			emitlocalstream ashStorageLevel:ashStorageLevel($D)
 	     	}
 	      	[# previous_D = D; #]
      	}
@@ -111,6 +111,7 @@ QActor monitoringdevice context ctxmonitoringdevice{
 		println("$name STARTS")
 		//si mette ad osservare lo stato del Incinerator
 		observeResource incinerator msgid statoIncinerator
+		subscribeTo datacleaner for ashStorageLevel
 	}
 	Goto wait
 	
