@@ -1,0 +1,254 @@
+/** Modello per l'architettura logica dello SPRINT2 del monitoringDevice */
+
+System monitoringdevice
+
+//Messaggi inerenti lo stato del ashStorage
+Event sonardata : distance(D)   "emitted  by sonardevice or (better) by datacleaner"
+Event ashStorageLevel : ashStorageLevel(D)   "emitted  by datacleaner"
+Dispatch statoAshStorage : statoAshStorage(N)  "AshStorage info: 0 is not empty, 1 otherwise"
+
+//Messaggi per modificare lo stato del led fisico
+Dispatch led_on : led_on(N) "messaggio di accensione del led"
+Dispatch led_blink: led_blink(N) "messaggio di lampeggio del led"
+Dispatch led_off : led_off(N) "messaggio di spegnimento del led"
+
+//Messaggio per notificare lo stato del Incinerator al monitoringDevice
+Dispatch statoIncinerator : statoIncinerator(N)  "Incinerator's burning status info: 0 is not burning, 1 otherwise"
+
+//Definizione dei contesti
+Context ctxmonitoringdevice ip [ host= "localhost"      port= 8100 ] 
+Context ctx_waste_incinerator_service ip [host="192.168.1.85" port=8125]
+
+//Attori esterni al monitoringDevice
+ExternalQActor incinerator context ctx_waste_incinerator_service
+ 
+//--------------------------------Attore sonardevice----------------------------------------------------------
+QActor sonardevice context ctxmonitoringdevice{
+[# 
+	lateinit var reader : java.io.BufferedReader
+    lateinit var p : Process	
+    var Distance = 0;
+    var Data = "";
+#]	
+
+	State s0 initial{
+		println("$name | sonarstart") 
+	 	[#
+			p       = Runtime.getRuntime().exec("python sonar.py")
+			reader  = java.io.BufferedReader(  java.io.InputStreamReader(p.getInputStream() ))	
+		#]		
+		delay 100
+	}
+	Goto readSonarData
+	
+	//Stato per la lettura dei dati dal sonar fisico
+	State readSonarData{
+	[# 
+		Data = reader.readLine()
+		if( Data != null ){
+		try{ 
+			val vd = Data.toFloat()
+			val v  = vd.toInt()
+			if( v <= 100 ){	//A first filter ...
+				Distance = v				
+			}else Distance = 0
+		}catch(e: Exception){
+				CommUtils.outred("$name readSonarDataERROR: $e "   )
+		}
+		}
+		
+	#]	
+		if [# Distance > 0 #] { 
+		    //println("$name with python: data = $Data"   ) color yellow
+			emitlocalstream sonardata : distance($Distance)			 
+		}
+		//autodispatch doread : doread(1)
+	}
+	Goto readSonarData
+}
+//----------------------------------------------------------------------------------------------------------
+
+//--------------------------------Attore datacleaner--------------------------------------------------------
+QActor datacleaner context ctxmonitoringdevice {
+	[# 
+		var Level = -1;
+		var previous_level = 0;
+		var D = 0; 
+		val DLIMIT = 10;
+		val DMIN = 100; 
+	#]
+	
+	State s0 initial {
+		delay 1000
+		subscribeTo sonardevice for sonardata		
+		println("$name subscribed to sonardevice") color blue
+	}
+	Transition t0 whenEvent sonardata -> filter
+	
+	//Stato per filtrare soltanto i dati di interesse.
+	State filter {
+     	onMsg(sonardata : distance(D)) {
+	      	[#  
+	      		D = payloadArg(0).toInt()
+	      		Level = if (D > DMIN) {
+					    0
+					} else if (D < DLIMIT) {
+					    2
+					} else {
+					    1
+					}
+	      	#]	      	
+	      	//println("$name D=$D, level=$Level") color red
+	      		
+	      	if [#Level != previous_level#]{ //verificare il margine della misura
+	      		println("$name emit newLevel of Ash") color magenta
+	 			emitlocalstream ashStorageLevel:ashStorageLevel($Level)
+	     	}
+	      	[# previous_level = Level; #]
+     	}
+	}	
+	Transition t0 whenEvent sonardata -> filter
+}
+//--------------------------------------------------------------------------------------------------------
+
+//--------------------------------Attore monitoringDevice-------------------------------------------------
+QActor monitoringdevice context ctxmonitoringdevice{
+	[#
+		var levelAshStorage = 0;
+		var IncineratorStatus = 0;
+	#]
+	
+	State s0 initial{
+		delay 2000
+		println("$name STARTS")
+		//si mette ad osservare lo stato del Incinerator
+		observeResource incinerator msgid statoIncinerator
+		subscribeTo datacleaner for ashStorageLevel
+		updateResource [# "statoAshStorage(0)" #]
+		delay 1000		
+	}
+	Goto wait
+	
+	//Stato che simula l'attesa di ricevere dati dal sonar fisico o aggiornamenti sullo stato del Incinerator
+	State wait{
+		println("$name Waiting data from sonar or updates from Incinerator...") color blue
+	}
+	Transition t0 whenMsg statoIncinerator-> handleUpdateStatoIncinerator
+				  whenEvent ashStorageLevel -> handleAshStorageLevel
+			
+	//Stato per gestire l'aggiornamento dello stato del Incinerator
+	State handleUpdateStatoIncinerator{
+		onMsg(statoIncinerator : statoIncinerator(D)) {
+	      	[# 
+	      		IncineratorStatus = payloadArg(0).toInt() 
+	      	#]
+	      	println("$name Current incinerator state: $IncineratorStatus") color blue
+	      	
+	      	if [#IncineratorStatus==1#]{
+	      		//se l'Incinerator sta bruciando, allora devo accendere il led
+	      		forward led -m led_on:led_on(1)
+	      	}
+	      	else{
+	      		//altrimenti, controllo lo stato del ashStorage
+	      		if [#levelAshStorage==1#]{
+	      			//se non è né vuoto né pieno, allora devo spegnere il led
+	      			forward led -m led_off:led_off(1)
+	      		}
+	      		else{
+	      			//altrimenti devo far lampeggiare il led
+	      			forward led -m led_blink:led_blink(1)
+	      		}
+	      	}
+	    }
+	} 
+	Goto wait
+	
+	//Stato per gestire nuovi dati sul livello della cenere
+	State handleAshStorageLevel{ 
+		onMsg(ashStorageLevel:ashStorageLevel(L)) {
+			[#
+				levelAshStorage = payloadArg(0).toInt()
+			#]
+			println("$name current AshStorageLevel=$levelAshStorage") color blue
+			if [#IncineratorStatus==0#]{ 
+				if [#levelAshStorage==1#]{
+					//se Incinerator non sta bruciando e AshStorage non è né vuoto né pieno, allora spengo il led
+					forward led -m led_off:led_off(1)
+				}
+				else{
+					//se Incinerator non sta bruciando e AshStorage è pieno o vuoto, allora faccio lampeggiare il led
+					forward led -m led_blink:led_blink(1)
+				}
+			}
+			
+			//Aggiorno lo stato del AshStorage in base alla distanza misurata
+			if [#levelAshStorage==2#]{
+				println("$name Updating AshStorageStatus to 1") color blue
+				updateResource [# "statoAshStorage(1)" #]
+			} else {
+				println("$name Updating AshStorageStatus to 0") color blue
+				updateResource [# "statoAshStorage(0)" #]
+			}
+		}	
+	}
+	Goto wait
+}
+//--------------------------------------------------------------------------------------------------------
+
+//--------------------------------Attore led--------------------------------------------------------------
+QActor led context ctxmonitoringdevice{
+	[#
+		lateinit var writer : java.io.BufferedWriter
+    	lateinit var p : Process
+    #]
+	State s0 initial{
+		println("$name started") color magenta
+		[#
+			p       = Runtime.getRuntime().exec("python ledDevice.py")
+			writer = java.io.BufferedWriter( java.io.OutputStreamWriter(p.getOutputStream()));
+		#]	
+	}
+	Goto wait
+	
+	//Stato che simula l'attesa di informazioni dal monitoringDevice
+	State wait{
+		println("Waiting info from monitoringDevice...")
+	}
+	Transition t0 whenMsg led_on -> handle_led_on 
+				  whenMsg led_off-> handle_led_off
+				  whenMsg led_blink -> handle_led_blink
+				  
+	//Stato per gestire l'accensione del led fisico
+	State handle_led_on {
+		println("LED on") color magenta
+		[# 
+			writer.write("on")
+        	writer.newLine()
+        	writer.flush()
+		#]
+	}
+	Goto wait
+	
+	//Stato per gestire lo spegnimento del led fisico
+	State handle_led_off {
+		println("LED off") color magenta
+		[# 
+			writer.write("off")
+	        writer.newLine()
+	        writer.flush()
+		#]
+	}
+	Goto wait
+	
+	//Stato per gestire il lampeggiamento del led fisico
+	State handle_led_blink {
+		println("LED blinks") color magenta
+		[#
+			writer.write("blink")
+	        writer.newLine()
+	        writer.flush()
+		#]
+	}
+	Goto wait
+}
+//--------------------------------------------------------------------------------------------------------
