@@ -27,7 +27,6 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					action { //it:State
 						delay(500) 
 						CommUtils.outgreen("$name STARTS")
-						observeResource("192.168.1.105","8100","ctxmonitoringdevice","monitoringdevice","statoAshStorage")
 						forward("activationCommand", "activationCommand(1)" ,"incinerator" ) 
 						//genTimer( actor, state )
 					}
@@ -80,17 +79,24 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				}	 
 				state("endRoute") { //this:State
 					action { //it:State
+						CommUtils.outgreen("$name OpRobot has finished its route")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
+				 	 		stateTimer = TimerActor("timer_endRoute", 
+				 	 					  scope, context!!, "local_tout_"+name+"_endRoute", 1000.toLong() )  //OCT2023
 					}	 	 
-					 transition(edgeName="t05",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
+					 transition(edgeName="t05",targetState="waitingRP",cond=whenTimeout("local_tout_"+name+"_endRoute"))   
+					transition(edgeName="t06",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
 				}	 
 				state("handleUpdateStatoAshStorage") { //this:State
 					action { //it:State
+						CommUtils.outgreen("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
+						 	   
 						if( checkMsgContent( Term.createTerm("statoAshStorage(N)"), Term.createTerm("statoAshStorage(N)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
+								CommUtils.outgreen("payloadArg: ${payloadArg(0)}")
 								 AshStorageStatus = payloadArg(0).toInt()  
 								CommUtils.outgreen("AshStorageStatus: $AshStorageStatus")
 						}
@@ -112,7 +118,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t06",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
+					 transition(edgeName="t07",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
 				}	 
 			}
 		}

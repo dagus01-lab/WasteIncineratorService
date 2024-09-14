@@ -55,7 +55,7 @@ QActor wis context ctx_waste_incinerator_service{
 		delay 500
 		println("$name STARTS") color green
 		//si mette ad osservare lo stato del AshStorage fornito dal MonitoringDevice
-		observeResource monitoringdevice msgid statoAshStorage
+		//observeResource monitoringdevice msgid statoAshStorage
 		//mando messaggio di attivazione del Incinerator
 		forward incinerator -m activationCommand : activationCommand(1)
 	}
@@ -91,15 +91,18 @@ QActor wis context ctx_waste_incinerator_service{
 	
 	//Stato per gestire la "fine del giro" di scarico del robot
 	State endRoute{
+		println("$name OpRobot has finished its route") color green
 		//se entro 1 secondo non ricevo aggiornamenti sullo stato del AshStorage, 
 		//allora considero di poter bruciare un nuovo RP
 	}
-	Transition t0 /*whenTime 1000 -> waitingRP*/
+	Transition t0 whenTime 1000 -> waitingRP
 				  whenMsg statoAshStorage -> handleUpdateStatoAshStorage
 							
 	//Stato per gestire l'aggiornamento dello stato del AshStorage
 	State handleUpdateStatoAshStorage{
+		printCurrentMessage color green
 		onMsg( statoAshStorage : statoAshStorage(N)){
+			println("payloadArg: ${payloadArg(0)}") color green
 			[# AshStorageStatus = payloadArg(0).toInt() #]
 			println("AshStorageStatus: $AshStorageStatus") color green
 		}
@@ -255,16 +258,16 @@ QActor incinerator context ctx_waste_incinerator_service{
 	//Stato per gestire l'inizio di burning
 	State handleStartBurning{
 		println("Incinerator is burning...") color red
-		[# stato = 1 #]
-		updateResource [# "statoIncinerator(1)" #] //aggiorno gli Observer collegati
+		//updateResource [# "statoIncinerator(1)" #] //aggiorno gli Observer collegati
+		forward monitoringdevice -m statoIncinerator:statoIncinerator(1)
 	}
 	Transition t0 whenTimeVar BTIME -> handleEndBurning
 	
 	//Stato per gestire la fine di burning
 	State handleEndBurning{
 		emit endBurning : endBurning(1) //emette il segnale di fine burning
-		updateResource [# "statoIncinerator(0)" #]
-		[# stato = 0 #]
+		//updateResource [# "statoIncinerator(0)" #]
+		forward monitoringdevice -m statoIncinerator:statoIncinerator(0)
 	}
 	Transition t0 whenMsg startBurning -> handleStartBurning   
 }
@@ -308,7 +311,7 @@ QActor scalemock context ctx_waste_incinerator_service{
 	Transition t0 whenTime 1000 -> simulateRP //l'attore simula l'arrivo di un RP dopo 1 secondo
 	
 	State simulateRP {
-		delay 10000
+		delay 5000
 		forward wis -m arrived_RP : arrived_RP(1)
 		//delay 38000
 		//forward wis -m arrived_RP : arrived_RP(1)
@@ -319,7 +322,7 @@ QActor scalemock context ctx_waste_incinerator_service{
 /*
 //------------------------Attore mok che simula il comportamento del MonitoringDevice------------------------
 QActor monitoring_device_mok context ctx_waste_incinerator_service{
-	[# var ashLevel = 0; val MAX_LEVEL = 4 #] //livello delle cenere sotto forma di numero di RP bruciati
+	[# var ashLevel = 3; val MAX_LEVEL = 4 #] //livello delle cenere sotto forma di numero di RP bruciati
 	
 	State s0 initial{
 		println("$name STARTS") color yellow

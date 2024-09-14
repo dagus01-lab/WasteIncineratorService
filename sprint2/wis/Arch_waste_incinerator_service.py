@@ -43,7 +43,7 @@ with Diagram('waste_incinerator_serviceArch', show=False, outformat='png', graph
      wistester >> Edge(color='blue', style='solid',  decorate='true', label='<arrived_RP &nbsp; >',  fontcolor='blue') >> wis
      oprobot >> Edge(color='blue', style='solid',  decorate='true', label='<rpInBurnin &nbsp; newAshes &nbsp; >',  fontcolor='blue') >> wis
      scalemock >> Edge(color='blue', style='solid',  decorate='true', label='<arrived_RP &nbsp; >',  fontcolor='blue') >> wis
+     incinerator >> Edge(color='blue', style='solid',  decorate='true', label='<statoIncinerator &nbsp; >',  fontcolor='blue') >> monitoringdevice
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<activationCommand &nbsp; startBurning &nbsp; >',  fontcolor='blue') >> incinerator
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<arrived_RP &nbsp; >',  fontcolor='blue') >> oprobot
-     monitoringdevice >> Edge(color='blue', style='solid',  decorate='true', label='<statoAshStorage &nbsp; >',  fontcolor='blue') >> wis
 diag

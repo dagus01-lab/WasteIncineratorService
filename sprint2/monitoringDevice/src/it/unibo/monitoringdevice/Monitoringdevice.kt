@@ -29,10 +29,8 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 					action { //it:State
 						delay(2000) 
 						CommUtils.outblack("$name STARTS")
-						observeResource("192.168.1.85","8125","ctx_waste_incinerator_service","incinerator","statoIncinerator")
 						subscribeToLocalActor("datacleaner") 
-						updateResourceRep( "statoAshStorage(0)"  
-						)
+						forward("statoAshStorage", "statoAshStorage(0)" ,"wis" ) 
 						delay(1000) 
 						//genTimer( actor, state )
 					}
@@ -54,6 +52,8 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 				}	 
 				state("handleUpdateStatoIncinerator") { //this:State
 					action { //it:State
+						CommUtils.outgreen("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
+						 	   
 						if( checkMsgContent( Term.createTerm("statoIncinerator(N)"), Term.createTerm("statoIncinerator(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 
@@ -95,13 +95,11 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 								}
 								if( levelAshStorage==2 
 								 ){CommUtils.outblue("$name Updating AshStorageStatus to 1")
-								updateResourceRep( "statoAshStorage(1)"  
-								)
+								forward("statoAshStorage", "statoAshStorage(1)" ,"wis" ) 
 								}
 								else
 								 {CommUtils.outblue("$name Updating AshStorageStatus to 0")
-								 updateResourceRep( "statoAshStorage(0)"  
-								 )
+								 forward("statoAshStorage", "statoAshStorage(0)" ,"wis" ) 
 								 }
 						}
 						//genTimer( actor, state )

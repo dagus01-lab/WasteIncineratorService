@@ -32,8 +32,9 @@ with Diagram('monitoringdeviceArch', show=False, outformat='png', graph_attr=gra
           led=Custom('led','./qakicons/symActorSmall.png')
      with Cluster('ctx_waste_incinerator_service', graph_attr=nodeattr):
           incinerator=Custom('incinerator(ext)','./qakicons/externalQActor.png')
+          wis=Custom('wis(ext)','./qakicons/externalQActor.png')
      sonardevice >> Edge( label='sonardata', **eventedgeattr, decorate='true', fontcolor='red') >> datacleaner
      datacleaner >> Edge( label='ashStorageLevel', **eventedgeattr, decorate='true', fontcolor='red') >> monitoringdevice
      monitoringdevice >> Edge(color='blue', style='solid',  decorate='true', label='<led_on &nbsp; led_off &nbsp; led_blink &nbsp; >',  fontcolor='blue') >> led
-     incinerator >> Edge(color='blue', style='solid',  decorate='true', label='<statoIncinerator &nbsp; >',  fontcolor='blue') >> monitoringdevice
+     monitoringdevice >> Edge(color='blue', style='solid',  decorate='true', label='<statoAshStorage &nbsp; >',  fontcolor='blue') >> wis
 diag
