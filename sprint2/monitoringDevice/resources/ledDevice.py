@@ -3,18 +3,38 @@ import RPi.GPIO as GPIO
 import sys
 import time
 import threading
+import signal
 
 # Setup GPIO
+LED=25
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(25, GPIO.OUT)
+GPIO.setup(LED, GPIO.OUT)
 
+# Signal handler to catch Ctrl+C and clean up
+def signal_handler(sig, frame):
+    global blinking, stop_thread, LED
+    print("Exiting...")
+
+    blinking = False
+    stop_thread = True
+    GPIO.output(LED, GPIO.LOW)  # Turn off the LED before exiting
+    GPIO.cleanup() 
+    sys.exit(0) 
+
+# Register the signal handler
+signal.signal(signal.SIGINT, signal_handler)
+
+# Led blinking thread setup
 blinking = False
+stop_thread = False 
 
 def blink_led():
     while blinking:
-        GPIO.output(25, GPIO.HIGH)
+        if stop_thread:
+            break
+        GPIO.output(LED, GPIO.HIGH)
         time.sleep(0.5)
-        GPIO.output(25, GPIO.LOW)
+        GPIO.output(LED, GPIO.LOW)
         time.sleep(0.5)
 
 for line in sys.stdin:
@@ -23,12 +43,12 @@ for line in sys.stdin:
     try:
         if 'on' in line:
             # Turn on the LED
-            GPIO.output(25, GPIO.HIGH)
-            blinking = False 
+            GPIO.output(LED, GPIO.HIGH)
+            blinking = False
         elif 'off' in line:
             # Turn off the LED
-            GPIO.output(25, GPIO.LOW)
-            blinking = False  
+            GPIO.output(LED, GPIO.LOW)
+            blinking = False
         elif 'blink' in line:
             # Start blinking the LED
             if not blinking:
@@ -37,6 +57,6 @@ for line in sys.stdin:
                 blink_thread.start()
         else:
             print("LedDevice | Unknown command")
-            blinking = False  
+            blinking = False
     except Exception as e:
         print(f"LedDevice | An exception occurred: {e}")
