@@ -21,6 +21,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
+		 var statoAshStorage = 0  
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -36,13 +37,13 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				}	 
 				state("waitingRP") { //this:State
 					action { //it:State
-						CommUtils.outgreen("Waiting for a new RP...")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
 					 transition(edgeName="t00",targetState="handleRP",cond=whenDispatch("arrived_RP"))
+					transition(edgeName="t01",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
 				}	 
 				state("handleRP") { //this:State
 					action { //it:State
@@ -53,7 +54,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t01",targetState="handleRPInBurnin",cond=whenDispatch("rpInBurnin"))
+					 transition(edgeName="t02",targetState="handleRPInBurnin",cond=whenDispatch("rpInBurnin"))
 				}	 
 				state("handleRPInBurnin") { //this:State
 					action { //it:State
@@ -64,7 +65,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t02",targetState="handleEndBurning",cond=whenEvent("endBurning"))
+					 transition(edgeName="t03",targetState="handleEndBurning",cond=whenEvent("endBurning"))
 				}	 
 				state("handleEndBurning") { //this:State
 					action { //it:State
@@ -74,7 +75,34 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="waitingRP", cond=doswitch() )
+					 transition(edgeName="t04",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
+				}	 
+				state("handleUpdateStatoAshStorage") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("statoAshStorage(N)"), Term.createTerm("statoAshStorage(N)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								 statoAshStorage = payloadArg(0).toInt()  
+								CommUtils.outgreen("AshStorageStatus: $statoAshStorage")
+						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="waitingRP", cond=doswitchGuarded({ statoAshStorage == 0  
+					}) )
+					transition( edgeName="goto",targetState="waitingAshesToBeRemoved", cond=doswitchGuarded({! ( statoAshStorage == 0  
+					) }) )
+				}	 
+				state("waitingAshesToBeRemoved") { //this:State
+					action { //it:State
+						CommUtils.outgreen("WIS is waiting an operator to remove ashes in AshStorage...")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t05",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
 				}	 
 			}
 		}

@@ -20,7 +20,7 @@ Event alarm : alarm(X)
 Dispatch newAshes : newAshes(N) "command that simulate the arrival of new RP's ashes"
  
 //Messaggio per notificare lo stato del AshStorage al WIS
-Dispatch statoAshStorage : statoAshStorage(N)  "AshStorage info: 0 is not empty, 1 otherwise"
+Event statoAshStorage : statoAshStorage(N)  "AshStorage info: 0 is not empty, 1 otherwise"
 
 //Messaggi per ingaggiare e muovere il BasicRobot
 Request engage        : engage(OWNER, STEPTIME)	
@@ -54,6 +54,9 @@ QActor wis context ctx_waste_incinerator_service{
 	State s0 initial{
 		delay 500
 		println("$name STARTS") color green
+		connectToMqttBroker "wss://test.mosquitto.org:8081" clientid "wisnat"
+ 		println("$name | CREATED  (and connected to mosquitto) ... ") color green
+ 		subscribe "unibodisi"
 		//si mette ad osservare lo stato del AshStorage fornito dal MonitoringDevice
 		//observeResource monitoringdevice msgid statoAshStorage
 		//mando messaggio di attivazione del Incinerator
@@ -64,7 +67,7 @@ QActor wis context ctx_waste_incinerator_service{
 	//Stato che simula l'attesa di un nuovo RP nel WasteStorage
 	State waitingRP{
 	}
-	Transition t0 whenMsg statoAshStorage -> handleUpdateStatoAshStorage
+	Transition t0 whenEvent statoAshStorage -> handleUpdateStatoAshStorage
 				  whenMsg arrived_RP ->  handleRP
 				
 	//Stato per gestire l'arrivo di un nuovo RP nel WasteStorage
@@ -96,7 +99,7 @@ QActor wis context ctx_waste_incinerator_service{
 		//allora considero di poter bruciare un nuovo RP
 	}
 	Transition t0 whenTime 1000 -> waitingRP
-				  whenMsg statoAshStorage -> handleUpdateStatoAshStorage
+				  whenEvent statoAshStorage -> handleUpdateStatoAshStorage
 							
 	//Stato per gestire l'aggiornamento dello stato del AshStorage
 	State handleUpdateStatoAshStorage{
@@ -113,7 +116,7 @@ QActor wis context ctx_waste_incinerator_service{
 	State waitingAshesToBeRemoved{
 		println("WIS is waiting an operator to remove ashes in AshStorage...") color green
 	}
-	Transition t0 whenMsg statoAshStorage -> handleUpdateStatoAshStorage
+	Transition t0 whenEvent statoAshStorage -> handleUpdateStatoAshStorage
 }
 //-----------------------------------------------------------------------------------------------------------
 

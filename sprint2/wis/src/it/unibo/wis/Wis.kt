@@ -27,6 +27,9 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					action { //it:State
 						delay(500) 
 						CommUtils.outgreen("$name STARTS")
+						connectToMqttBroker( "wss://test.mosquitto.org:8081", "wisnat" )
+						CommUtils.outgreen("$name | CREATED  (and connected to mosquitto) ... ")
+						subscribe(  "unibodisi" ) //mqtt.subscribe(this,topic)
 						forward("activationCommand", "activationCommand(1)" ,"incinerator" ) 
 						//genTimer( actor, state )
 					}
@@ -42,7 +45,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t00",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
+					 transition(edgeName="t00",targetState="handleUpdateStatoAshStorage",cond=whenEvent("statoAshStorage"))
 					transition(edgeName="t01",targetState="handleRP",cond=whenDispatch("arrived_RP"))
 				}	 
 				state("handleRP") { //this:State
@@ -88,7 +91,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				 	 					  scope, context!!, "local_tout_"+name+"_endRoute", 1000.toLong() )  //OCT2023
 					}	 	 
 					 transition(edgeName="t05",targetState="waitingRP",cond=whenTimeout("local_tout_"+name+"_endRoute"))   
-					transition(edgeName="t06",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
+					transition(edgeName="t06",targetState="handleUpdateStatoAshStorage",cond=whenEvent("statoAshStorage"))
 				}	 
 				state("handleUpdateStatoAshStorage") { //this:State
 					action { //it:State
@@ -118,7 +121,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t07",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
+					 transition(edgeName="t07",targetState="handleUpdateStatoAshStorage",cond=whenEvent("statoAshStorage"))
 				}	 
 			}
 		}

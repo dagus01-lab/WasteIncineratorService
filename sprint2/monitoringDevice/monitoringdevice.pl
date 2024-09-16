@@ -3,7 +3,7 @@
 %====================================================================================
 event( sonardata, distance(D) ). %emitted  by sonardevice or (better) by datacleaner
 event( ashStorageLevel, ashStorageLevel(D) ). %emitted  by datacleaner
-dispatch( statoAshStorage, statoAshStorage(N) ). %AshStorage info: 0 is not empty, 1 otherwise
+event( statoAshStorage, statoAshStorage(N) ). %AshStorage info: 0 is not empty, 1 otherwise
 dispatch( led_on, led_on(N) ). %messaggio di accensione del led
 dispatch( led_blink, led_blink(N) ). %messaggio di lampeggio del led
 dispatch( led_off, led_off(N) ). %messaggio di spegnimento del led

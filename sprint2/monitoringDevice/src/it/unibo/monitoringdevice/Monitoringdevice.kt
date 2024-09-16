@@ -29,8 +29,12 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 					action { //it:State
 						delay(2000) 
 						CommUtils.outblack("$name STARTS")
+						connectToMqttBroker( "wss://test.mosquitto.org:8081", "monitoringdevicenat" )
+						CommUtils.outgreen("$name | CREATED  (and connected to mosquitto) ... ")
+						subscribe(  "unibodisi" ) //mqtt.subscribe(this,topic)
 						subscribeToLocalActor("datacleaner") 
-						forward("statoAshStorage", "statoAshStorage(0)" ,"wis" ) 
+						//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(0)" ) 
+						publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(0)").toString(), "unibodisi" )   
 						delay(1000) 
 						//genTimer( actor, state )
 					}
@@ -95,11 +99,13 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 								}
 								if( levelAshStorage==2 
 								 ){CommUtils.outblue("$name Updating AshStorageStatus to 1")
-								forward("statoAshStorage", "statoAshStorage(1)" ,"wis" ) 
+								//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(1)" ) 
+								publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(1)").toString(), "unibodisi" )   
 								}
 								else
 								 {CommUtils.outblue("$name Updating AshStorageStatus to 0")
-								 forward("statoAshStorage", "statoAshStorage(0)" ,"wis" ) 
+								 //val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(0)" ) 
+								 publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(0)").toString(), "unibodisi" )   
 								 }
 						}
 						//genTimer( actor, state )

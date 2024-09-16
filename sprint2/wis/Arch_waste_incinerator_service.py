@@ -35,6 +35,7 @@ with Diagram('waste_incinerator_serviceArch', show=False, outformat='png', graph
           basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
      with Cluster('ctxmonitoringdevice', graph_attr=nodeattr):
           monitoringdevice=Custom('monitoringdevice(ext)','./qakicons/externalQActor.png')
+     sys >> Edge( label='statoAshStorage', **evattr, decorate='true', fontcolor='darkgreen') >> wis
      sys >> Edge( label='endBurning', **evattr, decorate='true', fontcolor='darkgreen') >> wis
      sys >> Edge( label='endBurning', **evattr, decorate='true', fontcolor='darkgreen') >> oprobot
      oprobot >> Edge( label='alarm', **eventedgeattr, decorate='true', fontcolor='red') >> sys
