@@ -26,6 +26,9 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outred("$name STARTS")
+						connectToMqttBroker( "ws://127.0.0.1:8081", "incineratornat" )
+						CommUtils.outgreen("$name | CREATED  (and connected to mosquitto) ... ")
+						subscribe(  "unibodisi" ) //mqtt.subscribe(this,topic)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -46,7 +49,8 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 				state("handleStartBurning") { //this:State
 					action { //it:State
 						CommUtils.outred("Incinerator is burning...")
-						forward("statoIncinerator", "statoIncinerator(1)" ,"monitoringdevice" ) 
+						//val m = MsgUtil.buildEvent(name, "statoIncinerator", "statoIncinerator(1)" ) 
+						publish(MsgUtil.buildEvent(name,"statoIncinerator","statoIncinerator(1)").toString(), "unibodisi" )   
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -59,7 +63,8 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 				state("handleEndBurning") { //this:State
 					action { //it:State
 						emit("endBurning", "endBurning(1)" ) 
-						forward("statoIncinerator", "statoIncinerator(0)" ,"monitoringdevice" ) 
+						//val m = MsgUtil.buildEvent(name, "statoIncinerator", "statoIncinerator(0)" ) 
+						publish(MsgUtil.buildEvent(name,"statoIncinerator","statoIncinerator(0)").toString(), "unibodisi" )   
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

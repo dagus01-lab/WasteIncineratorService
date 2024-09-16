@@ -23,7 +23,7 @@ class Datacleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		 
 				var Level = -1;
-				var previous_level = 0;
+				var previous_level = -1;
 				var D = 0; 
 				val DLIMIT = 10;
 				val DMIN = 100; 

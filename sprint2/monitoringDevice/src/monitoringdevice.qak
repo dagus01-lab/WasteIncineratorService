@@ -13,7 +13,7 @@ Dispatch led_blink: led_blink(N) "messaggio di lampeggio del led"
 Dispatch led_off : led_off(N) "messaggio di spegnimento del led"
 
 //Messaggio per notificare lo stato del Incinerator al monitoringDevice
-Dispatch statoIncinerator : statoIncinerator(N)  "Incinerator's burning status info: 0 is not burning, 1 otherwise"
+Event statoIncinerator : statoIncinerator(N)  "Incinerator's burning status info: 0 is not burning, 1 otherwise"
 
 //Definizione dei contesti
 Context ctxmonitoringdevice ip [ host= "localhost"      port= 8100 ] 
@@ -73,7 +73,7 @@ QActor sonardevice context ctxmonitoringdevice{
 QActor datacleaner context ctxmonitoringdevice {
 	[# 
 		var Level = -1;
-		var previous_level = 0;
+		var previous_level = -1;
 		var D = 0; 
 		val DLIMIT = 10;
 		val DMIN = 100; 
@@ -122,9 +122,7 @@ QActor monitoringdevice context ctxmonitoringdevice{
 	State s0 initial{
 		delay 2000
 		println("$name STARTS")
-		connectToMqttBroker "wss://test.mosquitto.org:8081" clientid "monitoringdevicenat"
- 		println("$name | CREATED  (and connected to mosquitto) ... ") color green
- 		subscribe "unibodisi"
+		connectToMqttBroker "ws://192.168.1.85:8081" clientid "monitoringdevicenat"
 		//si mette ad osservare lo stato del Incinerator
 		//observeResource incinerator msgid statoIncinerator
 		subscribeTo datacleaner for ashStorageLevel
@@ -139,7 +137,7 @@ QActor monitoringdevice context ctxmonitoringdevice{
 	State wait{
 		println("$name Waiting data from sonar or updates from Incinerator...") color blue
 	}
-	Transition t0 whenMsg statoIncinerator-> handleUpdateStatoIncinerator
+	Transition t0 whenEvent statoIncinerator-> handleUpdateStatoIncinerator
 				  whenEvent ashStorageLevel -> handleAshStorageLevel
 			
 	//Stato per gestire l'aggiornamento dello stato del Incinerator

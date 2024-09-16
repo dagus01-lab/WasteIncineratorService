@@ -27,7 +27,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					action { //it:State
 						delay(500) 
 						CommUtils.outgreen("$name STARTS")
-						connectToMqttBroker( "wss://test.mosquitto.org:8081", "wisnat" )
+						connectToMqttBroker( "ws://127.0.0.1:8081", "wisnat" )
 						CommUtils.outgreen("$name | CREATED  (and connected to mosquitto) ... ")
 						subscribe(  "unibodisi" ) //mqtt.subscribe(this,topic)
 						forward("activationCommand", "activationCommand(1)" ,"incinerator" ) 
@@ -88,7 +88,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 				 	 		stateTimer = TimerActor("timer_endRoute", 
-				 	 					  scope, context!!, "local_tout_"+name+"_endRoute", 1000.toLong() )  //OCT2023
+				 	 					  scope, context!!, "local_tout_"+name+"_endRoute", 2000.toLong() )  //OCT2023
 					}	 	 
 					 transition(edgeName="t05",targetState="waitingRP",cond=whenTimeout("local_tout_"+name+"_endRoute"))   
 					transition(edgeName="t06",targetState="handleUpdateStatoAshStorage",cond=whenEvent("statoAshStorage"))

@@ -2,7 +2,7 @@
 % waste_incinerator_service description   
 %====================================================================================
 dispatch( arrived_RP, arrived_RP(N) ). %command that simulate the arrival of new RP
-dispatch( statoIncinerator, statoIncinerator(N) ). %Incinerator's burning status info: 0 is not burning, 1 otherwise
+event( statoIncinerator, statoIncinerator(N) ). %Incinerator's burning status info: 0 is not burning, 1 otherwise
 dispatch( activationCommand, activationCommand(N) ). %command that turns the incinerator on
 dispatch( startBurning, startBurning(N) ). %command that makes the incinerator start burning the next RP
 dispatch( rpInBurnin, rpInBurnin(N) ). %command that makes the wis start the incinerator
@@ -31,7 +31,5 @@ context(ctxmonitoringdevice, "192.168.1.105",  "TCP", "8100").
  static(oprobot).
   qactor( incinerator, ctx_waste_incinerator_service, "it.unibo.incinerator.Incinerator").
  static(incinerator).
-  qactor( wistester, ctx_waste_incinerator_service, "it.unibo.wistester.Wistester").
- static(wistester).
   qactor( scalemock, ctx_waste_incinerator_service, "it.unibo.scalemock.Scalemock").
  static(scalemock).

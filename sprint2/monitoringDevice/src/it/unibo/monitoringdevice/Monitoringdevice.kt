@@ -29,9 +29,7 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 					action { //it:State
 						delay(2000) 
 						CommUtils.outblack("$name STARTS")
-						connectToMqttBroker( "wss://test.mosquitto.org:8081", "monitoringdevicenat" )
-						CommUtils.outgreen("$name | CREATED  (and connected to mosquitto) ... ")
-						subscribe(  "unibodisi" ) //mqtt.subscribe(this,topic)
+						connectToMqttBroker( "ws://192.168.1.85:8081", "monitoringdevicenat" )
 						subscribeToLocalActor("datacleaner") 
 						//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(0)" ) 
 						publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(0)").toString(), "unibodisi" )   
@@ -51,7 +49,7 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t02",targetState="handleUpdateStatoIncinerator",cond=whenDispatch("statoIncinerator"))
+					 transition(edgeName="t02",targetState="handleUpdateStatoIncinerator",cond=whenEvent("statoIncinerator"))
 					transition(edgeName="t03",targetState="handleAshStorageLevel",cond=whenEvent("ashStorageLevel"))
 				}	 
 				state("handleUpdateStatoIncinerator") { //this:State
