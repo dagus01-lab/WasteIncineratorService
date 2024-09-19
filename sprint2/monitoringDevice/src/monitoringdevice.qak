@@ -5,7 +5,7 @@ System monitoringdevice
 //Messaggi inerenti lo stato del ashStorage
 Event sonardata : distance(D)   "emitted  by sonardevice or (better) by datacleaner"
 Event ashStorageLevel : ashStorageLevel(D)   "emitted  by datacleaner"
-Event statoAshStorage : statoAshStorage(N)  "AshStorage info: 0 is not empty, 1 otherwise"
+Dispatch statoAshStorage : statoAshStorage(N)  "AshStorage info: 0 is not empty, 1 otherwise"
 
 //Messaggi per modificare lo stato del led fisico
 Dispatch led_on : led_on(N) "messaggio di accensione del led"
@@ -13,11 +13,11 @@ Dispatch led_blink: led_blink(N) "messaggio di lampeggio del led"
 Dispatch led_off : led_off(N) "messaggio di spegnimento del led"
 
 //Messaggio per notificare lo stato del Incinerator al monitoringDevice
-Event statoIncinerator : statoIncinerator(N)  "Incinerator's burning status info: 0 is not burning, 1 otherwise"
+Dispatch statoIncinerator : statoIncinerator(SENDER, N)  "Incinerator's burning status info: 0 is not burning, 1 otherwise"
 
 //Definizione dei contesti
 Context ctxmonitoringdevice ip [ host= "localhost"      port= 8100 ] 
-Context ctx_waste_incinerator_service ip [host="192.168.1.85" port=8125]
+Context ctx_waste_incinerator_service ip [host="192.168.114.28" port=8125]
 
 //Attori esterni al monitoringDevice
 ExternalQActor incinerator context ctx_waste_incinerator_service
@@ -46,6 +46,7 @@ QActor sonardevice context ctxmonitoringdevice{
 	State readSonarData{
 	[# 
 		Data = reader.readLine()
+		//CommUtils.outyellow("$name with python: data = $Data"   )
 		if( Data != null ){
 		try{ 
 			val vd = Data.toFloat()
@@ -75,7 +76,7 @@ QActor datacleaner context ctxmonitoringdevice {
 		var Level = -1;
 		var previous_level = -1;
 		var D = 0; 
-		val DLIMIT = 10;
+		val DLIMIT = 30;
 		val DMIN = 100; 
 	#]
 	
@@ -117,19 +118,21 @@ QActor monitoringdevice context ctxmonitoringdevice{
 	[#
 		var levelAshStorage = 0;
 		var IncineratorStatus = 0;
+		var statoAshStorage = 0;
+		var needAgentRemoveAsh = false;
 	#]
 	
 	State s0 initial{
 		delay 2000
-		println("$name STARTS")
-		connectToMqttBroker "ws://192.168.1.85:8081" clientid "monitoringdevicenat"
+		println("$name STARTS") color blue
+		//connectToMqttBroker "ws://192.168.1.85:8081" clientid "monitoringdevicenat"
+		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "monitoringdevicenat"
+		
 		//si mette ad osservare lo stato del Incinerator
-		//observeResource incinerator msgid statoIncinerator
+		observeResource incinerator msgid statoIncinerator
 		subscribeTo datacleaner for ashStorageLevel
-		//updateResource [# "statoAshStorage(0)" #]
-		publish "unibodisi" -m statoAshStorage:statoAshStorage(0)
-		//forward wis -m statoAshStorage:statoAshStorage(0)
-		delay 1000		
+
+		//publish "unibodisi" -m statoAshStorage:statoAshStorage(0)	
 	}
 	Goto wait
 	
@@ -137,17 +140,19 @@ QActor monitoringdevice context ctxmonitoringdevice{
 	State wait{
 		println("$name Waiting data from sonar or updates from Incinerator...") color blue
 	}
-	Transition t0 whenEvent statoIncinerator-> handleUpdateStatoIncinerator
+	Transition t0 whenMsg statoIncinerator-> handleUpdateStatoIncinerator
 				  whenEvent ashStorageLevel -> handleAshStorageLevel
 			
 	//Stato per gestire l'aggiornamento dello stato del Incinerator
 	State handleUpdateStatoIncinerator{
 		printCurrentMessage color green
-		onMsg(statoIncinerator : statoIncinerator(D)) {
-	      	[# 
-	      		IncineratorStatus = payloadArg(0).toInt() 
-	      	#]
-	      	println("$name Current incinerator state: $IncineratorStatus") color blue
+		onMsg(statoIncinerator : statoIncinerator(SENDER, N)) {
+	      	if [# !payloadArg(1).contains("nonews") #]{
+		      	[# 
+		      		IncineratorStatus = payloadArg(1).split("(")[1].split(")")[0].toInt() 
+		      	#]
+		    }
+		    println("$name Current incinerator state: $IncineratorStatus") color blue
 	      	
 	      	if [#IncineratorStatus==1#]{
 	      		//se l'Incinerator sta bruciando, allora devo accendere il led
@@ -189,14 +194,16 @@ QActor monitoringdevice context ctxmonitoringdevice{
 			//Aggiorno lo stato del AshStorage in base alla distanza misurata
 			if [#levelAshStorage==2#]{
 				println("$name Updating AshStorageStatus to 1") color blue
-				publish "unibodisi" -m statoAshStorage:statoAshStorage(1)
+				//publish "unibodisi" -m statoAshStorage:statoAshStorage(1)
 				//forward wis -m statoAshStorage:statoAshStorage(1)
-				//updateResource [# "statoAshStorage(1)" #]
+				
+				updateResource [# "statoAshStorage(1)" #]
 			} else {
 				println("$name Updating AshStorageStatus to 0") color blue
-				publish "unibodisi" -m statoAshStorage:statoAshStorage(0)
+				//publish "unibodisi" -m statoAshStorage:statoAshStorage(0)
 				//forward wis -m statoAshStorage:statoAshStorage(0)
-				//updateResource [# "statoAshStorage(0)" #]
+				
+				updateResource [# "statoAshStorage(0)" #]
 			}
 		}	
 	}

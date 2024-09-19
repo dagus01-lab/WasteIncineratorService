@@ -6,7 +6,7 @@ System waste_incinerator_service
 Dispatch arrived_RP : arrived_RP(N) "command that simulate the arrival of new RP"
 
 //Messaggio per notificare lo stato del Incinerator al WIS
-Event statoIncinerator : statoIncinerator(N)  "Incinerator's burning status info: 0 is not burning, 1 otherwise"
+Dispatch statoIncinerator : statoIncinerator(N)  "Incinerator's burning status info: 0 is not burning, 1 otherwise"
 
 //Messaggi per la gestione del burning dell'Incinerator
 Dispatch activationCommand : activationCommand(N) "command that turns the incinerator on"
@@ -20,7 +20,7 @@ Event alarm : alarm(X)
 Dispatch newAshes : newAshes(N) "command that simulate the arrival of new RP's ashes"
  
 //Messaggio per notificare lo stato del AshStorage al WIS
-Event statoAshStorage : statoAshStorage(N)  "AshStorage info: 0 is not empty, 1 otherwise"
+Dispatch statoAshStorage : statoAshStorage(SENDER, N)  "AshStorage info: 0 is not empty, 1 otherwise"
 
 //Messaggi per ingaggiare e muovere il BasicRobot
 Request engage        : engage(OWNER, STEPTIME)	
@@ -39,7 +39,7 @@ Reply inforeply: inforeply(X) for info
 //Definizione dei contesti
 Context ctx_waste_incinerator_service ip [host="localhost" port=8125]
 Context ctxbasicrobot ip [host="127.0.0.1" port=8020] 
-Context ctxmonitoringdevice ip [host="192.168.1.105" port=8100]
+Context ctxmonitoringdevice ip [host="192.168.114.105" port=8100]
 //Context ctxscale ip [host="192.168.1.105" port=8101]
 
 //Attori esterni al WIS
@@ -54,20 +54,22 @@ QActor wis context ctx_waste_incinerator_service{
 	State s0 initial{
 		delay 500
 		println("$name STARTS") color green
-		connectToMqttBroker "ws://127.0.0.1:8081" clientid "wisnat" 
- 		println("$name | CREATED  (and connected to mosquitto) ... ") color green
- 		subscribe "unibodisi"
+		//connectToMqttBroker "ws://127.0.0.1:8081" clientid "wisnat"
+		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "wisnat"
+ 		//println("$name | CREATED  (and connected to mosquitto) ... ") color green
+ 		//subscribe "unibodisi"
 		//si mette ad osservare lo stato del AshStorage fornito dal MonitoringDevice
-		//observeResource monitoringdevice msgid statoAshStorage
 		//mando messaggio di attivazione del Incinerator
 		forward incinerator -m activationCommand : activationCommand(1)
+		delay 8000
+		observeResource monitoringdevice msgid statoAshStorage
 	}
 	Goto waitingRP
 	
 	//Stato che simula l'attesa di un nuovo RP nel WasteStorage
 	State waitingRP{
 	}
-	Transition t0 whenEvent statoAshStorage -> handleUpdateStatoAshStorage
+	Transition t0 whenMsg statoAshStorage -> handleUpdateStatoAshStorage
 				  whenMsg arrived_RP ->  handleRP
 				
 	//Stato per gestire l'arrivo di un nuovo RP nel WasteStorage
@@ -99,24 +101,32 @@ QActor wis context ctx_waste_incinerator_service{
 		//allora considero di poter bruciare un nuovo RP
 	}
 	Transition t0 whenTime 2000 -> waitingRP
-				  whenEvent statoAshStorage -> handleUpdateStatoAshStorage
+				  whenMsg statoAshStorage -> handleUpdateStatoAshStorage
 							
 	//Stato per gestire l'aggiornamento dello stato del AshStorage
 	State handleUpdateStatoAshStorage{
 		printCurrentMessage color green
-		onMsg( statoAshStorage : statoAshStorage(N)){
-			println("payloadArg: ${payloadArg(0)}") color green
-			[# AshStorageStatus = payloadArg(0).toInt() #]
-			println("AshStorageStatus: $AshStorageStatus") color green
+		onMsg(statoAshStorage : statoAshStorage(SENDER, N)){
+			//println ("cifra stato: ${payloadArg(1).split('(')[1].split(')')[0]}") color green
+			if [# !payloadArg(1).contains("nonews") #]{
+				[# AshStorageStatus = payloadArg(1).split("(")[1].split(")")[0].toInt() #]
+				println("AshStorageStatus: $AshStorageStatus") color green
+			}
 		}
+	}
+	Transition t0 whenTime 2000 -> ashCheckFinish
+				  whenMsg statoAshStorage -> handleUpdateStatoAshStorage
+	
+	State ashCheckFinish{
+		 
 	}
 	Goto waitingRP if [# AshStorageStatus == 0 #] else waitingAshesToBeRemoved
 	
 	//Stato per gestire l'attesa che la cenere nel AshStorage sia rimossa per poter bruciare nuovi RPs
 	State waitingAshesToBeRemoved{
-		println("WIS is waiting an operator to remove ashes in AshStorage...") color green
+		println("WIS is waiting for an operator to arrive...") color green
 	}
-	Transition t0 whenEvent statoAshStorage -> handleUpdateStatoAshStorage
+	Transition t0 whenMsg statoAshStorage -> handleUpdateStatoAshStorage
 }
 //-----------------------------------------------------------------------------------------------------------
 
@@ -142,7 +152,7 @@ QActor oprobot context ctx_waste_incinerator_service{
 	//Stato per provare ad "ingaggiare" il BasicRobot
 	State engage{
 		println("$name | $MyName engaging ... ") color yellow 
-		request basicrobot -m engage : engage($MyName,330) //pc Emanuele 112
+		request basicrobot -m engage : engage($MyName,112) //pc Emanuele 112
 	}
 	Transition t0 whenTime 1000 -> noResponse
 				  whenReply engagedone   -> waitingWorking
@@ -214,6 +224,7 @@ QActor oprobot context ctx_waste_incinerator_service{
 		println("The ash has been taken out") color yellow
 		//mando notifica di nuova cenere
 		forward wis -m newAshes : newAshes(1)
+		delay 1000
 		request basicrobot -m moverobot:moverobot($HOMEx, $HOMEy)    
 	}
 	Transition t0 whenMsg arrived_RP -> takeRpBeforeFinishPlan
@@ -249,10 +260,11 @@ QActor incinerator context ctx_waste_incinerator_service{
 	[# val BTIME = 10000L; var stato = 0; #]
 	
 	State s0 initial{
-		println("$name STARTS") color red
-		connectToMqttBroker "ws://127.0.0.1:8081" clientid "incineratornat" 
- 		println("$name | CREATED  (and connected to mosquitto) ... ") color green
- 		subscribe "unibodisi"
+		println("$name STARTS") color red 
+		//connectToMqttBroker "ws://127.0.0.1:8081" clientid "incineratornat"
+		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "incineratornat" 
+ 		//println("$name | CREATED  (and connected to mosquitto) ... ") color green
+ 		//subscribe "unibodisi"
 	}
 	Transition t0 whenMsg activationCommand -> turnOn
 	
@@ -264,18 +276,18 @@ QActor incinerator context ctx_waste_incinerator_service{
 	//Stato per gestire l'inizio di burning
 	State handleStartBurning{
 		println("Incinerator is burning...") color red
-		//updateResource [# "statoIncinerator(1)" #] //aggiorno gli Observer collegati
+		updateResource [# "statoIncinerator(1)" #] //aggiorno gli Observer collegati
 		//forward monitoringdevice -m statoIncinerator:statoIncinerator(1)
-		publish "unibodisi" -m statoIncinerator:statoIncinerator(1)
+		//publish "unibodisi" -m statoIncinerator:statoIncinerator(1)
 	}
 	Transition t0 whenTimeVar BTIME -> handleEndBurning
 	
 	//Stato per gestire la fine di burning
 	State handleEndBurning{
 		emit endBurning : endBurning(1) //emette il segnale di fine burning
-		//updateResource [# "statoIncinerator(0)" #]
+		updateResource [# "statoIncinerator(0)" #]
 		//forward monitoringdevice -m statoIncinerator:statoIncinerator(0)
-		publish "unibodisi" -m statoIncinerator:statoIncinerator(0)
+		//publish "unibodisi" -m statoIncinerator:statoIncinerator(0)
 	}
 	Transition t0 whenMsg startBurning -> handleStartBurning   
 }
@@ -296,16 +308,22 @@ QActor scalemock context ctx_waste_incinerator_service{
 	}
 	Goto simulateRP
 }
+
 //-----------------------------------------------------------------------------------------------------------
 /*
 //------------------------Attore mok che simula il comportamento del MonitoringDevice------------------------
 QActor monitoring_device_mok context ctx_waste_incinerator_service{
-	[# var ashLevel = 3; val MAX_LEVEL = 4 #] //livello delle cenere sotto forma di numero di RP bruciati
-	
+	[# var ashLevel = 3; val MAX_LEVEL = 4;  //livello delle cenere sotto forma di numero di RP bruciati
+	 var statoAshStorage=0; #]
 	State s0 initial{
 		println("$name STARTS") color yellow
-	}
-	Transition t0 whenMsg newAshes -> handleAshes
+	}Goto emitState
+	
+	State emitState{
+		updateResource [# "statoAshStorage(0)" #]
+		delay 2000
+	}Goto emitState
+	/*Transition t0 whenMsg newAshes -> handleAshes
 	
 	//Stato per gestire l'arrivo di nuova cenere nel container
 	State handleAshes{
