@@ -11,6 +11,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
 
@@ -27,10 +33,9 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					action { //it:State
 						delay(500) 
 						CommUtils.outgreen("$name STARTS")
-						connectToMqttBroker( "ws://127.0.0.1:8081", "wisnat" )
-						CommUtils.outgreen("$name | CREATED  (and connected to mosquitto) ... ")
-						subscribe(  "unibodisi" ) //mqtt.subscribe(this,topic)
 						forward("activationCommand", "activationCommand(1)" ,"incinerator" ) 
+						delay(8000) 
+						observeResource("192.168.114.105","8100","ctxmonitoringdevice","monitoringdevice","statoAshStorage")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -45,7 +50,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t00",targetState="handleUpdateStatoAshStorage",cond=whenEvent("statoAshStorage"))
+					 transition(edgeName="t00",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
 					transition(edgeName="t01",targetState="handleRP",cond=whenDispatch("arrived_RP"))
 				}	 
 				state("handleRP") { //this:State
@@ -91,18 +96,31 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				 	 					  scope, context!!, "local_tout_"+name+"_endRoute", 2000.toLong() )  //OCT2023
 					}	 	 
 					 transition(edgeName="t05",targetState="waitingRP",cond=whenTimeout("local_tout_"+name+"_endRoute"))   
-					transition(edgeName="t06",targetState="handleUpdateStatoAshStorage",cond=whenEvent("statoAshStorage"))
+					transition(edgeName="t06",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
 				}	 
 				state("handleUpdateStatoAshStorage") { //this:State
 					action { //it:State
 						CommUtils.outgreen("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
 						 	   
-						if( checkMsgContent( Term.createTerm("statoAshStorage(N)"), Term.createTerm("statoAshStorage(N)"), 
+						if( checkMsgContent( Term.createTerm("statoAshStorage(SENDER,N)"), Term.createTerm("statoAshStorage(SENDER,N)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								CommUtils.outgreen("payloadArg: ${payloadArg(0)}")
-								 AshStorageStatus = payloadArg(0).toInt()  
+								if(  !payloadArg(1).contains("nonews")  
+								 ){ AshStorageStatus = payloadArg(1).split("(")[1].split(")")[0].toInt()  
 								CommUtils.outgreen("AshStorageStatus: $AshStorageStatus")
+								}
 						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+				 	 		stateTimer = TimerActor("timer_handleUpdateStatoAshStorage", 
+				 	 					  scope, context!!, "local_tout_"+name+"_handleUpdateStatoAshStorage", 2000.toLong() )  //OCT2023
+					}	 	 
+					 transition(edgeName="t07",targetState="ashCheckFinish",cond=whenTimeout("local_tout_"+name+"_handleUpdateStatoAshStorage"))   
+					transition(edgeName="t08",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
+				}	 
+				state("ashCheckFinish") { //this:State
+					action { //it:State
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -115,13 +133,13 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				}	 
 				state("waitingAshesToBeRemoved") { //this:State
 					action { //it:State
-						CommUtils.outgreen("WIS is waiting an operator to remove ashes in AshStorage...")
+						CommUtils.outgreen("WIS is waiting for an operator to remove ashes in AshStorage...")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t07",targetState="handleUpdateStatoAshStorage",cond=whenEvent("statoAshStorage"))
+					 transition(edgeName="t09",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
 				}	 
 			}
 		}

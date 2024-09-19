@@ -124,7 +124,7 @@ QActor wis context ctx_waste_incinerator_service{
 	
 	//Stato per gestire l'attesa che la cenere nel AshStorage sia rimossa per poter bruciare nuovi RPs
 	State waitingAshesToBeRemoved{
-		println("WIS is waiting for an operator to arrive...") color green
+		println("WIS is waiting for an operator to remove ashes in AshStorage...") color green
 	}
 	Transition t0 whenMsg statoAshStorage -> handleUpdateStatoAshStorage
 }
@@ -152,7 +152,7 @@ QActor oprobot context ctx_waste_incinerator_service{
 	//Stato per provare ad "ingaggiare" il BasicRobot
 	State engage{
 		println("$name | $MyName engaging ... ") color yellow 
-		request basicrobot -m engage : engage($MyName,112) //pc Emanuele 112
+		request basicrobot -m engage : engage($MyName,330) //pc Emanuele 112
 	}
 	Transition t0 whenTime 1000 -> noResponse
 				  whenReply engagedone   -> waitingWorking
@@ -224,7 +224,6 @@ QActor oprobot context ctx_waste_incinerator_service{
 		println("The ash has been taken out") color yellow
 		//mando notifica di nuova cenere
 		forward wis -m newAshes : newAshes(1)
-		delay 1000
 		request basicrobot -m moverobot:moverobot($HOMEx, $HOMEy)    
 	}
 	Transition t0 whenMsg arrived_RP -> takeRpBeforeFinishPlan

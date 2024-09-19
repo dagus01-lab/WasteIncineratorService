@@ -118,8 +118,6 @@ QActor monitoringdevice context ctxmonitoringdevice{
 	[#
 		var levelAshStorage = 0;
 		var IncineratorStatus = 0;
-		var statoAshStorage = 0;
-		var needAgentRemoveAsh = false;
 	#]
 	
 	State s0 initial{

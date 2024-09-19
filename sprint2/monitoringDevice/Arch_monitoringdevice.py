@@ -35,6 +35,6 @@ with Diagram('monitoringdeviceArch', show=False, outformat='png', graph_attr=gra
           wis=Custom('wis(ext)','./qakicons/externalQActor.png')
      sonardevice >> Edge( label='sonardata', **eventedgeattr, decorate='true', fontcolor='red') >> datacleaner
      datacleaner >> Edge( label='ashStorageLevel', **eventedgeattr, decorate='true', fontcolor='red') >> monitoringdevice
-     sys >> Edge( label='statoIncinerator', **evattr, decorate='true', fontcolor='darkgreen') >> monitoringdevice
      monitoringdevice >> Edge(color='blue', style='solid',  decorate='true', label='<led_on &nbsp; led_off &nbsp; led_blink &nbsp; >',  fontcolor='blue') >> led
+     incinerator >> Edge(color='blue', style='solid',  decorate='true', label='<statoIncinerator &nbsp; >',  fontcolor='blue') >> monitoringdevice
 diag

@@ -11,6 +11,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
 
@@ -28,12 +34,9 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 				state("s0") { //this:State
 					action { //it:State
 						delay(2000) 
-						CommUtils.outblack("$name STARTS")
-						connectToMqttBroker( "ws://192.168.1.85:8081", "monitoringdevicenat" )
+						CommUtils.outblue("$name STARTS")
+						observeResource("192.168.114.28","8125","ctx_waste_incinerator_service","incinerator","statoIncinerator")
 						subscribeToLocalActor("datacleaner") 
-						//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(0)" ) 
-						publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(0)").toString(), "unibodisi" )   
-						delay(1000) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -49,17 +52,19 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t02",targetState="handleUpdateStatoIncinerator",cond=whenEvent("statoIncinerator"))
+					 transition(edgeName="t02",targetState="handleUpdateStatoIncinerator",cond=whenDispatch("statoIncinerator"))
 					transition(edgeName="t03",targetState="handleAshStorageLevel",cond=whenEvent("ashStorageLevel"))
 				}	 
 				state("handleUpdateStatoIncinerator") { //this:State
 					action { //it:State
 						CommUtils.outgreen("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
 						 	   
-						if( checkMsgContent( Term.createTerm("statoIncinerator(N)"), Term.createTerm("statoIncinerator(D)"), 
+						if( checkMsgContent( Term.createTerm("statoIncinerator(SENDER,N)"), Term.createTerm("statoIncinerator(SENDER,N)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								 
-									      		IncineratorStatus = payloadArg(0).toInt() 
+								if(  !payloadArg(1).contains("nonews")  
+								 ){ 
+										      		IncineratorStatus = payloadArg(1).split("(")[1].split(")")[0].toInt() 
+								}
 								CommUtils.outblue("$name Current incinerator state: $IncineratorStatus")
 								if( IncineratorStatus==1 
 								 ){forward("led_on", "led_on(1)" ,"led" ) 
@@ -97,13 +102,13 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 								}
 								if( levelAshStorage==2 
 								 ){CommUtils.outblue("$name Updating AshStorageStatus to 1")
-								//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(1)" ) 
-								publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(1)").toString(), "unibodisi" )   
+								updateResourceRep( "statoAshStorage(1)"  
+								)
 								}
 								else
 								 {CommUtils.outblue("$name Updating AshStorageStatus to 0")
-								 //val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(0)" ) 
-								 publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(0)").toString(), "unibodisi" )   
+								 updateResourceRep( "statoAshStorage(0)"  
+								 )
 								 }
 						}
 						//genTimer( actor, state )
