@@ -1,3 +1,4 @@
+{"actor":"monitoringdevice", "msgType":"dispatch", "curstate":"wait", "nextstate":"handleUpdateStatoIncinerator", "msgId":"statoIncinerator"}
 {"actor":"led", "msgType":"dispatch", "curstate":"wait", "nextstate":"handle_led_on", "msgId":"led_on"}
 {"actor":"led", "msgType":"dispatch", "curstate":"wait", "nextstate":"handle_led_off", "msgId":"led_off"}
 {"actor":"led", "msgType":"dispatch", "curstate":"wait", "nextstate":"handle_led_blink", "msgId":"led_blink"}

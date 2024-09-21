@@ -320,15 +320,15 @@ sfruttiamo appieno la gestione della coda dei messaggi di cui sono dotati gli at
 Definiamo ora un modello, composto da tre file distinti .qak, che descrive come i componenti elencati in precedenza interagiscono tra loro:
 <ul>
 	<li>
-		<b><a href="../src/WasteIncineratorService_problema.qak">WIS</a></b><br>
+		<b><a href="../wis/src/WasteIncineratorService_problema.qak">WIS</a></b><br>
 		<a href="./img/waste_incinerator_problem_servicearch.png"><img src="./img/waste_incinerator_problem_servicearch.png" width="1000" height="800"/></a>
 	</li>
 	<li>
-		<b><a href="../src/monitoringdevice.qak">MonitoringDevice</a></b><br>
+		<b><a href="../monitoringDevice/src/monitoringdevice.qak">MonitoringDevice</a></b><br>
 		<a href="./img/monitoringdevicearch.png"><img src="./img/monitoringdevicearch.png" width="1000" height="800"/></a>
 	</li>
 	<li>
-		<b><a href="../src/scale.qak">Scale</a></b><br>
+		<b><a href="../scale/src/scale.qak">Scale</a></b><br>
 		<a href="./img/scalearch.png"><img src="./img/scalearch.png" width="1000" height="800"/></a>
 	</li>
 </ul>
@@ -336,8 +336,9 @@ Definiamo ora un modello, composto da tre file distinti .qak, che descrive come 
 <span class="slidekp">Discussione sulle entità</span><br>
 Notiamo, come già descritto nell'analisi sull'architettura del MonitoringDevice, che il monitoringdevice delega i vari compiti al sonardevice, datacleaner e led,
 mostrandosi come unico componente verso l'esterno.<br>
-In particolare, il datacleaner ha il compito di pulire i tanti dati ricevuti dal sonardevice e inviare soltanto le variazioni al monitoringdevice che ha il compito
-di interpretare la distanza ricevuta per capire se considerare il contenitore vuoto, pieno o "normale" (nè pieno nè vuoto).<br>
+In particolare, il datacleaner ha il compito di pulire i tanti dati ricevuti dal sonardevice e inviare un <b>ashStorageLevel</b> al monitoringdevice
+che aggiorna <b>statoAshStorage</b> di conseguenza, in base al parametro ricevuto. (0 -> vuoto, 1 -> nè pieno nè vuoto, 2 -> pieno)<br>
+Ricordiamo che statoAshStorage può essere 0 = non pieno o 1 = pieno, in quanto al WIS non interessa l'informazione di quando è vuoto.<br><br>
 Configurazione simile la abbiamo per la Scale, che delega il raccoglimento delle misurazioni a scaledevice. 
 Dopodichè, la scale effettua la conversione dei dati e l'invio al WIS come descritto in precedenza.
 </p>
@@ -364,6 +365,28 @@ Il test può essere trovato <a href="../src/main/java/test/TestWISOutput.java">q
 	<u>Nota:</u> il modello che viene eseguito si riferisce a quello del Progetto, quindi mostra il comportamento del robot nei casi specificati nel piano dei test.<br>
 	Nel caso si volesse provare il sistema "in modo continuativo", quindi con la simulazione di nuovi RP gestiti dalla scale_mok e la gestione del AshStorage da parte del monitoring_device_mok,
 	occorre lanciare gli stessi comandi elencati in precedenza, ma sul modello dell'architettura logica.
+</p>
+
+<h2>Suddivisione dei compiti</h2>
+<p>
+	<ol>
+		<li><b>Analisi del problema:</b> tutti i membri hanno contribuito, in particolare:
+			<ul>
+				<li>Bryan: concentrato principalmente sull'interazione WIS - MonitoringDevice.</li>
+				<li>Gabriele: concentrato principalmente su Interazione WIS - Scale.</li>
+				<li>Emanuele: concentrato principalmente sull'Architettura del MonitoringDevice.</li>
+			</ul>
+		Alla fine delle singole analisi, si è fatto una piccola revisione interna per discutere assieme dei punti analizzati e modificarli/validarli.
+		</li>
+		<li><b>Definizione del modello:</b> tutti i membri hanno contribuito, in particolare:
+			<ul>
+				<li>Bryan: modifica del WIS, in particolare per ricevere gli updateResource da contesti esterni, e supporto nell'interazione tra i componenti.</li>
+				<li>Gabriele ed Emanuele: logica della scale + logica del monitoringdevice.</li>
+			</ul>
+		In questa fase di modellazione, si sono fatte diverse riunioni per allinearci sui problemi/soluzioni riscontrati durante lo sviluppo.
+		</li>
+		<li><b>Testing:</b> piano dei test deciso assieme. L'effettiva realizzazione è stata affidata a Gabriele.</li>
+	</ol>
 </p>
 
 <h2>Sprint futuri</h2>
