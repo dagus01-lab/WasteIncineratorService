@@ -1,0 +1,103 @@
+/** Modello per l'architettura logica dello SPRINT2 della scale */
+
+System scale
+
+//Messaggi inerenti lo stato del WasteStorage
+Event scaledata : weight(W)   "emitted  by scale or (better) by datacleaner"
+Event wasteStorageRPs:wasteStorageRPs(N)   "emitted  by datacleaner"
+Dispatch arrived_RP : arrived_RP(N) "command that simulate the arrival of new RP"
+
+//Definizione dei contesti
+Context ctxscale ip [ host= "localhost"      port= 8200 ] 
+Context ctx_waste_incinerator_service ip [host="192.168.1.110" port=8125]
+
+//Attori esterni alla scale
+ExternalQActor wis context ctx_waste_incinerator_service
+
+//--------------------------------Attore scaledevice------------------------------------------------------
+QActor scaledevice context ctxscale{
+[# 
+	lateinit var reader : java.io.BufferedReader
+    lateinit var p : Process	
+    var Weight = 0
+#]	
+	
+	State s0 initial{
+		println("$name | scalestart") 
+	 	[#
+			p       = Runtime.getRuntime().exec("python scale.py")
+			reader  = java.io.BufferedReader(  java.io.InputStreamReader(p.getInputStream() ))	
+		#]		
+	}
+	Goto readscaleData
+	
+	//Stato per la lettura dei dati dalla scale fisica
+	State readscaleData{
+	[# 
+		var data = reader.readLine()
+		CommUtils.outyellow("$name with python: data = $data"   ) 
+		if( data != null ){
+		try{ 
+			val vd = data.toFloat()
+			val v  = vd.toInt()
+			if( v <= 100 ){	//A first filter ...
+				Weight = v				
+			}else Weight = 0
+		}catch(e: Exception){
+				CommUtils.outred("$name readscaleDataERROR: $e "   )
+		}
+		}
+		
+	#]	
+		if [# Weight > 0 #] { 
+		    println("$name with python: data = $data"   ) color yellow
+			emitlocalstream scaledata : weight($Weight)			 
+		}
+		//autodispatch doread : doread(1)
+	}
+	Goto readscaleData
+}
+//--------------------------------------------------------------------------------------------------------
+
+//--------------------------------Attore scale------------------------------------------------------------
+QActor scale context ctxscale {
+	[# 
+		var RPs = 0;
+		var previous_RPs = 0; 
+		val WRP = 50;
+	#]
+	
+	State s0 initial {
+		delay 1000
+		subscribeTo scaledevice for scaledata		
+		println("$name subscribed to scaledevice") color blue
+	}
+	Transition t0 whenEvent scaledata -> filter
+	
+	//Stato per gestire i dati emessi dalla scaledata
+	State filter {
+     	onMsg(scaledata : weight(W)) {
+	      	[#  
+	      		W = payloadArg(0).toInt() 
+	      		RPs = W/WRP
+	      	#]	      	
+	      	println("$name RPs=$RPs") color black	
+	      	
+	      	//Se il numero di RPs è aumentato, notifico tale info al WIS
+	      	if [#RPs >= previous_RPs#]{ //verificare il margine della misura
+	      		println("$name emit number of RPs in Waste Storage") color magenta
+	      		[#
+	      			for (i in previous_RPs..RPs) {
+	      				#]
+	      				forward wis -m arrived_RP:arrived_RP(1)
+	      				[#
+	      			}
+	      		#]
+	     	}
+	      	[# previous_RPs = RPs; #]
+     	}
+	}	
+	Transition t0 whenEvent scaledata -> filter
+}
+//--------------------------------------------------------------------------------------------------------
+
