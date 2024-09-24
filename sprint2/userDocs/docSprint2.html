@@ -1,27 +1,218 @@
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-	<title>Documento Sprint2</title>
-	<meta name="generator" content="LibreOffice 24.2.6.2 (Linux)"/>
-	<meta name="created" content="00:00:00"/>
-	<meta name="changed" content="2024-09-23T00:50:58.094645401"/>
-	<meta name="viewport" content="width=device-width, initial-scale=1"/>
-	<style type="text/css">
-		@page { size: 21cm 29.7cm; margin-left: 2cm; margin-right: 1cm; margin-top: 1cm; margin-bottom: 1cm }
-		p { color: #0a0a0a; font-family: "Tahoma"; font-size: 10pt; font-weight: normal; line-height: 160%; margin-left: 0.79cm; margin-right: 0.79cm; margin-bottom: 0.25cm; background: transparent }
-		h1 { font-variant: normal; color: #242424; font-family: "Tahoma", "Helvetica", "Arial", sans-serif; font-size: 24pt; font-style: normal; font-weight: normal; line-height: 140%; margin-left: 0.79cm; margin-right: 0.79cm; margin-bottom: 0.21cm; background: #b2c0ff; border: none; padding: 0cm; background: transparent; page-break-after: avoid }
-		h2 { font-variant: normal; color: #242424; font-family: "Tahoma", "Helvetica", "Arial", sans-serif; font-size: 18pt; font-style: normal; font-weight: normal; line-height: 140%; margin-left: 0.79cm; margin-right: 0.79cm; margin-top: 0.35cm; margin-bottom: 0.21cm; background: #9ed8ff; border: none; padding: 0cm; background: transparent; page-break-after: avoid }
-		h4 { font-variant: normal; color: #0a0a0a; font-family: "Helvetica Neue", "Helvetica", "Roboto", "Arial", sans-serif; font-size: 12pt; font-style: normal; font-weight: normal; line-height: 140%; margin-left: 0.79cm; margin-right: 0.79cm; margin-top: 0.21cm; margin-bottom: 0.21cm; background: #ccffcc; border: none; padding: 0cm; background: transparent; page-break-after: avoid }
-		a:link { color: #545454; background: transparent; text-decoration: underline }
-		a:visited { color: #545454; background: transparent; text-decoration: underline }
-	</style>
+    <!--
+<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+<script type="text/javascript" src="../css/issStyle.js"></script>
+-->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.4/dist/css/foundation.min.css" crossorigin="anonymous">
+		<script src="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.4/dist/js/foundation.min.js"crossorigin="anonymous"></script> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/templateISS.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/main.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/navbar.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/table.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/code.css">
+        <!-- <script type="text/javascript" src="./commons/resources/scripts/myScripts.js"></script> -->
+<style type="text/css">
+body
+{
+    margin-left:  30px;
+    margin-right: 30px;
+};
+
+P
+{
+    font-family: Tahoma;
+    font-size: 10pt;
+};
+
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+	font-size: 93%;
+}
+
+a:hover {
+    background-color: #cccccc;
+}
+
+
+hr {
+    clear: both;
+    height: 1px;
+    color: #242424;
+    background-color: transparent;
+}
+
+h1, h2, h3 {
+    color: #242424;
+    clear: left;
+    font: 100% Tahoma, Helvetica, Arial, sans-serif;
+    margin-bottom: 0.5em;
+    padding-top: 0.5em;
+	border-radius: 10px;
+	padding: 5px;
+}
+
+top {
+	width: 100%;
+}
+
+
+#i {
+    color: #ff1010;
+}
+tt{
+	font-family: "Arial";
+    font-size: 90%;
+	color: #006600;
+}
+em{
+	font-family: "Arial";
+    font-size: 80%;
+	font-weight: bold;
+	border-style:solid;
+	border-color: #abe876;
+    color: #1632cc;
+}
+bc{
+	font-family: "Arial";
+	font-size: 90%;
+	font-weight: bold;
+    color: #990000;
+	background-color: #fcf8c7;
+}
+ks{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #0000CD	;
+	font-size: 90%;
+}
+kc{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #008000	;
+	font-size: 90%;
+}
+pre{
+	font-family: "Consolas";
+	font-size: 85%;
+	background-color: #f5f5f5;
+	border: 1.5px solid silver;
+	padding: 5px;
+}
+m{
+	font-family: "Helvetica";
+	line-height: 100%;
+ 	font-size: 75%;
+}
+div.body{
+	 
+    font-size: 18px;
+}
+k{
+    color: #990000;
+	font-weight: bold;
+	font-size: 90%;
+}
+h1 {
+    font-size: 150%;
+    background-color: #b2c0ff;
+	padding: 10px;
+}
+
+h2 {
+    background-color: #9ed8ff;
+    font-size: 130%;
+}
+
+h3 {
+	background-color: #e6ccff;
+    font-size: 100%;
+}
+h4 {
+    background-color: #ccffcc;
+    font-size: 100%;
+	width: 95%;
+	border-radius: 5px;
+	padding: 2px;
+}
+h5 {
+    background-color: #d5ffb0;
+    font-size: 100%;
+
+}
+div.req{
+	background-color: #d9ffb3;
+    font-size: 18px;
+	width: 700px;
+    border: 3px solid green;
+    padding: 15px;
+    margin: 10px;
+}
+div.remark{
+	background-color: #E3F2FD;
+    border: 1.5px solid #d5f2ed;
+    padding: 15px;
+    margin: 10px;
+	border-radius: 25px;
+}
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+ol, ul, li {
+  margin: 0;
+  margin-left: 10px;
+  padding: 0;
+  padding-bottom: 5px;
+}
+
+table, th, td {
+	border: 1px solid black;
+}
+
+img {
+	border: 1.5px solid #d5f2ed
+
+}
+
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+}
+
+div.wrapdesc{
+	width: 90%;
+	margin: auto;
+}
+
+div.imagedesc{
+	width: 85%;
+	margin: auto;
+}
+
+.slidekp{
+    background-color: hsl(332, 77%, 86%);
+    border-radius: 10px;
+    border: 1px solid blue;
+    font-size: 18px; 
+    font-weight: bold;
+    line-height: 1.5;
+    padding: 3px
+  } 
+</style>
 </head>
-<body lang="en-GB" text="#0a0a0a" link="#545454" vlink="#545454" bgcolor="#fefefe" dir="ltr">
-<div id="top" dir="ltr"><h1 style="margin-left: 0cm; margin-right: 0cm">
+<body>
+<div id="top"><h1 style="margin-left: 0cm; margin-right: 0cm">
 	WASTE INCINERATOR SERVICE - Sprint 2 
 	</h1>
 </div>
+<div class="body">
 <h2>Introduzione</h2>
 <p>Un'azienda intende realizzare un <b>WasteIncineratorService</b>
 per trattare i rifiuti bruciandoli e necessita di un servizio di
@@ -53,12 +244,12 @@ l'architettura iniziale di questo sprint.<br/>
 <p>In questo SPRINT verranno affrontati i seguenti requisiti: 
 </p>
 <ul>
-	<li><p style="margin-bottom: 0cm">Architettura del MonitoringDevice 
-	</p></li>
-	<li><p style="margin-bottom: 0cm">Interazione WIS - MonitoringDevice
-		</p></li>
-	<li><p>Interazione WIS - Scale 
-	</p></li>
+	<li>Architettura del MonitoringDevice 
+	</li>
+	<li>Interazione WIS - MonitoringDevice
+		</li>
+	<li>Interazione WIS - Scale 
+	</li>
 </ul>
 <p>Si rimanda quindi al prossimo SPRINT la definizione della
 ServiceStatusGUI. 
@@ -76,11 +267,11 @@ attraverso il componente <a href="RaspApplCode24.html"><b>sonar24qak</b></a>
 che sappiamo essere composto da due attori: 
 </p>
 <ul>
-	<li><p style="margin-bottom: 0cm"><b>sonardevice</b> che si occupa
+	<li><b>sonardevice</b> che si occupa
 	di leggere i dati generati dallo script <a href="sonar.py"><b>sonar.py</b></a>.
 	Tale script non fa altro che rilevare continuamente dati dal sonar
 	fisico presente nel RaspberryPi. 
-	</p></li>
+	</li>
 	<li><p><b>datacleaner</b> che riceve i valori letti dal sonardevice
 	e si occupa di effettuare un ulteriore filtraggio sui dati. 
 	</p></li>
@@ -100,20 +291,21 @@ seguito.
 MonitoringDevice sono le seguenti: 
 </p>
 <ul>
-	<li><p style="line-height: 150%; margin-right: 0cm; margin-bottom: 0cm">
-	<span style="display: inline-block; border: 1px solid #0000ff; padding: 0.08cm"><font size="4" style="font-size: 13pt"><b>P1</b></font></span>
+	<li>
+	<span class="slidekp">P1</span>
 	Quando il MonitoringDevice rileva che l'ashStorage è pieno, come
 	notifica tale informazione al WIS? 
-	</p></li>
-	<li><p style="line-height: 150%; margin-right: 0cm; margin-bottom: 0cm">
-	<span style="display: inline-block; border: 1px solid #0000ff; padding: 0.08cm"><font size="4" style="font-size: 13pt"><b>P2</b></font></span>
+	</li>
+
+	<li><span class="slidekp">P2</span>
 	Come capire quando l'ashStorage è vuoto? 
-	</p></li>
-	<li><p style="line-height: 150%; margin-right: 0cm"><span style="display: inline-block; border: 1px solid #0000ff; padding: 0.08cm"><font size="4" style="font-size: 13pt"><b>P3</b></font></span>
+	</li>
+
+	<li><span class="slidekp">P3</span>
 	lo stato dei componenti del WIS è conosciuto anche al
 	MonitoringDevice o quest'ultimo deve esplicitamente chiedere tale
 	informazione al WIS? 
-	</p></li>
+	</li>
 </ul>
 <p><br/>
 Incominciamo analizzando il problema P1.<br/>
@@ -161,13 +353,12 @@ MonitoringDevice.
 seguenti: 
 </p>
 <ul>
-	<li><p style="line-height: 150%; margin-right: 0cm; margin-bottom: 0cm">
-	<span style="display: inline-block; border: 1px solid #0000ff; padding: 0.08cm"><font size="4" style="font-size: 13pt"><b>P4</b></font></span>
+	<li><span class="slidekp">P4</span>
 	Come calcolare il numero di RP dal peso rilevato dalla scale fisica?
-		</p></li>
-	<li><p style="line-height: 150%; margin-right: 0cm"><span style="display: inline-block; border: 1px solid #0000ff; padding: 0.08cm"><font size="4" style="font-size: 13pt"><b>P5</b></font></span>
+	</li>
+	<li><span class="slidekp">P5</span>
 	Come comunicare tale informazione al WIS? 
-	</p></li>
+	</li>
 </ul>
 <p><br/>
 Partiamo analizzando il problema P4.<br/>
@@ -218,7 +409,7 @@ descrive come i componenti elencati in precedenza interagiscono tra
 loro: 
 </p>
 <ul>
-	<li><p style="margin-bottom: 0cm"><a href="../wis/src/WasteIncineratorService_problema.qak"><b>WIS</b></a><br/>
+	<li><p style="margin-bottom: 0cm"><a href="../analisi_problema/wis/src/WasteIncineratorService_problema.qak"><b>WIS</b></a><br/>
 <a href="img/waste_incinerator_problem_servicearch.png">
   <font color="#545454">
     <img src="img/waste_incinerator_problem_servicearch.png" name="Image2" align="bottom" width="1000" height="800" border="1"/>
@@ -226,7 +417,7 @@ loro:
 </a>
 
 		</p></li>
-	<li><p style="margin-bottom: 0cm"><a href="../monitoringDevice/src/monitoringdevice.qak"><b>MonitoringDevice</b></a><br/>
+	<li><p style="margin-bottom: 0cm"><a href="../analisi_problema/monitoringDevice/src/monitoringdevice.qak"><b>MonitoringDevice</b></a><br/>
 <a href="img/monitoringdevicearch.png">
   <font color="#545454">
     <img src="img/monitoringdevicearch.png" name="Image3" align="bottom" width="1000" height="800" border="1"/>
@@ -234,7 +425,7 @@ loro:
 </a>
 
 		</p></li>
-	<li><p><a href="../scale/src/scale.qak"><b>Scale</b></a><br/>
+	<li><p><a href="../analisi_problema/scale/src/scale.qak"><b>Scale</b></a><br/>
 <a href="img/scalearch.png">
   <font color="#545454">
     <img src="img/scalearch.png" name="Image4" align="bottom" width="1000" height="800" border="1"/>
@@ -243,8 +434,7 @@ loro:
 
 		</p></li>
 </ul>
-<p style="line-height: 150%; margin-left: 0cm; margin-right: 0cm"><span style="display: inline-block; border: 1px solid #0000ff; padding: 0.08cm"><font size="4" style="font-size: 13pt"><b>Discussione
-sulle entità</b></font></span><br/>
+<p style="line-height: 150%; margin-left: 0cm; margin-right: 0cm"><span class="slidekp">Discussione sulle entità</span><br/>
 Notiamo, come già descritto
 nell'analisi sull'architettura del MonitoringDevice, che il
 monitoringdevice delega i vari compiti al sonardevice, datacleaner e
@@ -265,11 +455,12 @@ misurazioni a scaledevice. Dopodichè, la scale effettua la
 conversione dei dati e l'invio al WIS come descritto in precedenza. 
 </p>
 <h2>Progetto</h2>
+<p></p>
 <h2>Piano di test</h2>
 <p>In funzione della creazione di un piano di testing, si è deciso
 di creare un’entità che debba verificare che all’avvio del
 sistema il monitoring device e la scale inviino informazioni visibili
-dal contesto del WIS. 
+dal contesto del WIS. </p>
 
 <p>A tal proposito, si può decidere di rendere, rispettivamente, il
 peso della bilancia per la scale e lo stato dell’AshStorage per il
@@ -378,18 +569,14 @@ in precedenza, ma sul modello dell'architettura logica.
 ServiceStatusGUI. 
 </p>
 <p style="margin-bottom: 0cm"><br/>
+</p>
+</div>
+<div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
+Bryan Bertoni : bryan.bertoni@studio.unibo.it <br>
+Gabriele Daga : gabriele.daga@studio.unibo.it <br>
+Emanuele D'Arsié : emanuele.darsie@studio.unibo.it <br><br>
 
-</p>
-<p align="left" style="margin-left: 0cm; margin-right: 0cm; margin-bottom: 0cm">
-<font color="#ffffff"><span style="background: #5638fd">Bryan Bertoni
-: bryan.bertoni@studio.unibo.it <br/>
-Gabriele Daga :
-gabriele.daga@studio.unibo.it <br/>
-Emanuele D'Arsié :
-emanuele.darsie@studio.unibo.it <br/>
-<br/>
-GIT repo:
-https://github.com/bryanber102/TemaFinale24 </span></font>
-</p>
+GIT repo: <a style="color: white" href="https://github.com/bryanber102/TemaFinale24">https://github.com/bryanber102/TemaFinale24</a>
+</div>
 </body>
 </html>
