@@ -36,7 +36,7 @@ Reply moverobotfailed:  moverobotfailed(PLANDONE, PLANTODO) for moverobot
 Context ctx_waste_incinerator_service ip [host="localhost" port=8125]
 Context ctxbasicrobot ip [host="127.0.0.1" port=8020] 
 Context ctxmonitoringdevice ip [host="192.168.114.105" port=8100]
-Context ctxscale ip [host="192.168.1.105" port=8101]
+Context ctxscale ip [host="169.254.12.90" port=8200]
 
 //Attori esterni al WIS
 ExternalQActor basicrobot context ctxbasicrobot
@@ -318,8 +318,8 @@ QActor monitoring_device_mok context ctx_waste_incinerator_service{
 	State emitState{
 		updateResource [# "statoAshStorage(0)" #]
 		delay 2000
-	}Goto emitState
-	/*Transition t0 whenMsg newAshes -> handleAshes
+	}
+	Transition t0 whenMsg newAshes -> handleAshes
 	
 	//Stato per gestire l'arrivo di nuova cenere nel container
 	State handleAshes{

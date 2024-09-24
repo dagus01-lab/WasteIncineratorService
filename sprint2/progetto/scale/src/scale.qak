@@ -9,7 +9,7 @@ Dispatch arrived_RP : arrived_RP(N) "command that simulate the arrival of new RP
 
 //Definizione dei contesti
 Context ctxscale ip [ host= "localhost"      port= 8200 ] 
-Context ctx_waste_incinerator_service ip [host="192.168.1.110" port=8125]
+Context ctx_waste_incinerator_service ip [host="169.254.12.89" port=8125]
 
 //Attori esterni alla scale
 ExternalQActor wis context ctx_waste_incinerator_service
@@ -20,12 +20,13 @@ QActor scaledevice context ctxscale{
 	lateinit var reader : java.io.BufferedReader
     lateinit var p : Process	
     var Weight = 0
+    var WeightMAX = 500
 #]	
 	
 	State s0 initial{
 		println("$name | scalestart") 
 	 	[#
-			p       = Runtime.getRuntime().exec("python scale.py")
+			p       = Runtime.getRuntime().exec("python scaleDevice.py")
 			reader  = java.io.BufferedReader(  java.io.InputStreamReader(p.getInputStream() ))	
 		#]		
 	}
@@ -35,22 +36,22 @@ QActor scaledevice context ctxscale{
 	State readscaleData{
 	[# 
 		var data = reader.readLine()
-		CommUtils.outyellow("$name with python: data = $data"   ) 
+		//CommUtils.outyellow("$name with python: data = $data"   ) 
 		if( data != null ){
-		try{ 
-			val vd = data.toFloat()
-			val v  = vd.toInt()
-			if( v <= 100 ){	//A first filter ...
-				Weight = v				
-			}else Weight = 0
-		}catch(e: Exception){
-				CommUtils.outred("$name readscaleDataERROR: $e "   )
-		}
+			try{ 
+				val vd = data.toFloat()
+				val v  = vd.toInt()
+				if( v <= WeightMAX ){	
+					Weight = v				
+				}else Weight = WeightMAX
+			}catch(e: Exception){
+					CommUtils.outred("$name readscaleDataERROR: $e "   )
+			}
 		}
 		
 	#]	
 		if [# Weight > 0 #] { 
-		    println("$name with python: data = $data"   ) color yellow
+		    //println("$name with python: data = $Weight"   ) color yellow
 			emitlocalstream scaledata : weight($Weight)			 
 		}
 		//autodispatch doread : doread(1)
@@ -60,17 +61,18 @@ QActor scaledevice context ctxscale{
 //--------------------------------------------------------------------------------------------------------
 
 //--------------------------------Attore scale------------------------------------------------------------
-QActor scale context ctxscale {
+QActor scale context ctxscale { 
 	[# 
 		var RPs = 0;
 		var previous_RPs = 0; 
-		val WRP = 50;
+		val WRP = 100;
 	#]
 	
 	State s0 initial {
 		delay 1000
 		subscribeTo scaledevice for scaledata		
 		println("$name subscribed to scaledevice") color blue
+		updateResource [# "arrived_RP(0)" #]
 	}
 	Transition t0 whenEvent scaledata -> filter
 	
@@ -78,18 +80,16 @@ QActor scale context ctxscale {
 	State filter {
      	onMsg(scaledata : weight(W)) {
 	      	[#  
-	      		W = payloadArg(0).toInt() 
-	      		RPs = W/WRP
-	      	#]	      	
-	      	println("$name RPs=$RPs") color black	
-	      	
+	      		var W = payloadArg(0).toInt() 
+	      		RPs = (W/WRP).toInt()
+	      	#]	      		      	
 	      	//Se il numero di RPs è aumentato, notifico tale info al WIS
-	      	if [#RPs >= previous_RPs#]{ //verificare il margine della misura
-	      		println("$name emit number of RPs in Waste Storage") color magenta
+	      	if [#RPs > previous_RPs#]{ //verificare il margine della misura
+	      		println("$name emit number of RPs=$RPs in Waste Storage") color magenta
 	      		[#
-	      			for (i in previous_RPs..RPs) {
+	      			for (i in previous_RPs..RPs-1) {
 	      				#]
-	      				updateResource[#arrived_RP(1)#]
+	      				updateResource [# "arrived_RP(1)"#]
 	      				[#
 	      			}
 	      		#]
@@ -100,4 +100,3 @@ QActor scale context ctxscale {
 	Transition t0 whenEvent scaledata -> filter
 }
 //--------------------------------------------------------------------------------------------------------
-

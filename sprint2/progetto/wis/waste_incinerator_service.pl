@@ -24,10 +24,8 @@ reply( infoMonitoringDeviceReply, infoMonitoringDeviceReply(X) ).  %%for infoMon
 %====================================================================================
 context(ctx_waste_incinerator_service, "localhost",  "TCP", "8125").
 context(ctxbasicrobot, "127.0.0.1",  "TCP", "8020").
-context(ctxmonitoringdevice, "192.168.114.105",  "TCP", "8100").
-context(ctxscale, "192.168.1.105",  "TCP", "8101").
+context(ctxscale, "169.254.12.90",  "TCP", "8200").
  qactor( basicrobot, ctxbasicrobot, "external").
-  qactor( monitoringdevice, ctxmonitoringdevice, "external").
   qactor( scale, ctxscale, "external").
   qactor( wis, ctx_waste_incinerator_service, "it.unibo.wis.Wis").
  static(wis).
@@ -37,3 +35,5 @@ context(ctxscale, "192.168.1.105",  "TCP", "8101").
  static(incinerator).
   qactor( wistester, ctx_waste_incinerator_service, "it.unibo.wistester.Wistester").
  static(wistester).
+  qactor( monitoring_device_mok, ctx_waste_incinerator_service, "it.unibo.monitoring_device_mok.Monitoring_device_mok").
+ static(monitoring_device_mok).

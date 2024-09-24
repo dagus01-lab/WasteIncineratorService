@@ -11,12 +11,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
-//Sept2024
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory 
-import org.json.simple.parser.JSONParser
-import org.json.simple.JSONObject
-
 
 //User imports JAN2024
 
@@ -38,7 +32,7 @@ class Scalemock ( name: String, scope: CoroutineScope, isconfined: Boolean=false
 				 	 		stateTimer = TimerActor("timer_s0", 
 				 	 					  scope, context!!, "local_tout_"+name+"_s0", 1000.toLong() )  //OCT2023
 					}	 	 
-					 transition(edgeName="t034",targetState="simulateRP",cond=whenTimeout("local_tout_"+name+"_s0"))   
+					 transition(edgeName="t037",targetState="simulateRP",cond=whenTimeout("local_tout_"+name+"_s0"))   
 				}	 
 				state("simulateRP") { //this:State
 					action { //it:State

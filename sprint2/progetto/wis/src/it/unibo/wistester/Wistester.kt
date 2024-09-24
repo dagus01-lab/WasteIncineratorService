@@ -27,10 +27,9 @@ class Wistester ( name: String, scope: CoroutineScope, isconfined: Boolean=false
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						delay(500) 
+						delay(1000) 
 						CommUtils.outred("$name STARTS")
-						observeResource("192.168.114.105","8100","ctxmonitoringdevice","monitoringdevice","statoAshStorage")
-						observeResource("192.168.1.105","8101","ctxscale","scale","arrived_RP")
+						observeResource("169.254.12.90","8200","ctxscale","scale","arrived_RP")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -52,6 +51,7 @@ class Wistester ( name: String, scope: CoroutineScope, isconfined: Boolean=false
 				}	 
 				state("handleScaleInfo") { //this:State
 					action { //it:State
+						CommUtils.outred("$name Replying with Scale activation $ScaleActivation!")
 						answer("infoScale", "infoScaleReply", "infoScaleReply($ScaleActivation)"   )  
 						//genTimer( actor, state )
 					}
@@ -72,7 +72,8 @@ class Wistester ( name: String, scope: CoroutineScope, isconfined: Boolean=false
 				}	 
 				state("scaleActivationOk") { //this:State
 					action { //it:State
-						scaleActivation=1 
+						ScaleActivation=1 
+						CommUtils.outred("$name Scale activation ok!")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -82,7 +83,8 @@ class Wistester ( name: String, scope: CoroutineScope, isconfined: Boolean=false
 				}	 
 				state("monitoringDeviceActivationOk") { //this:State
 					action { //it:State
-						monitoringDeviceActivation=1 
+						MonitoringDeviceActivation=1 
+						CommUtils.outred("$name MonitoringDevice activation ok")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

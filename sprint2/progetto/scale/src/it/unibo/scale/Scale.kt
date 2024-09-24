@@ -24,13 +24,15 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 		 
 				var RPs = 0;
 				var previous_RPs = 0; 
-				val WRP = 50;
+				val WRP = 100;
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						delay(1000) 
 						subscribeToLocalActor("scaledevice") 
 						CommUtils.outblue("$name subscribed to scaledevice")
+						updateResourceRep( "arrived_RP(0)"  
+						)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -43,14 +45,13 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 						if( checkMsgContent( Term.createTerm("weight(W)"), Term.createTerm("weight(W)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								  
-									      		W = payloadArg(0).toInt() 
-									      		RPs = W/WRP
-								CommUtils.outblack("$name RPs=$RPs")
-								if( RPs >= previous_RPs 
-								 ){CommUtils.outmagenta("$name emit number of RPs in Waste Storage")
+									      		var W = payloadArg(0).toInt() 
+									      		RPs = (W/WRP).toInt()
+								if( RPs > previous_RPs 
+								 ){CommUtils.outmagenta("$name emit number of RPs=$RPs in Waste Storage")
 								
-									      			for (i in previous_RPs..RPs) {
-								updateResourceRep(arrived_RP(1) 
+									      			for (i in previous_RPs..RPs-1) {
+								updateResourceRep( "arrived_RP(1)" 
 								)
 								
 									      			}

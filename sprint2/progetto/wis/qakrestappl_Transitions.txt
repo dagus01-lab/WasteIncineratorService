@@ -1,5 +1,5 @@
 {"actor":"wis", "msgType":"dispatch", "curstate":"waitingRP", "nextstate":"handleUpdateStatoAshStorage", "msgId":"statoAshStorage"}
-{"actor":"wis", "msgType":"dispatch", "curstate":"waitingRP", "nextstate":"handleRP", "msgId":"arrived_RP"}
+{"actor":"wis", "msgType":"dispatch", "curstate":"waitingRP", "nextstate":"testRP", "msgId":"arrived_RP"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"handleRP", "nextstate":"handleRPInBurnin", "msgId":"rpInBurnin"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"handleEndBurning", "nextstate":"endRoute", "msgId":"newAshes"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"endRoute", "nextstate":"handleUpdateStatoAshStorage", "msgId":"statoAshStorage"}
@@ -12,3 +12,6 @@
 {"actor":"incinerator", "msgType":"dispatch", "curstate":"handleEndBurning", "nextstate":"handleStartBurning", "msgId":"startBurning"}
 {"actor":"wistester", "msgType":"dispatch", "curstate":"wait", "nextstate":"scaleActivationOk", "msgId":"arrived_RP"}
 {"actor":"wistester", "msgType":"dispatch", "curstate":"wait", "nextstate":"monitoringDeviceActivationOk", "msgId":"statoAshStorage"}
+{"actor":"monitoring_device_mok", "msgType":"dispatch", "curstate":"emitState", "nextstate":"handleAshes", "msgId":"newAshes"}
+{"actor":"monitoring_device_mok", "msgType":"dispatch", "curstate":"handleAshes", "nextstate":"handleAshes", "msgId":"newAshes"}
+{"actor":"monitoring_device_mok", "msgType":"dispatch", "curstate":"simulateRemoveAshes", "nextstate":"handleAshes", "msgId":"newAshes"}

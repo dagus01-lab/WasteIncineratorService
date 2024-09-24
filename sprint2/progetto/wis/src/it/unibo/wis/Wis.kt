@@ -21,7 +21,9 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
-		 var AshStorageStatus = 0  
+		 
+				var AshStorageStatus = 0 
+				var RPs = 0
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -29,8 +31,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 						CommUtils.outgreen("$name STARTS")
 						forward("activationCommand", "activationCommand(1)" ,"incinerator" ) 
 						delay(8000) 
-						observeResource("192.168.114.105","8100","ctxmonitoringdevice","monitoringdevice","statoAshStorage")
-						observeResource("192.168.1.105","8101","ctxscale","scale","arrived_RP")
+						observeResource("169.254.12.90","8200","ctxscale","scale","arrived_RP")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -46,7 +47,23 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					sysaction { //it:State
 					}	 	 
 					 transition(edgeName="t00",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
-					transition(edgeName="t01",targetState="handleRP",cond=whenDispatch("arrived_RP"))
+					transition(edgeName="t01",targetState="testRP",cond=whenDispatch("arrived_RP"))
+				}	 
+				state("testRP") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("arrived_RP(SOURCE,N)"), Term.createTerm("arrived_RP(SOURCE,N)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								RPs = payloadArg(1).split("(")[1].split(")")[0].toInt() 
+						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="handleRP", cond=doswitchGuarded({RPs>0 
+					}) )
+					transition( edgeName="goto",targetState="waitingRP", cond=doswitchGuarded({! (RPs>0 
+					) }) )
 				}	 
 				state("handleRP") { //this:State
 					action { //it:State

@@ -41,17 +41,20 @@ Reply infoMonitoringDeviceReply: infoMonitoringDeviceReply(X) for infoMonitoring
 //Definizione dei contesti
 Context ctx_waste_incinerator_service ip [host="localhost" port=8125]
 Context ctxbasicrobot ip [host="127.0.0.1" port=8020] 
-Context ctxmonitoringdevice ip [host="192.168.114.105" port=8100]
-Context ctxscale ip [host="192.168.1.105" port=8101]
+//Context ctxmonitoringdevice ip [host="192.168.114.105" port=8100]
+Context ctxscale ip [host="169.254.12.90" port=8200]
 
 //Attori esterni al WIS
 ExternalQActor basicrobot context ctxbasicrobot
-ExternalQActor monitoringdevice context ctxmonitoringdevice
+//ExternalQActor monitoringdevice context ctxmonitoringdevice
 ExternalQActor scale context ctxscale
 
 //--------------------------------Attore WIS-----------------------------------------------------------------
 QActor wis context ctx_waste_incinerator_service{
-	[# var AshStorageStatus = 0 #]
+	[# 
+		var AshStorageStatus = 0 
+		var RPs = 0
+	#]
 	
 	State s0 initial{
 		delay 500
@@ -64,7 +67,7 @@ QActor wis context ctx_waste_incinerator_service{
 		//mando messaggio di attivazione del Incinerator
 		forward incinerator -m activationCommand : activationCommand(1)
 		delay 8000
-		observeResource monitoringdevice msgid statoAshStorage
+		//observeResource monitoringdevice msgid statoAshStorage
 		observeResource scale msgid arrived_RP
 	}
 	Goto waitingRP
@@ -73,7 +76,13 @@ QActor wis context ctx_waste_incinerator_service{
 	State waitingRP{
 	}
 	Transition t0 whenMsg statoAshStorage -> handleUpdateStatoAshStorage
-				  whenMsg arrived_RP ->  handleRP
+				  whenMsg arrived_RP ->  testRP
+	State testRP{
+		onMsg(arrived_RP:arrived_RP(SOURCE, N)){
+			[#RPs = payloadArg(1).split("(")[1].split(")")[0].toInt()#]
+		}
+	}
+	Goto handleRP if [#RPs>0#] else waitingRP
 				
 	//Stato per gestire l'arrivo di un nuovo RP nel WasteStorage
 	State handleRP{
@@ -301,9 +310,9 @@ QActor wistester context ctx_waste_incinerator_service{
 		var ScaleActivation = 0;
 	#]
 	State s0 initial{
-		delay 500
+		delay 1000
 		println("$name STARTS") color red
-		observeResource monitoringdevice msgid statoAshStorage
+		//observeResource monitoringdevice msgid statoAshStorage
 		observeResource scale msgid arrived_RP
 	}
 	Goto wait
@@ -316,6 +325,7 @@ QActor wistester context ctx_waste_incinerator_service{
 					whenMsg arrived_RP -> scaleActivationOk
 					whenMsg statoAshStorage -> monitoringDeviceActivationOk
 	State handleScaleInfo{
+		println("$name Replying with Scale activation $ScaleActivation!") color red
 		replyTo infoScale with infoScaleReply:infoScaleReply($ScaleActivation)
 	}
 	Goto wait
@@ -324,11 +334,13 @@ QActor wistester context ctx_waste_incinerator_service{
 	}
 	Goto wait
 	State scaleActivationOk{
-		[#scaleActivation=1#]
+		[#ScaleActivation=1#]
+		println("$name Scale activation ok!") color red
 	}
 	Goto wait
 	State monitoringDeviceActivationOk{
-		[#monitoringDeviceActivation=1#]
+		[#MonitoringDeviceActivation=1#]
+		println("$name MonitoringDevice activation ok") color red
 	}
 	Goto wait
 }
@@ -350,7 +362,7 @@ QActor wistester context ctx_waste_incinerator_service{
 }*/
 
 //-----------------------------------------------------------------------------------------------------------
-/*
+
 //------------------------Attore mok che simula il comportamento del MonitoringDevice------------------------
 QActor monitoring_device_mok context ctx_waste_incinerator_service{
 	[# var ashLevel = 3; val MAX_LEVEL = 4;  //livello delle cenere sotto forma di numero di RP bruciati
@@ -362,8 +374,8 @@ QActor monitoring_device_mok context ctx_waste_incinerator_service{
 	State emitState{
 		updateResource [# "statoAshStorage(0)" #]
 		delay 2000
-	}Goto emitState
-	/*Transition t0 whenMsg newAshes -> handleAshes
+	}
+	Transition t0 whenMsg newAshes -> handleAshes
 	
 	//Stato per gestire l'arrivo di nuova cenere nel container
 	State handleAshes{
@@ -391,4 +403,3 @@ QActor monitoring_device_mok context ctx_waste_incinerator_service{
 	Transition t0 whenMsg newAshes -> handleAshes
 }
 //-----------------------------------------------------------------------------------------------------------
-*/

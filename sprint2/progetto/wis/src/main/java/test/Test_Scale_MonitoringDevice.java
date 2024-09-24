@@ -18,7 +18,7 @@ import unibo.basicomm23.utils.ColorsOut;
 import unibo.basicomm23.utils.CommUtils;
 import unibo.basicomm23.utils.ConnectionFactory;
 
-public class TestWISOutput {
+public class Test_Scale_MonitoringDevice {
 	private static Interaction connSupport;
 	private static Process procBasicRobot;
 	private static Process procWIS;
@@ -49,7 +49,7 @@ public class TestWISOutput {
 				CommUtils.outmagenta("TestWIS activateBasicRobot");
 				try {
 					//procBasicRobot = Runtime.getRuntime().exec("./src/main/java/test/basicRobotexec.bat");
-					procBasicRobot = Runtime.getRuntime().exec("../unibo.basicrobot24/gradlew run");
+					procBasicRobot = Runtime.getRuntime().exec("../../unibo.basicrobot24/gradlew run");
 					showOutput(procBasicRobot,ColorsOut.BLUE);
 				} catch ( Exception e) {
 					CommUtils.outred("TestWIS activateBasicRobot ERROR " + e.getMessage());
@@ -112,8 +112,8 @@ public class TestWISOutput {
 		public void testScaleActivation() {
 			IApplMessage req  = CommUtils.buildRequest( "tester", "infoScale", "infoScale(X)", "wistester");
 	 		try {
-	 			Thread.sleep(10000);
-	  			 CommUtils.outmagenta("testWISSystemOutput ======================================= ");
+	 			Thread.sleep(15000);
+	  			 CommUtils.outmagenta("testScaleActivation ======================================= ");
 				while( connSupport == null ) {
 	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.tcp, "localhost", "8125");
 	 				CommUtils.outcyan("testWISSystem another connect attempt ");
@@ -133,8 +133,8 @@ public class TestWISOutput {
 		public void testMonitoringDeviceActivation() {
 			IApplMessage req  = CommUtils.buildRequest( "tester", "infoMonitoringDevice", "infoMonitoringDevice(X)", "wistester");
 	 		try {
-	 			Thread.sleep(10000);
-	  			 CommUtils.outmagenta("testWISSystemOutput ======================================= ");
+	 			Thread.sleep(15000);
+	  			 CommUtils.outmagenta("testMonitoringDeviceActivation ======================================= ");
 				while( connSupport == null ) {
 	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.tcp, "localhost", "8125");
 	 				CommUtils.outcyan("testWISSystem another connect attempt ");
