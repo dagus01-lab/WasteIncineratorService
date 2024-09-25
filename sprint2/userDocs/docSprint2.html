@@ -1,276 +1,383 @@
 <!DOCTYPE html>
-<html>
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-	<title></title>
-	<meta name="generator" content="LibreOffice 24.2.6.2 (Linux)"/>
-	<meta name="created" content="00:00:00"/>
-	<meta name="changed" content="2024-09-25T02:13:38.885370886"/>
-	<meta name="viewport" content="width=device-width, initial-scale=1"/>
-	<style type="text/css">
-		@page { size: 21cm 29.7cm; margin-left: 2cm; margin-right: 1cm; margin-top: 1cm; margin-bottom: 1cm }
-		p { color: #0a0a0a; font-family: "Tahoma"; font-size: 10pt; font-weight: normal; line-height: 160%; margin-left: 0.79cm; margin-right: 0.79cm; margin-bottom: 0.25cm; background: transparent }
-		h1 { font-variant: normal; color: #242424; font-family: "Tahoma", "Helvetica", "Arial", sans-serif; font-size: 24pt; font-style: normal; font-weight: normal; line-height: 140%; margin-left: 0.79cm; margin-right: 0.79cm; margin-bottom: 0.21cm; background: #b2c0ff; border: none; padding: 0cm; background: transparent; page-break-after: avoid }
-		h2 { font-variant: normal; color: #242424; font-family: "Tahoma", "Helvetica", "Arial", sans-serif; font-size: 18pt; font-style: normal; font-weight: normal; line-height: 140%; margin-left: 0.79cm; margin-right: 0.79cm; margin-top: 0.35cm; margin-bottom: 0.21cm; background: #9ed8ff; border: none; padding: 0cm; background: transparent; page-break-after: avoid }
-		h4 { font-variant: normal; color: #0a0a0a; font-family: "Helvetica Neue", "Helvetica", "Roboto", "Arial", sans-serif; font-size: 12pt; font-style: normal; font-weight: normal; line-height: 140%; margin-left: 0.79cm; margin-right: 0.79cm; margin-top: 0.21cm; margin-bottom: 0.21cm; background: #ccffcc; border: none; padding: 0cm; background: transparent; page-break-after: avoid }
-		a:link { color: #545454; background: transparent; text-decoration: underline }
-		a:visited { color: #545454; background: transparent; text-decoration: underline }
-	</style>
+    <!--
+<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+<script type="text/javascript" src="../css/issStyle.js"></script>
+-->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.4/dist/css/foundation.min.css" crossorigin="anonymous">
+		<script src="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.4/dist/js/foundation.min.js"crossorigin="anonymous"></script> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/templateISS.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/main.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/navbar.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/table.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/code.css">
+        <!-- <script type="text/javascript" src="./commons/resources/scripts/myScripts.js"></script> -->
+<style type="text/css">
+body
+{
+    margin-left:  30px;
+    margin-right: 30px;
+};
+
+P
+{
+    font-family: Tahoma;
+    font-size: 10pt;
+};
+
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+	font-size: 93%;
+}
+
+a:hover {
+    background-color: #cccccc;
+}
+
+
+hr {
+    clear: both;
+    height: 1px;
+    color: #242424;
+    background-color: transparent;
+}
+
+h1, h2, h3 {
+    color: #242424;
+    clear: left;
+    font: 100% Tahoma, Helvetica, Arial, sans-serif;
+    margin-bottom: 0.5em;
+    padding-top: 0.5em;
+	border-radius: 10px;
+	padding: 5px;
+}
+
+top {
+	width: 100%;
+}
+
+
+#i {
+    color: #ff1010;
+}
+tt{
+	font-family: "Arial";
+    font-size: 90%;
+	color: #006600;
+}
+em{
+	font-family: "Arial";
+    font-size: 80%;
+	font-weight: bold;
+	border-style:solid;
+	border-color: #abe876;
+    color: #1632cc;
+}
+bc{
+	font-family: "Arial";
+	font-size: 90%;
+	font-weight: bold;
+    color: #990000;
+	background-color: #fcf8c7;
+}
+ks{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #0000CD	;
+	font-size: 90%;
+}
+kc{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #008000	;
+	font-size: 90%;
+}
+pre{
+	font-family: "Consolas";
+	font-size: 85%;
+	background-color: #f5f5f5;
+	border: 1.5px solid silver;
+	padding: 5px;
+}
+m{
+	font-family: "Helvetica";
+	line-height: 100%;
+ 	font-size: 75%;
+}
+div.body{
+	 
+    font-size: 18px;
+}
+k{
+    color: #990000;
+	font-weight: bold;
+	font-size: 90%;
+}
+h1 {
+    font-size: 150%;
+    background-color: #b2c0ff;
+	padding: 10px;
+}
+
+h2 {
+    background-color: #9ed8ff;
+    font-size: 130%;
+}
+
+h3 {
+	background-color: #e6ccff;
+    font-size: 100%;
+}
+h4 {
+    background-color: #ccffcc;
+    font-size: 100%;
+	width: 95%;
+	border-radius: 5px;
+	padding: 2px;
+}
+h5 {
+    background-color: #d5ffb0;
+    font-size: 100%;
+
+}
+div.req{
+	background-color: #d9ffb3;
+    font-size: 18px;
+	width: 700px;
+    border: 3px solid green;
+    padding: 15px;
+    margin: 10px;
+}
+div.remark{
+	background-color: #E3F2FD;
+    border: 1.5px solid #d5f2ed;
+    padding: 15px;
+    margin: 10px;
+	border-radius: 25px;
+}
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+ol, ul, li {
+  margin: 0;
+  margin-left: 10px;
+  padding: 0;
+  padding-bottom: 5px;
+}
+
+table, th, td {
+	border: 1px solid black;
+}
+
+img {
+	border: 1.5px solid #d5f2ed
+
+}
+
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+}
+
+div.wrapdesc{
+	width: 90%;
+	margin: auto;
+}
+
+div.imagedesc{
+	width: 85%;
+	margin: auto;
+}
+
+.slidekp{
+    background-color: hsl(332, 77%, 86%);
+    border-radius: 10px;
+    border: 1px solid blue;
+    font-size: 18px; 
+    font-weight: bold;
+    line-height: 1.5;
+    padding: 3px
+  } 
+</style>
+
+<title>Documento Sprint2</title>
 </head>
-<body lang="en-GB" text="#0a0a0a" link="#545454" vlink="#545454" bgcolor="#fefefe" dir="ltr">
-<div id="top" dir="ltr"><h1 style="margin-left: 0cm; margin-right: 0cm">
-	WASTE INCINERATOR SERVICE - Sprint 2 
-	</h1>
+
+<body>
+<div id="top">
+	<h1> WASTE INCINERATOR SERVICE - Sprint 2 </h1>
 </div>
+
+<div class="body"> 
 <h2>Introduzione</h2>
-<p>Un'azienda intende realizzare un <b>WasteIncineratorService</b>
-per trattare i rifiuti bruciandoli e necessita di un servizio di
-sistema software (WIS) che controlli un robot (chiamato OpRobot) per
-spostare i rifiuti.</p>
+<p>
+Un'azienda intende realizzare un <b>WasteIncineratorService</b> per trattare i rifiuti bruciandoli 
+e necessita di un servizio di sistema software (WIS) che controlli un robot (chiamato OpRobot) per spostare i rifiuti.
+</p>
+
 <h2>Requisiti</h2>
 <p>Il seguente link porta al documento dei requisiti fornito dal
 cliente. <br/>
 <a href="TemaFinale24.html">Documento requisiti</a> 
 </p>
+
 <h2>Sprint precedente</h2>
 <p>Il seguente link porta al documento dello SPRINT precedente, nel
 quale si sono affrontati i requisiti sull'interazione WIS-OpRobot e
 WIS/OpRobot-Incinerator.<br/>
-<a href="../../sprint1/userDocs/docSprint1.html">SPRINT
-1</a> 
+<a href="../../sprint1/userDocs/docSprint1.html">SPRINT 1</a> 
 </p>
+
 <h4>Architettura iniziale di riferimento</h4>
-<p>Di seguito viene mostrata un'immagine che rappresenta
-l'architettura finale dello sprint precedente, che sarà quindi
-l'architettura iniziale di questo sprint.<br/>
-<font color="#545454"><a href="img/architetturaIniziale.png">
-  <font color="#545454">
-    <img src="img/architetturaIniziale.png" name="Image1" align="bottom" width="1000" height="800" border="1"/>
-  </font>
+<p>Di seguito viene mostrata un'immagine che rappresenta l'architettura finale dello sprint precedente, che sarà quindi l'architettura iniziale di questo sprint.<br/>
+<a href="img/architetturaIniziale.png">
+	<img src="img/architetturaIniziale.png" name="Image1" align="bottom" width="1000" height="800" border="1"/>
 </a>
 <a href="img/architetturaIniziale.png">
-</a></font>
+</a>
 </p>
+
 <h2>GOAL</h2>
-<p>In questo SPRINT verranno affrontati i seguenti requisiti: 
-</p>
+<p>In questo SPRINT verranno affrontati i seguenti requisiti:
 <ul>
-	<li><p style="margin-bottom: 0cm">Architettura del MonitoringDevice 
-	</p></li>
-	<li><p style="margin-bottom: 0cm">Interazione WIS - MonitoringDevice
-		</p></li>
-	<li><p>Interazione WIS - Scale 
-	</p></li>
+	<li>Architettura del MonitoringDevice</li>
+	<li>Interazione WIS - MonitoringDevice</li>
+	<li>Interazione WIS - Scale</li>
 </ul>
-<p>Si rimanda quindi al prossimo SPRINT la definizione della
-ServiceStatusGUI. 
+Si rimanda quindi al prossimo SPRINT la definizione della ServiceStatusGUI. 
 </p>
+
 <h2>Analisi del problema</h2>
 <h4>Architettura del MonitoringDevice</h4>
-<p>I requisiti specificano che il MonitoringDevice è composto da un
-Sonar e da un Led e lavora su un RaspberryPi, quindi un nodo esterno
-a quello in cui è presente il WIS.<br/>
-Per rappresentare il sonar
-fisico e il led fisico, sfruttiamo quanto ci viene fornito dalla
-nostra software house.<br/>
-In particolare, rappresentiamo il sonar
-attraverso il componente <a href="RaspApplCode24.html"><b>sonar24qak</b></a>
-che sappiamo essere composto da due attori: 
-</p>
+<p>I requisiti specificano che il MonitoringDevice è composto da unSonar e da un Led e lavora su un RaspberryPi, quindi un nodo esterno a quello in cui è presente il WIS.<br/>
+Per rappresentare il sonar fisico e il led fisico, sfruttiamo quanto ci viene fornito dalla nostra software house.<br/>
+In particolare, rappresentiamo il sonar attraverso il componente <a href="RaspApplCode24.html"><b>sonar24qak</b></a> che sappiamo essere composto da due attori: 
 <ul>
-	<li><p style="margin-bottom: 0cm"><b>sonardevice</b> che si occupa
-	di leggere i dati generati dallo script <a href="sonar.py"><b>sonar.py</b></a>.
-	Tale script non fa altro che rilevare continuamente dati dal sonar
-	fisico presente nel RaspberryPi. 
-	</p></li>
-	<li><p><b>datacleaner</b> che riceve i valori letti dal sonardevice
-	e si occupa di effettuare un ulteriore filtraggio sui dati. 
-	</p></li>
+	<li><b>sonardevice</b> che si occupadi leggere i dati generati dallo script <a href="sonar.py"><b>sonar.py</b></a>.
+	Tale script non fa altro che rilevare continuamente dati dal sonar fisico presente nel RaspberryPi. 
+	</li>
+	<li><b>datacleaner</b> che riceve i valori letti dal sonardevice e si occupa di effettuare un ulteriore filtraggio sui dati. 
+	</li>
 </ul>
-<p>Il comportamento del led fisico verrà gestita da un altro attore
-<b>led</b> che dovrà richiamare alcuni script python per
-l'accensione, spegnimento e lampeggiamento del led fisico.<br/>
+Il comportamento del led fisico verrà gestita da un altro attore <b>led</b> che dovrà richiamare alcuni script python per l'accensione, spegnimento e lampeggiamento del led fisico.<br/>
 <br/>
-Il
-MonitoringDevice verrà quindi visto dall'esterno come un unico
-componente (che internamente è composto dagli attori appena
-descritti), le cui interazioni con il WIS verranno discusse di
-seguito. 
+Il MonitoringDevice verrà quindi visto dall'esterno come un unico componente (che internamente è composto dagli attori appena descritti), le cui interazioni con il WIS verranno discusse di seguito. 
 </p>
+
 <h4>Interazione WIS - MonitoringDevice</h4>
-<p>Le principali problematiche dell'interazione WIS -
-MonitoringDevice sono le seguenti: 
-</p>
+<p>Le principali problematiche dell'interazione WIS - MonitoringDevice sono le seguenti: 
 <ul>
-	<li><p style="line-height: 150%; margin-right: 0cm; margin-bottom: 0cm">
-	<span style="display: inline-block; border: 1px solid #0000ff; padding: 0.08cm"><font size="4" style="font-size: 13pt"><b>P1</b></font></span>
-	Quando il MonitoringDevice rileva che l'ashStorage è pieno, come
-	notifica tale informazione al WIS? 
-	</p></li>
-	<li><p style="line-height: 150%; margin-right: 0cm; margin-bottom: 0cm">
-	<span style="display: inline-block; border: 1px solid #0000ff; padding: 0.08cm"><font size="4" style="font-size: 13pt"><b>P2</b></font></span>
-	Come capire quando l'ashStorage è vuoto? 
-	</p></li>
-	<li><p style="line-height: 150%; margin-right: 0cm"><span style="display: inline-block; border: 1px solid #0000ff; padding: 0.08cm"><font size="4" style="font-size: 13pt"><b>P3</b></font></span>
-	lo stato dei componenti del WIS è conosciuto anche al
-	MonitoringDevice o quest'ultimo deve esplicitamente chiedere tale
-	informazione al WIS? 
-	</p></li>
+	<li>
+		<span class="slidekp">P1</span>
+		Quando il MonitoringDevice rileva che l'ashStorage è pieno, come notifica tale informazione al WIS? 
+	</li>
+	<li>
+		<span class="slidekp">P2</span>
+		Come capire quando l'ashStorage è vuoto? 
+	</li>
+	<li>
+		<span class="slidekp">P3</span>
+		lo stato dei componenti del WIS è conosciuto anche al MonitoringDevice o quest'ultimo deve esplicitamente chiedere tale informazione al WIS? 
+	</li>
 </ul>
-<p><br/>
+<br>
 Incominciamo analizzando il problema P1.<br/>
-Da requisiti
-sappiamo che quando l'AshStorage è pieno, e finché l'operatore
-esterno non lo svuota, il WIS deve impedire che vengano bruciati
-altri RP.<br/>
-La scelta più adatta e coerente a quanto descritto
-nello SPRINT1 (attraverso il mok del MonitoringDevice) è rendere il
-WIS un &quot;Observer&quot; del MonitoringDevice, in particolare
-dell'informazione sullo stato del AshStorage.<br/>
-Quando il
-datacleaner del MonitoringDevice rileva una distanza minore o uguale
-a DLIMT, allora il container è da considerare pieno e quindi
-aggiorna lo stato.<br/>
+Da requisiti sappiamo che quando l'AshStorage è pieno, e finché l'operatore esterno non lo svuota, il WIS deve impedire che vengano bruciati altri RP.<br/>
+La scelta più adatta e coerente a quanto descritto nello SPRINT1 (attraverso il mok del MonitoringDevice) è rendere il
+WIS un Observer del MonitoringDevice, in particolare dell'informazione sullo stato del AshStorage.<br/>
+Quando il datacleaner del MonitoringDevice rileva una distanza minore o uguale a DLIMT, allora il container è da considerare pieno e quindi aggiorna lo stato.<br/>
 <br/>
 Ora consideriamo il problema P2.<br/>
-Capire
-quando l'AshStorage è vuoto, è più complicato di vedere quando è
-pieno, in quanto non viene fornito dai requisiti un parametro sulla
+Capire quando l'AshStorage è vuoto, è più complicato di vedere quando è pieno, in quanto non viene fornito dai requisiti un parametro sulla
 distanza da rilevare per considerarlo vuoto.<br/>
-Una possibile
-soluzione è considerarlo vuoto all'avvio del sistema e ogni volta
-che viene svuotato dall'operatore esterno.<br/>
-Un altro modo è
-introdurre un parametro nel sistema, per il momento costante ma che
-negli SPRINT successivi può essere impostato dall'utente (ad esempio
-attraverso la GUI), che indichi la distanza tra il sonar e il fondo
-del contenitore, così se viene rilevata dal sonar tale distanza, si
-può considerare l'AshStorage vuoto.<br/>
+Una possibile soluzione è considerarlo vuoto all'avvio del sistema e ogni volta che viene svuotato dall'operatore esterno.<br/>
+Un altro modo è introdurre un parametro nel sistema, per il momento costante ma che negli SPRINT successivi può essere impostato dall'utente (ad esempio
+attraverso la GUI), che indichi la distanza tra il sonar e il fondo del contenitore, così se viene rilevata dal sonar tale distanza, si può considerare l'AshStorage vuoto.<br/>
 <br/>
-Infine discutiamo il
-problema P3.<br/>
-Al MonitoringDevice l'unico componente del WIS che
-gli interessa realmente è l'Incinerator, in particolare sapere se
-sta bruciando o meno per accendere o spegnere il led di
-conseguenza.<br/>
-Il modo migliore per ottenere tale informazione è
-far si che il MonitoringDevice diventi un Observer dell'Incinerator,
-evitando quindi uno scambio di messaggi poco utili tra WIS e
-MonitoringDevice. 
+Infine discutiamo il problema P3.<br/>
+Al MonitoringDevice l'unico componente del WIS che gli interessa realmente è l'Incinerator, in particolare sapere se sta bruciando o meno per accendere o spegnere il led di conseguenza.<br/>
+Il modo migliore per ottenere tale informazione è far si che il MonitoringDevice diventi un Observer dell'Incinerator, evitando quindi uno scambio di messaggi poco utili tra WIS e MonitoringDevice. 
 </p>
+
 <h4>Interazione WIS - Scale</h4>
-<p>Le problematiche relative all'interazione WIS - Scale sono le
-seguenti: 
-</p>
+<p>Le problematiche relative all'interazione WIS - Scale sono le seguenti: 
 <ul>
-	<li><p style="line-height: 150%; margin-right: 0cm; margin-bottom: 0cm">
-	<span style="display: inline-block; border: 1px solid #0000ff; padding: 0.08cm"><font size="4" style="font-size: 13pt"><b>P4</b></font></span>
-	Come calcolare il numero di RP dal peso rilevato dalla scale fisica?
-		</p></li>
-	<li><p style="line-height: 150%; margin-right: 0cm"><span style="display: inline-block; border: 1px solid #0000ff; padding: 0.08cm"><font size="4" style="font-size: 13pt"><b>P5</b></font></span>
-	Come comunicare tale informazione al WIS? 
-	</p></li>
+	<li>
+		<span class="slidekp">P4</span>
+		Come calcolare il numero di RP dal peso rilevato dalla scale fisica?
+	</li>
+	<li>
+		<span class="slidekp">P5</span>
+		Come comunicare tale informazione al WIS? 
+	</li>
 </ul>
-<p><br/>
+<br/>
 Partiamo analizzando il problema P4.<br/>
 La principale
-difficoltà sta nella &quot;conversione&quot; del peso rilevato dalla
-scale fisica in numero di RP, in quanto ci viene specificato dai
-requisiti che un RP è circa <b>WRP = 50 kg</b>, ma questo &quot;circa&quot;,
-unito all'errore fisico, potrebbe portare a misurazioni errate.
+difficoltà sta nella conversione del peso rilevato dalla scale fisica in numero di RP, 
+in quanto ci viene specificato dai requisiti che un RP è circa <b>WRP = 50 kg</b>, ma questo circa, unito all'errore fisico, potrebbe portare a misurazioni errate.
 <br/>
-Inoltre, l'errore di misura può variare da bilancia a
-bilancia, quindi in questa prima fase di analisi si decide di
-semplificare la realtà, considerando un arrotondamento &quot;secco&quot;
-per difetto su WRP per calcolare il numero di RPs misurati: <b>RPs =
-W/WRP</b> con W peso rilevato dalla scale fisica. <br/>
+Inoltre, l'errore di misura può variare da bilancia a bilancia, quindi in questa prima fase di analisi si decide di semplificare la realtà, considerando un arrotondamento &quot;secco&quot;
+per difetto su WRP per calcolare il numero di RPs misurati: 
+<b>RPs = W/WRP</b> con W peso rilevato dalla scale fisica. <br/>
 <br/>
-Consideriamo
-ora il problema P5.<br/>
-Una volta ottenuto il numero di RPs presenti
-nel WasteStorage, occorre comunicare tale informazione al WIS.<br/>
-Un
-possibile approccio, simile a quanto fatto con il MonitoringDevice, è
-rendere la scale osservabile e farla osservare dal WIS.<br/>
-Tuttavia,
-per sfruttare quanto fatto negli sprint precedenti, si decide di
-comunicare il numero di RPs nel modo seguente: 
-</p>
+Consideriamo ora il problema P5.<br/>
+Una volta ottenuto il numero di RPs presenti nel WasteStorage, occorre comunicare tale informazione al WIS.<br/>
+Un possibile approccio, simile a quanto fatto con il MonitoringDevice, è rendere la scale osservabile e farla osservare dal WIS.<br/>
+Tuttavia, per sfruttare quanto fatto negli sprint precedenti, si decide di comunicare il numero di RPs nel modo seguente:
 <ol>
-	<li><p style="margin-right: 0cm; margin-bottom: 0cm">l'attore scale,
-	dopo aver convertito da peso a numero di RP, calcola soltanto la
-	differenza con il numero di RP precedenti. 
-	</p></li>
-	<li><p style="margin-right: 0cm; margin-bottom: 0cm">sempre l'attore
-	scale manda un Dispatch <b>arrived_rp</b>, per ciascuna unità
-	calcolata, al WIS. 
-	</p></li>
-	<li><p>l'attore WIS, per capire se sono presenti o meno degli RPs,
-	non fa altro che consumare i messaggi arrived_rp dalla propria coda
-	di messaggi ricevuti. 
-	</p></li>
+	<li>l'attore scale, dopo aver convertito da peso a numero di RP, calcola soltanto la differenza con il numero di RP precedenti. </li>
+	<li>sempre l'attore scale manda un Dispatch <b>arrived_rp</b>, per ciascuna unità calcolata, al WIS.</li>
+	<li>l'attore WIS, per capire se sono presenti o meno degli RPs, non fa altro che consumare i messaggi arrived_rp dalla propria coda di messaggi ricevuti. </li>
 </ol>
-<p>Grazie a questo approccio, non dobbiamo toccare l'architettura del
+Grazie a questo approccio, non dobbiamo toccare l'architettura del
 WIS, e quindi dover aggiungere una variabile lato WIS che memorizzi
 il numero di RPs, e inoltre sfruttiamo appieno la gestione della coda
 dei messaggi di cui sono dotati gli attori qak. 
 </p>
+
 <h4>Architettura logica del problema</h4>
-<p>Definiamo ora un modello, composto da tre file distinti .qak, che
-descrive come i componenti elencati in precedenza interagiscono tra
-loro: 
-</p>
+<p>Definiamo ora un modello, composto da tre file distinti .qak, che descrive come i componenti elencati in precedenza interagiscono tra loro: 
 <ul>
-	<li><p style="margin-right: 0cm; margin-bottom: 0cm"><a href="../analisi_problema/wis/src/WasteIncineratorService_problema.qak"><b>WIS</b></a><br/>
-<font color="#545454"><a href="img/waste_incinerator_problem_servicearch.png">
-  <font color="#545454">
-    <img src="img/waste_incinerator_problem_servicearch.png" name="Image2" align="bottom" width="1000" height="800" border="1"/>
-  </font>
-</a>
-<a href="img/waste_incinerator_problem_servicearch.png">
-	</a></font>
-	</p></li>
-	<li><p style="margin-right: 0cm; margin-bottom: 0cm"><a href="../analisi_problema/monitoringDevice/src/monitoringdevice.qak"><b>MonitoringDevice</b></a><br/>
-<font color="#545454"><a href="img/monitoringdevicearch.png">
-  <font color="#545454">
-    <img src="img/monitoringdevicearch.png" name="Image3" align="bottom" width="1000" height="800" border="1"/>
-  </font>
-</a>
-<a href="img/monitoringdevicearch.png">
-	</a></font>
-	</p></li>
-	<li><p><a href="../analisi_problema/scale/src/scale.qak"><b>Scale</b></a><br/>
-<font color="#545454"><a href="img/scalearch.png">
-  <font color="#545454">
-    <img src="img/scalearch.png" name="Image4" align="bottom" width="1000" height="800" border="1"/>
-  </font>
-</a>
-<a href="img/scalearch.png">
-	</a></font>
-	</p></li>
+	<li>
+		<a href="../analisi_problema/wis/src/WasteIncineratorService_problema.qak"><b>WIS</b></a><br/>
+		<a href="img/waste_incinerator_problem_servicearch.png">
+			<img src="img/waste_incinerator_problem_servicearch.png" name="Image2" align="bottom" width="1000" height="800" border="1"/>
+		</a>
+	</li>
+	<li>
+		<a href="../analisi_problema/monitoringDevice/src/monitoringdevice.qak"><b>MonitoringDevice</b></a><br/>
+		<a href="img/monitoringdevicearch.png">
+			<img src="img/monitoringdevicearch.png" name="Image3" align="bottom" width="1000" height="800" border="1"/>
+		</a>
+	</li>
+	<li>
+		<a href="../analisi_problema/scale/src/scale.qak"><b>Scale</b></a><br/>
+		<a href="img/scalearch.png">
+			<img src="img/scalearch.png" name="Image4" align="bottom" width="1000" height="800" border="1"/>
+		</a>
+	</li>
 </ul>
-<p style="line-height: 150%; margin-left: 0cm; margin-right: 0cm"><span style="display: inline-block; border: 1px solid #0000ff; padding: 0.08cm"><font size="4" style="font-size: 13pt"><b>Discussione
-sulle entità</b></font></span><br/>
-Notiamo, come già descritto
-nell'analisi sull'architettura del MonitoringDevice, che il
-monitoringdevice delega i vari compiti al sonardevice, datacleaner e
-led, mostrandosi come unico componente verso l'esterno.<br/>
-In
-particolare, il datacleaner ha il compito di pulire i tanti dati
-ricevuti dal sonardevice e inviare un <b>ashStorageLevel</b> al
-monitoringdevice che aggiorna <b>statoAshStorage</b> di conseguenza,
-in base al parametro ricevuto. (0 -&gt; vuoto, 1 -&gt; nè pieno nè
-vuoto, 2 -&gt; pieno)<br/>
-Ricordiamo che statoAshStorage può essere
-0 = non pieno o 1 = pieno, in quanto al WIS non interessa
-l'informazione di quando è vuoto.<br/>
+<span class="slidekp">Discussione sulle entità</span>
 <br/>
-Configurazione simile
-la abbiamo per la Scale, che delega il raccoglimento delle
-misurazioni a scaledevice. Dopodichè, la scale effettua la
+Notiamo, come già descritto nell'analisi sull'architettura del MonitoringDevice, che il monitoringdevice delega i vari compiti al sonardevice, 
+datacleaner e led, mostrandosi come unico componente verso l'esterno.<br/>
+In particolare, il datacleaner ha il compito di pulire i tanti dati ricevuti dal sonardevice e inviare un <b>ashStorageLevel</b> al monitoringdevice 
+che aggiorna <b>statoAshStorage</b> di conseguenza, in base al parametro ricevuto. (0 - vuoto, 1 - nè pieno nè vuoto, 2 - pieno)<br/>
+Ricordiamo che statoAshStorage può essere 0 = non pieno o 1 = pieno, in quanto al WIS non interessa l'informazione di quando è vuoto.<br/>
+<br/>
+Configurazione simile la abbiamo per la Scale, che delega il raccoglimento delle misurazioni a scaledevice. Dopodichè, la scale effettua la
 conversione dei dati e l'invio al WIS come descritto in precedenza. 
 </p>
+
 <h2>Progetto</h2>
+
 <h2>Piano di test</h2>
 <p>In funzione della creazione di un piano di testing, si è deciso
 di creare un’entità che debba verificare che all’avvio del
@@ -282,15 +389,14 @@ peso della bilancia per la scale e lo stato dell’AshStorage per il
 monitoringDevice, visibili dall’esterno tramite due logiche: 
 </p>
 <ol>
-	<li><p style="margin-bottom: 0cm">una logica di <b>publish/subscribe</b>:
-	dove scale, monitoringDevice e WIS si iscrivono ad un topic su un
-	broker MQTT, e I dispositivi esterni in questione inviano i loro
-	stati sotto forma di eventi, in modo tale che possano essere
-	visibili a chiunque si iscriva al topic 
-	</p></li>
-	<li><p>il pattern <b>observer</b>: già usato in fase di analisi del
-	problema 
-	</p></li>
+	<li>
+		una logica di <b>publish/subscribe</b>:
+		dove scale, monitoringDevice e WIS si iscrivono ad un topic su un
+		broker MQTT, e I dispositivi esterni in questione inviano i loro
+		stati sotto forma di eventi, in modo tale che possano essere
+		visibili a chiunque si iscriva al topic 
+	</li>
+	<li>il pattern <b>observer</b>: già usato in fase di analisi del problema </li>
 </ol>
 <p>Il primo approccio risulterebbe senz'altro più pulito in quanto
 permetterebbe ad un'unità di testing automatizzata di iscriversi al
@@ -301,7 +407,7 @@ di poter constatare che i messaggi arrivino correttamente. Il
 problema però che è stato riscontrato con il primo approccio
 consiste nell'impossibilità data dall'ambiente di sviluppo fornito
 di specificare la QoS dei messaggi inviati via MQTT, che rimane
-sempre &quot;at most once&quot;. In questo modo purtroppo si
+sempre at most once. In questo modo purtroppo si
 impedirebbe al WIS di essere notiziato dell'arrivo di un RP mentre è
 in altri stati, ad esempio. Per questo motivo si è deciso di
 mantenere la seconda opzione anche in fase di progettazione. Rispetto
@@ -313,117 +419,68 @@ relativamente all'arrivo di un nuovo RP in questa fase viene gestita
 come risorsa osservabile (per i motivi enunciati poc'anzi). Il test
 automatizzato può essere trovato <a href="../progetto/wis/src/main/java/test/Test_Scale_MonitoringDevice.java">qui</a>.
 </p>
+
 <h2>Deployment</h2>
 <p>Per poter provare questo primo prototipo del sistema, occorre
 eseguire i seguenti componenti nel seguente ordine: 
 </p>
 <ol>
-	<li><p style="margin-right: 0cm; margin-bottom: 0cm">Ambiente di
-	simulazione <b>VirtualRobot:</b> posizionarsi nella cartella
-	&quot;it.unibo.virtualRobot2023&quot;, aprire un terminale e
-	lanciare il comando <b>docker compose -f .\virtualRobot23.yaml up</b>;
-		</p></li>
-	<li><p style="margin-right: 0cm; margin-bottom: 0cm"><b>BasicRobot</b>:
-	posizionarsi nella cartella &quot;unibo.basicrobot24&quot;, aprire
-	un terminale e lanciare il comando <b>gradlew run</b>; 
-	</p></li>
-	<li><p style="margin-right: 0cm; margin-bottom: 0cm"><b>WasteIncineratorService</b>:
-	posizionarsi nella cartella &quot;sprint2&quot;, aprire un terminale
-	e lanciare il comando <b>gradlew run</b>; 
-	</p></li>
+	<li>Ambiente di simulazione <b>VirtualRobot:</b> posizionarsi nella cartella
+	it.unibo.virtualRobot2023, aprire un terminale e lanciare il comando <b>docker compose -f .\virtualRobot23.yaml up</b>;
+	</li>
+	<li><b>BasicRobot</b>: posizionarsi nella cartella unibo.basicrobot24, aprire un terminale e lanciare il comando <b>gradlew run</b>; 
+	</li>
+	<li><b>WasteIncineratorService</b>: posizionarsi nella cartella sprint2, aprire un terminale e lanciare il comando <b>gradlew run</b>; 
+	</li>
 </ol>
-<p>Il risultato sarà la visualizzazione del robot virtuale che si
-muove nella stanza, seguendo la logica definita nei requisiti.
+<p>
 Contemporaneamente a quanto fatto per avviare il WIS, occorre avviare
 dai due nodi diversi su cui risiedono rispettivamente la logica della
-Scale e del MonitoringDevice I relativi contesti. Per farlo occorre:</p>
+Scale e del MonitoringDevice i relativi contesti. Per farlo occorre:</p>
 <ol start="4">
-	<li><p style="margin-right: 0cm; margin-bottom: 0cm">Creare un
-	eseguibile sia per il MonitoringDevice che per la Scale eseguendo
-	<b>./gradlew distZip</b>; 
-	</p></li>
-	<li><p style="margin-right: 0cm; margin-bottom: 0cm">Copiare il file
-	zip generato su entrambi i raspberry 
-	</p></li>
-	<li><p style="margin-right: 0cm; margin-bottom: 0cm">Unzippare il
-	file e lanciare il file eseguibile della sottocartella <b>bin</b>.
-	<br/>
-<br/>
-<u>Nota:</u> il modello che viene eseguito si riferisce
-	a quello del Progetto, quindi mostra il comportamento del robot nei
-	casi specificati nel piano dei test.<br/>
-Nel caso si volesse
-	provare il sistema &quot;in modo continuativo&quot;, quindi con la
-	simulazione di nuovi RP gestiti dalla scale_mok e la gestione del
-	AshStorage da parte del monitoring_device_mok, occorre lanciare gli
-	stessi comandi elencati in precedenza, ma sul modello
-	dell'architettura logica. 
-	</p>
-	<p style="margin-right: 0cm; margin-bottom: 0cm"><u>Nota:</u> Gli
-	script che sono stati predisposti per il funzionamento del sonar e
-	della scale sono stati pensati, rispettivamente, per sonar HC-SR04,
-	e per il convertitore hx711 per bilance digitali (<a href="hx711_datasheet.pdf">il cui datasheet</a>,
-	dal quale si è riusciti a creare lo script, viene incluso nella
-	userDocs).</p></li>
+	<li>Creare un eseguibile sia per il MonitoringDevice che per la Scale eseguendo <b>./gradlew distZip</b>; </li>
+	<li>Copiare il file zip generato su entrambi i raspberry;</li>
+	<li>Unzippare il file e lanciare il file eseguibile della sottocartella <b>bin</b>.</li>
 </ol>
-<h2>Suddivisione dei compiti</h2>
-<ol>
-	<li><p style="margin-right: 0cm; margin-bottom: 0cm"><b>Analisi del
-	problema:</b> tutti i membri hanno contribuito, in particolare: 
-	</p>
-	<ul>
-		<li><p style="margin-right: 0cm; margin-bottom: 0cm">Bryan:
-		concentrato principalmente sull'interazione WIS - MonitoringDevice.
-				</p></li>
-		<li><p style="margin-right: 0cm; margin-bottom: 0cm">Gabriele:
-		concentrato principalmente su Interazione WIS - Scale. 
-		</p></li>
-		<li><p style="margin-right: 0cm; margin-bottom: 0cm">Emanuele:
-		concentrato principalmente sull'Architettura del MonitoringDevice. 
-		</p></li>
-	</ul>
-	<p style="margin-right: 0cm; margin-bottom: 0cm">Alla fine delle
-	singole analisi, si è fatto una piccola revisione interna per
-	discutere assieme dei punti analizzati e modificarli/validarli. 
-	</p></li>
-	<li><p style="margin-right: 0cm; margin-bottom: 0cm"><b>Definizione
-	del modello:</b> tutti i membri hanno contribuito, in particolare: 
-	</p>
-	<ul>
-		<li><p style="margin-right: 0cm; margin-bottom: 0cm">Bryan:
-		modifica del WIS, in particolare per ricevere gli updateResource da
-		contesti esterni, e supporto nell'interazione tra i componenti. 
-		</p></li>
-		<li><p style="margin-right: 0cm; margin-bottom: 0cm">Gabriele ed
-		Emanuele: logica della scale + logica del monitoringdevice. 
-		</p></li>
-	</ul>
-	<p style="margin-right: 0cm; margin-bottom: 0cm">In questa fase di
-	modellazione, si sono fatte diverse riunioni per allinearci sui
-	problemi/soluzioni riscontrati durante lo sviluppo. 
-	</p></li>
-	<li><p><b>Testing:</b> piano dei test deciso assieme. L'effettiva
-	realizzazione è stata affidata a Gabriele. 
-	</p></li>
-</ol>
-<h2>Sprint futuri</h2>
-<p>Nel prossimo sprint si prevede di implementare la
-ServiceStatusGUI. 
+<p>
+<u>Nota:</u> Gli script che sono stati predisposti per il funzionamento del sonar e della scale sono stati pensati, rispettivamente, per sonar HC-SR04,
+	e per il convertitore hx711 per bilance digitali (<a href="hx711_datasheet.pdf">il cui datasheet</a>, dal quale si è riusciti a creare lo script, viene incluso nella userDocs).
 </p>
-<p style="margin-left: 0cm; margin-right: 0cm; margin-bottom: 0cm"><br/>
 
+<h2>Suddivisione dei compiti</h2>
+<p>
+<ol>
+	<li><b>Analisi del problema:</b> tutti i membri hanno contribuito, in particolare: 
+		<ul>
+			<li>Bryan: concentrato principalmente sull'interazione WIS - MonitoringDevice.</li>
+			<li>Gabriele: concentrato principalmente su Interazione WIS - Scale.</li>
+			<li>Emanuele: concentrato principalmente sull'Architettura del MonitoringDevice.</li>
+		</ul>
+	Alla fine delle singole analisi, si è fatto una piccola revisione interna per discutere assieme dei punti analizzati e modificarli/validarli. 
+	</li>
+	<li><b>Definizione del modello:</b> tutti i membri hanno contribuito, in particolare: 
+		<ul>
+			<li>Bryan: modifica del WIS, in particolare per ricevere gli updateResource da contesti esterni, e supporto nell'interazione tra i componenti. </li>
+			<li>Gabriele ed Emanuele: logica della scale + logica del monitoringdevice. </li>
+		</ul>
+	In questa fase di modellazione, si sono fatte diverse riunioni per allinearci sui problemi/soluzioni riscontrati durante lo sviluppo. 
+	</li>
+	<li><b>Testing:</b> piano dei test deciso assieme. L'effettiva realizzazione è stata affidata a Gabriele. </li>
+</ol>
 </p>
-<p align="left" style="margin-left: 0cm; margin-right: 0cm; margin-bottom: 0cm">
-<font color="#ffffff"><span style="background: #5638fd">Bryan Bertoni
-: bryan.bertoni@studio.unibo.it <br/>
-Gabriele Daga :
-gabriele.daga@studio.unibo.it <br/>
-Emanuele D'Arsié :
-emanuele.darsie@studio.unibo.it <br/>
-<br/>
-GIT repo:
-<a href="https://github.com/bryanber102/TemaFinale24">https://github.com/bryanber102/TemaFinale24</a>
-</span></font>
+
+<h2>Sprint futuri</h2>
+<p>Nel prossimo sprint si prevede di implementare la ServiceStatusGUI. 
 </p>
+</div>
+
+<div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
+Bryan Bertoni : bryan.bertoni@studio.unibo.it <br>
+Gabriele Daga : gabriele.daga@studio.unibo.it <br>
+Emanuele D'Arsié : emanuele.darsie@studio.unibo.it <br><br>
+
+GIT repo: https://github.com/bryanber102/TemaFinale24
+</div>
+
 </body>
 </html>
