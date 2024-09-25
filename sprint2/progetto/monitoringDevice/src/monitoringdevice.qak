@@ -17,7 +17,7 @@ Dispatch statoIncinerator : statoIncinerator(SENDER, N)  "Incinerator's burning 
 
 //Definizione dei contesti
 Context ctxmonitoringdevice ip [ host= "localhost"      port= 8100 ] 
-Context ctx_waste_incinerator_service ip [host="192.168.114.28" port=8125]
+Context ctx_waste_incinerator_service ip [host="192.168.11.122" port=8125]
 
 //Attori esterni al monitoringDevice
 ExternalQActor incinerator context ctx_waste_incinerator_service
@@ -147,7 +147,11 @@ QActor monitoringdevice context ctxmonitoringdevice{
 		onMsg(statoIncinerator : statoIncinerator(SENDER, N)) {
 	      	if [# !payloadArg(1).contains("nonews") #]{
 		      	[# 
-		      		IncineratorStatus = payloadArg(1).split("(")[1].split(")")[0].toInt() 
+		      		try{
+		      			IncineratorStatus = payloadArg(1).split("(")[1].split(")")[0].toInt() 	
+		      		} catch (e:Exception){
+		      			IncineratorStatus = 0
+		      		}
 		      	#]
 		    }
 		    println("$name Current incinerator state: $IncineratorStatus") color blue

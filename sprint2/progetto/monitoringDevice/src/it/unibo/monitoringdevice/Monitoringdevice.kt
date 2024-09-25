@@ -23,15 +23,13 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		
 				var levelAshStorage = 0;
-				var statoIncinerator = 0;
-				val DLIMIT = 10;
-				val DMIN = 100;
+				var IncineratorStatus = 0;
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						delay(1000) 
-						CommUtils.outblack("$name STARTS")
-						observeResource("192.168.1.85","8125","ctx_waste_incinerator_service","incinerator","statoIncinerator")
+						delay(2000) 
+						CommUtils.outblue("$name STARTS")
+						observeResource("192.168.11.122","8125","ctx_waste_incinerator_service","incinerator","statoIncinerator")
 						subscribeToLocalActor("datacleaner") 
 						//genTimer( actor, state )
 					}
@@ -42,7 +40,7 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 				}	 
 				state("wait") { //this:State
 					action { //it:State
-						CommUtils.outblack("Waiting data from sonar or updates from Incinerator...")
+						CommUtils.outblue("$name Waiting data from sonar or updates from Incinerator...")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -53,14 +51,24 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 				}	 
 				state("handleUpdateStatoIncinerator") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("statoIncinerator(N)"), Term.createTerm("statoIncinerator(D)"), 
+						CommUtils.outgreen("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
+						 	   
+						if( checkMsgContent( Term.createTerm("statoIncinerator(SENDER,N)"), Term.createTerm("statoIncinerator(SENDER,N)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								 statoIncinerator = payloadArg(0).toInt()  
-								if( statoIncinerator==1 
+								if(  !payloadArg(1).contains("nonews")  
+								 ){ 
+										      		try{
+										      			IncineratorStatus = payloadArg(1).split("(")[1].split(")")[0].toInt() 	
+										      		} catch (e:Exception){
+										      			IncineratorStatus = 0
+										      		}
+								}
+								CommUtils.outblue("$name Current incinerator state: $IncineratorStatus")
+								if( IncineratorStatus==1 
 								 ){forward("led_on", "led_on(1)" ,"led" ) 
 								}
 								else
-								 {if( levelAshStorage < DMIN && levelAshStorage > DLIMIT 
+								 {if( levelAshStorage==1 
 								  ){forward("led_off", "led_off(1)" ,"led" ) 
 								 }
 								 else
@@ -77,24 +85,27 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 				}	 
 				state("handleAshStorageLevel") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("ashStorageLevel(D)"), Term.createTerm("ashStorageLevel(D)"), 
+						if( checkMsgContent( Term.createTerm("ashStorageLevel(D)"), Term.createTerm("ashStorageLevel(L)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 												levelAshStorage = payloadArg(0).toInt()
-								if( statoIncinerator==0 
-								 ){if( levelAshStorage < DMIN && levelAshStorage > DLIMIT 
+								CommUtils.outblue("$name current AshStorageLevel=$levelAshStorage")
+								if( IncineratorStatus==0 
+								 ){if( levelAshStorage==1 
 								 ){forward("led_off", "led_off(1)" ,"led" ) 
 								}
 								else
 								 {forward("led_blink", "led_blink(1)" ,"led" ) 
 								 }
 								}
-								if( levelAshStorage <= DLIMIT 
-								 ){updateResourceRep( "statoAshStorage(1)"  
+								if( levelAshStorage==2 
+								 ){CommUtils.outblue("$name Updating AshStorageStatus to 1")
+								updateResourceRep( "statoAshStorage(1)"  
 								)
 								}
 								else
-								 {updateResourceRep( "statoAshStorage(0)"  
+								 {CommUtils.outblue("$name Updating AshStorageStatus to 0")
+								 updateResourceRep( "statoAshStorage(0)"  
 								 )
 								 }
 						}

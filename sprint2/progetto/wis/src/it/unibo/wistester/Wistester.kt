@@ -29,7 +29,8 @@ class Wistester ( name: String, scope: CoroutineScope, isconfined: Boolean=false
 					action { //it:State
 						delay(1000) 
 						CommUtils.outred("$name STARTS")
-						observeResource("169.254.12.90","8200","ctxscale","scale","arrived_RP")
+						observeResource("192.168.11.105","8100","ctxmonitoringdevice","monitoringdevice","statoAshStorage")
+						observeResource("192.168.11.103","8200","ctxscale","scale","arrived_RP")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

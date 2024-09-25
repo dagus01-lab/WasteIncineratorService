@@ -22,8 +22,11 @@ class Datacleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		 
-				var D = 0;
-				var previous_D = 0; 
+				var Level = -1;
+				var previous_level = -1;
+				var D = 0; 
+				val DLIMIT = 30;
+				val DMIN = 100; 
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -41,13 +44,20 @@ class Datacleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("distance(D)"), Term.createTerm("distance(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								  D = payloadArg(0).toInt()  
-								CommUtils.outblack("$name D=$D")
-								if( D != previous_D 
+								  
+									      		D = payloadArg(0).toInt()
+									      		Level = if (D > DMIN) {
+													    0
+													} else if (D < DLIMIT) {
+													    2
+													} else {
+													    1
+													}
+								if( Level != previous_level 
 								 ){CommUtils.outmagenta("$name emit newLevel of Ash")
-								emitLocalStreamEvent("ashStorageLevel", "ashStorageLevel($D)" ) 
+								emitLocalStreamEvent("ashStorageLevel", "ashStorageLevel($Level)" ) 
 								}
-								 previous_D = D;  
+								 previous_level = Level;  
 						}
 						//genTimer( actor, state )
 					}

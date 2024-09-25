@@ -9,7 +9,7 @@ Dispatch arrived_RP : arrived_RP(N) "command that simulate the arrival of new RP
 
 //Definizione dei contesti
 Context ctxscale ip [ host= "localhost"      port= 8200 ] 
-Context ctx_waste_incinerator_service ip [host="169.254.12.89" port=8125]
+Context ctx_waste_incinerator_service ip [host="192.168.11.122" port=8125]
 
 //Attori esterni alla scale
 ExternalQActor wis context ctx_waste_incinerator_service

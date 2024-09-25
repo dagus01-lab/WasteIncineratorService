@@ -112,7 +112,7 @@ public class Test_Scale_MonitoringDevice {
 		public void testScaleActivation() {
 			IApplMessage req  = CommUtils.buildRequest( "tester", "infoScale", "infoScale(X)", "wistester");
 	 		try {
-	 			Thread.sleep(15000);
+	 			Thread.sleep(10000);
 	  			 CommUtils.outmagenta("testScaleActivation ======================================= ");
 				while( connSupport == null ) {
 	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.tcp, "localhost", "8125");
@@ -133,7 +133,7 @@ public class Test_Scale_MonitoringDevice {
 		public void testMonitoringDeviceActivation() {
 			IApplMessage req  = CommUtils.buildRequest( "tester", "infoMonitoringDevice", "infoMonitoringDevice(X)", "wistester");
 	 		try {
-	 			Thread.sleep(15000);
+	 			Thread.sleep(10000);
 	  			 CommUtils.outmagenta("testMonitoringDeviceActivation ======================================= ");
 				while( connSupport == null ) {
 	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.tcp, "localhost", "8125");

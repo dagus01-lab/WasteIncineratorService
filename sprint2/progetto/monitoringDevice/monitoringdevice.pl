@@ -7,11 +7,12 @@ dispatch( statoAshStorage, statoAshStorage(N) ). %AshStorage info: 0 is not empt
 dispatch( led_on, led_on(N) ). %messaggio di accensione del led
 dispatch( led_blink, led_blink(N) ). %messaggio di lampeggio del led
 dispatch( led_off, led_off(N) ). %messaggio di spegnimento del led
-dispatch( statoIncinerator, statoIncinerator(N) ). %Incinerator's burning status info: 0 is not burning, 1 otherwise
+dispatch( statoIncinerator, statoIncinerator(SENDER,N) ). %Incinerator's burning status info: 0 is not burning, 1 otherwise
 %====================================================================================
 context(ctxmonitoringdevice, "localhost",  "TCP", "8100").
-context(ctx_waste_incinerator_service, "192.168.1.85",  "TCP", "8125").
+context(ctx_waste_incinerator_service, "192.168.11.122",  "TCP", "8125").
  qactor( incinerator, ctx_waste_incinerator_service, "external").
+  qactor( wis, ctx_waste_incinerator_service, "external").
   qactor( sonardevice, ctxmonitoringdevice, "it.unibo.sonardevice.Sonardevice").
  static(sonardevice).
   qactor( datacleaner, ctxmonitoringdevice, "it.unibo.datacleaner.Datacleaner").

@@ -21,10 +21,16 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
+		
+				lateinit var writer : java.io.BufferedWriter
+		    	lateinit var p : Process
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outmagenta("$name started")
+						
+									p       = Runtime.getRuntime().exec("python ledDevice.py")
+									writer = java.io.BufferedWriter( java.io.OutputStreamWriter(p.getOutputStream()));
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -47,7 +53,10 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				state("handle_led_on") { //this:State
 					action { //it:State
 						CommUtils.outmagenta("LED on")
-						 Runtime.getRuntime().exec("python3 led_on.py")  
+						 
+									writer.write("on")
+						        	writer.newLine()
+						        	writer.flush()
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -58,7 +67,10 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				state("handle_led_off") { //this:State
 					action { //it:State
 						CommUtils.outmagenta("LED off")
-						 Runtime.getRuntime().exec("python3 led_off.py")  
+						 
+									writer.write("off")
+							        writer.newLine()
+							        writer.flush()
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -69,7 +81,10 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				state("handle_led_blink") { //this:State
 					action { //it:State
 						CommUtils.outmagenta("LED blinks")
-						 Runtime.getRuntime().exec("python3 led_blink.py")  
+						
+									writer.write("blink")
+							        writer.newLine()
+							        writer.flush()
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

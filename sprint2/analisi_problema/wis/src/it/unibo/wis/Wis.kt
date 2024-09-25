@@ -29,7 +29,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 						CommUtils.outgreen("$name STARTS")
 						forward("activationCommand", "activationCommand(1)" ,"incinerator" ) 
 						delay(8000) 
-						observeResource("192.168.114.105","8100","ctxmonitoringdevice","monitoringdevice","statoAshStorage")
+						observeResource("192.168.11.105","8100","ctxmonitoringdevice","monitoringdevice","statoAshStorage")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
