@@ -27,6 +27,8 @@ class Datacleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 				var D = 0; 
 				val DLIMIT = 30;
 				val DMIN = 100; 
+				var timeLastUpdate = System.currentTimeMillis();
+				var timeout = 10000;
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -38,7 +40,7 @@ class Datacleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t00",targetState="filter",cond=whenEvent("sonardata"))
+					 transition(edgeName="t02",targetState="filter",cond=whenEvent("sonardata"))
 				}	 
 				state("filter") { //this:State
 					action { //it:State
@@ -57,6 +59,10 @@ class Datacleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 								 ){CommUtils.outmagenta("$name emit newLevel of Ash")
 								emitLocalStreamEvent("ashStorageLevel", "ashStorageLevel($Level)" ) 
 								}
+								if( System.currentTimeMillis()-timeLastUpdate>=timeout 
+								 ){emitLocalStreamEvent("ashStorageLevel", "ashStorageLevel($Level)" ) 
+								timeLastUpdate=System.currentTimeMillis() 
+								}
 								 previous_level = Level;  
 						}
 						//genTimer( actor, state )
@@ -64,7 +70,7 @@ class Datacleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t01",targetState="filter",cond=whenEvent("sonardata"))
+					 transition(edgeName="t03",targetState="filter",cond=whenEvent("sonardata"))
 				}	 
 			}
 		}

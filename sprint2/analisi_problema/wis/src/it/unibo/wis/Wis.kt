@@ -21,15 +21,14 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
-		 var AshStorageStatus = 0  
+		 var statoAshStorage = 0  
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						delay(500) 
 						CommUtils.outgreen("$name STARTS")
+						observeResource("192.168.1.105","8100","ctxmonitoringdevice","monitoringdevice","statoAshStorage")
 						forward("activationCommand", "activationCommand(1)" ,"incinerator" ) 
-						delay(8000) 
-						observeResource("192.168.11.105","8100","ctxmonitoringdevice","monitoringdevice","statoAshStorage")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -81,59 +80,42 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				}	 
 				state("endRoute") { //this:State
 					action { //it:State
-						CommUtils.outgreen("$name OpRobot has finished its route")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 				 	 		stateTimer = TimerActor("timer_endRoute", 
-				 	 					  scope, context!!, "local_tout_"+name+"_endRoute", 2000.toLong() )  //OCT2023
+				 	 					  scope, context!!, "local_tout_"+name+"_endRoute", 1000.toLong() )  //OCT2023
 					}	 	 
 					 transition(edgeName="t05",targetState="waitingRP",cond=whenTimeout("local_tout_"+name+"_endRoute"))   
 					transition(edgeName="t06",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
 				}	 
 				state("handleUpdateStatoAshStorage") { //this:State
 					action { //it:State
-						CommUtils.outgreen("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
-						 	   
-						if( checkMsgContent( Term.createTerm("statoAshStorage(SENDER,N)"), Term.createTerm("statoAshStorage(SENDER,N)"), 
+						if( checkMsgContent( Term.createTerm("statoAshStorage(N)"), Term.createTerm("statoAshStorage(N)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								if(  !payloadArg(1).contains("nonews")  
-								 ){ AshStorageStatus = payloadArg(1).split("(")[1].split(")")[0].toInt()  
-								CommUtils.outgreen("AshStorageStatus: $AshStorageStatus")
-								}
+								 statoAshStorage = payloadArg(0).toInt()  
+								CommUtils.outgreen("AshStorageStatus: $statoAshStorage")
 						}
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
-				 	 		stateTimer = TimerActor("timer_handleUpdateStatoAshStorage", 
-				 	 					  scope, context!!, "local_tout_"+name+"_handleUpdateStatoAshStorage", 2000.toLong() )  //OCT2023
 					}	 	 
-					 transition(edgeName="t07",targetState="ashCheckFinish",cond=whenTimeout("local_tout_"+name+"_handleUpdateStatoAshStorage"))   
-					transition(edgeName="t08",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
-				}	 
-				state("ashCheckFinish") { //this:State
-					action { //it:State
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="waitingRP", cond=doswitchGuarded({ AshStorageStatus == 0  
+					 transition( edgeName="goto",targetState="waitingRP", cond=doswitchGuarded({ statoAshStorage == 0  
 					}) )
-					transition( edgeName="goto",targetState="waitingAshesToBeRemoved", cond=doswitchGuarded({! ( AshStorageStatus == 0  
+					transition( edgeName="goto",targetState="waitingAshesToBeRemoved", cond=doswitchGuarded({! ( statoAshStorage == 0  
 					) }) )
 				}	 
 				state("waitingAshesToBeRemoved") { //this:State
 					action { //it:State
-						CommUtils.outgreen("WIS is waiting for an operator to remove ashes in AshStorage...")
+						CommUtils.outgreen("WIS is waiting an operator to remove ashes in AshStorage...")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t09",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
+					 transition(edgeName="t07",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
 				}	 
 			}
 		}

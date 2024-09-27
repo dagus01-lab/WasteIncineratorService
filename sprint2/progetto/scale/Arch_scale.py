@@ -28,7 +28,5 @@ with Diagram('scaleArch', show=False, outformat='png', graph_attr=graphattr) as 
      with Cluster('ctxscale', graph_attr=nodeattr):
           scaledevice=Custom('scaledevice','./qakicons/symActorSmall.png')
           scale=Custom('scale','./qakicons/symActorSmall.png')
-     with Cluster('ctx_waste_incinerator_service', graph_attr=nodeattr):
-          wis=Custom('wis(ext)','./qakicons/externalQActor.png')
      scaledevice >> Edge( label='scaledata', **eventedgeattr, decorate='true', fontcolor='red') >> scale
 diag

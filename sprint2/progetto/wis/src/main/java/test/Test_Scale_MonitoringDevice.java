@@ -6,17 +6,23 @@ import static org.junit.Assert.fail;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.concurrent.Flow.Subscriber;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import unibo.basicomm23.*;
 import unibo.basicomm23.interfaces.IApplMessage;
 import unibo.basicomm23.interfaces.Interaction;
 import unibo.basicomm23.msg.ProtocolType;
 import unibo.basicomm23.utils.ColorsOut;
 import unibo.basicomm23.utils.CommUtils;
 import unibo.basicomm23.utils.ConnectionFactory;
+import unibo.basicomm23.mqtt.MqttConnection;
+
+import unibo.basicomm23.interfaces.*;
+import unibo.basicomm23.utils.*;
 
 public class Test_Scale_MonitoringDevice {
 	private static Interaction connSupport;
@@ -108,43 +114,52 @@ public class Test_Scale_MonitoringDevice {
 
 	/*
 	 */
-		@Test
+		@Test(timeout=20000)
 		public void testScaleActivation() {
-			IApplMessage req  = CommUtils.buildRequest( "tester", "infoScale", "infoScale(X)", "wistester");
 	 		try {
-	 			Thread.sleep(10000);
+	 			Thread.sleep(2000);
 	  			 CommUtils.outmagenta("testScaleActivation ======================================= ");
 				while( connSupport == null ) {
-	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.tcp, "localhost", "8125");
+	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:8081", "wistester");
 	 				CommUtils.outcyan("testWISSystem another connect attempt ");
 	 				Thread.sleep(1000);
 	 			}
-	 			CommUtils.outcyan("CONNECTED to wis " + connSupport);
-				IApplMessage reply = connSupport.request(req);
-				CommUtils.outmagenta("test scale activation reply ="+reply);
-				String answer = reply.msgContent();
-				assertEquals(answer, "infoScaleReply(1)");
+	 			CommUtils.outcyan("CONNECTED to mqtt broker " + connSupport);
+	 			((MqttConnection)connSupport).trace=true;
+	 			((MqttConnection)connSupport).setupConnectionForAnswer("wisinfo");
+	 			((MqttConnection)connSupport).subscribe("wisinfo");
+	 			
+	 			String message = "";
+	 			long startWait = System.currentTimeMillis();
+	 			long timeout = 10000;
+	 			while(!message.contains("new_RP")) {
+	 				message = connSupport.receiveMsg();
+	 			}
+	 			
 			} catch (Exception e) {
 				CommUtils.outred("testWIS ERROR " + e.getMessage());
 				fail("testRequest " + e.getMessage());
 			}
 		}
-		@Test 
+		@Test(timeout=20000)
 		public void testMonitoringDeviceActivation() {
-			IApplMessage req  = CommUtils.buildRequest( "tester", "infoMonitoringDevice", "infoMonitoringDevice(X)", "wistester");
-	 		try {
-	 			Thread.sleep(10000);
+			try {
+	 			Thread.sleep(2000);
 	  			 CommUtils.outmagenta("testMonitoringDeviceActivation ======================================= ");
 				while( connSupport == null ) {
-	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.tcp, "localhost", "8125");
+	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:8081", "wistester");
 	 				CommUtils.outcyan("testWISSystem another connect attempt ");
 	 				Thread.sleep(1000);
 	 			}
-	 			CommUtils.outcyan("CONNECTED to wis " + connSupport);
-				IApplMessage reply = connSupport.request(req);
-				CommUtils.outmagenta("test Monitoring Device activation ="+reply);
-				String answer = reply.msgContent();
-				assertEquals(answer, "infoMonitoringDeviceReply(1)");
+	 			CommUtils.outcyan("CONNECTED to mqtt broker " + connSupport);
+	 			((MqttConnection)connSupport).subscribe("wisinfo");
+	 			String message = "";
+	 			long startWait = System.currentTimeMillis();
+	 			long timeout = 10000;
+	 			while(!(message.contains("statoAshStorage"))) {
+	 				message = connSupport.receiveMsg();
+	 			}
+	 			
 			} catch (Exception e) {
 				CommUtils.outred("testWIS ERROR " + e.getMessage());
 				fail("testRequest " + e.getMessage());

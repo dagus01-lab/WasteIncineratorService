@@ -25,14 +25,19 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 				var RPs = 0;
 				var previous_RPs = 0; 
 				val WRP = 100;
+				var timeLastUpdate = System.currentTimeMillis();
+				var timeout = 10000;
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						delay(1000) 
 						subscribeToLocalActor("scaledevice") 
 						CommUtils.outblue("$name subscribed to scaledevice")
-						updateResourceRep( "arrived_RP(0)"  
-						)
+						connectToMqttBroker( "tcp://192.168.1.85:8081", "scalenat" )
+						CommUtils.outblue("$name | CREATED  (and connected to mosquitto) ... ")
+						subscribe(  "wisinfo" ) //mqtt.subscribe(this,topic)
+						//val m = MsgUtil.buildEvent(name, "new_RP", "new_RP(0)" ) 
+						publish(MsgUtil.buildEvent(name,"new_RP","new_RP(0)").toString(), "wisinfo" )   
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -51,10 +56,16 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 								 ){CommUtils.outmagenta("$name emit number of RPs=$RPs in Waste Storage")
 								
 									      			for (i in previous_RPs..RPs-1) {
-								updateResourceRep( "arrived_RP(1)" 
-								)
+								//val m = MsgUtil.buildEvent(name, "new_RP", "new_RP(1)" ) 
+								publish(MsgUtil.buildEvent(name,"new_RP","new_RP(1)").toString(), "wisinfo" )   
 								
 									      			}
+									      			timeLastUpdate = System.currentTimeMillis()
+								}
+								if( System.currentTimeMillis()-timeLastUpdate>=10000 
+								 ){//val m = MsgUtil.buildEvent(name, "new_RP", "new_RP(0)" ) 
+								publish(MsgUtil.buildEvent(name,"new_RP","new_RP(0)").toString(), "wisinfo" )   
+								timeLastUpdate=System.currentTimeMillis() 
 								}
 								 previous_RPs = RPs;  
 						}

@@ -376,48 +376,98 @@ Configurazione simile la abbiamo per la Scale, che delega il raccoglimento delle
 conversione dei dati e l'invio al WIS come descritto in precedenza. 
 </p>
 
+<p>
 <h2>Progetto</h2>
-
+<p>
+Mentre nella sezione di analisi del problema si è deciso di modellare l'interazione tra MonitoringDevice e WIS e tra scale e WIS con il meccanismo
+di observeResource in quanto più coerente con i requisiti dati dal committente, in questa fase si è deciso di optare per una comunicazione di tipo
+publish/subscribe, in cui ogni qualvolta un dispositivo in un contesto deve comunicare con un dispositivo in un altro contesto emette un evento ad un
+broker mqtt, che si occuperà di girarlo al contesto giusto. In questo modo si riesce a disaccoppiare i singoli contesti, che quindi possono
+effettivamente "funzionare" indipendentemente dagli altri.<br/>
+</p>
+<p>
+Si pone ora un problema: supponiamo che il monitoringDevice aggiorni il suo stato di riempimento. Se il wis non fosse nello stato giusto per ricevere
+l'evento inviato dal monitoringDevice tramite MQTT, quest'ultimo andrebbe perso. A tal scopo (oltre all'obiettivo di disaccoppiare il più possibile
+le responsabilità degli attori) si è deciso che in ogni contesto, per ogni tipo di evento ricevuto tramite MQTT, vi siano degli appositi attori "proxy"
+che si occupino di ricevere questi eventi e ritrasmetterli sotto forma di dispatch:
+<ul>
+<li><b>WIS</b>: può ricevere aggiornamenti sia da parte del monitoringDevice che da scale. Di conseguenza, vengono creati gli attori:
+	<ul>
+	<li><b>wismonitoringdeviceproxy</b>: riceve eventi di tipo statoAshStorage e invia al WIS dispatch di tipo ashesLevel</li>
+	<li><b>wisscaleproxy</b>: riceve eventi di tipo new_RP e invia al WIS dispatch di tipo arrived_RP</li>
+	</ul>
+</li>
+<li><b>monitoringDevice</b>: può ricevere aggiornamenti da parte di incinerator. Viene quindi creato l'attore <b>monitoringdeviceproxy</b> per ricevere
+eventi di tipo statoIncinerator e inviare dispatch di tipo incineratorState al monitoringDevice.</li>
+</ul><br/>
+</p>
+<p>
+Inoltre, nel caso particolare del monitoringDevice, si è discusso molto il fatto che adottando questo approccio non si riuscirebbe a capire in maniera
+diretta se quest'ultimo stia funzionando correttamente e se sia ancora connesso al broker (a differenza dell'approccio adottato in fase di analisi,
+che garantirebbe, grazie al fatto che i contesti sono collegati tra loro, che in caso di scollegamento di una parte le altre siano in qualche modo
+notificate). In effetti, si è concluso che se il monitoringDevice non riuscisse più a comunicare con il wis per qualsiasi motivo, quest'ultimo non
+dovrebbe essere in grado di continuare con la sua esecuzione. Di conseguenza, in modo tale da non rinunciare al disaccoppiamento offerto dalla modalità
+publish/subscribe, si è deciso di fare in modo che il monitoringDevice invii comunque lo stato di riempimento dell'ashStorage ogni 10 secondi nel caso
+in cui non vi fossero aggiornamenti. Dal lato del wis, se non vi sono aggiornamenti da parte del monitoringDevice da più di 10 secondi, ci si posiziona
+in uno stato di stallo fintantoché non arrivino nuovi aggiornamenti.<br/>
+</p>
+Di seguito si trovano i modelli aggiornati: <a href="../progetto/wis/src/WasteIncineratorService_progetto.qak">WIS</a>, <a href="../progetto/monitoringDevice/src/monitoringdevice.qak">monitoringDevice</a>, <a href="../progetto/scale/src/scale.qak">Scale</a>.
+</p>
+<h3>Dispositivi utilizzati</h3>
+<img alt="raspberrypins" src="Raspberry-Pi-GPIO-Layout-Model-B-Plus.png"></img><br>
+Entrambi i dispositivi "esterni" (scale e monitoringDevice) sono pensati per essere eseguiti su raspberry Pi. Di seguito viene illustrato come sono stati
+montati:
+<ul>
+<li><b>monitoringDevice</b>: il monitoringDevice è composto da un led e da un sonar HC-SR04. Per poter pilotarli vengono predisposti i seguenti script: <a href="../progetto/monitoringDevice/resources/ledDevice.py">ledDevice.py</a>, <a href="../progetto/monitoringDevice/resources/sonar.py">sonar.py</a> Coerentemente con quanto imposto dagli script, occorre montare i dispositivi nel modo seguente ad un raspberry Pi:
+<ul>
+<li><b>led</b>: collegare l'anodo (gambo lungo, +) al GPIO pin BCM25 (fisico 22) e il catodo (gambo corto, -) a GND (fisico 20)</li>
+<li><b>sonar</b>: collegare:
+	<ol>
+	<li>VCC al pin fisico 4 </li>
+	<li>GND al pin fisico 6 </li>
+	<li>TRIG al pin fisico 11 </li>
+	<li>ECHO al pin fisico 13 </li>
+</li>
+</ul>
+</li>
+<img alt="monitoringDevice" src="monitoringDevice.jpg"></img><br>
+<li><b>scale</b>: la scale è composta da una load cell e <a href="hx711_datasheet.pdf">un convertitore AC/DC hx711</a>. Per poter leggere il peso dalla
+bilancia viene predisposto lo script <a href="../progetto/scale/resources/scaleDevice.py">scaleDevice.py</a></li>. Coerentemente con quanto imposto
+dallo script, occorre collegare i dispositivi nel modo seguente:
+<ul>
+<li>hx711 e raspberry:
+<ul>
+<li>VCC al pin fisico 4</li>
+<li>SCK al pin fisico 18</li>
+<li>DT al pin fisico 16</li>
+<li>GND al pin fisico 9</li>
+</ul>
+</li>
+<li>hx711 e scale:
+<ul>
+<li>E+: filo rosso</li>
+<li>E-: filo nero</li>
+<li>A-: filo verde</li>
+<li>A+: filo bianco</li>
+</ul>
+</li>
+</ul>
+<img alt="scale" src="scaleDevice.jpg"></img><br>
+</ul>
 <h2>Piano di test</h2>
-<p>In funzione della creazione di un piano di testing, si è deciso
-di creare un’entità che debba verificare che all’avvio del
-sistema il monitoring device e la scale inviino informazioni visibili
-dal contesto del WIS. 
+<p>
+Dovendo avere a che fare con dispositivi di input che devono comunicare tra di loro su contesti diversi, si è pensato che il test automatizzato
+dovesse prevedere di verificare che arrivino effettivamente messaggi di ogni dispositivo sul broker MQTT. In particolare, per ogni attore coinvolto,
+si è deciso di effettuare un test che verifichi che entro un lasso di tempo di 20 secondi dall'avvio del WIS, non vengano ricevuti aggiornamenti.
+Gli attori in questione sono:
+<ul>
+<li><b>MonitoringDevice</b>: emette già eventi periodici al massimo ogni 10 secondi</li>
+<li><b>Scale</b>: emette un evento soltanto quando arrivano nuovi pacchetti. Si è deciso di modificarlo in modo tale che, se entro un intervallo di
+10 secondi non vi sono aggiornamenti, si invia un evento new_RP con payload 0 (che verrà scartato dal proxy dal lato del WIS)</li>
+</ul>
 </p>
-<p>A tal proposito, si può decidere di rendere, rispettivamente, il
-peso della bilancia per la scale e lo stato dell’AshStorage per il
-monitoringDevice, visibili dall’esterno tramite due logiche: 
-</p>
-<ol>
-	<li>
-		una logica di <b>publish/subscribe</b>:
-		dove scale, monitoringDevice e WIS si iscrivono ad un topic su un
-		broker MQTT, e I dispositivi esterni in questione inviano i loro
-		stati sotto forma di eventi, in modo tale che possano essere
-		visibili a chiunque si iscriva al topic 
-	</li>
-	<li>il pattern <b>observer</b>: già usato in fase di analisi del problema </li>
-</ol>
-<p>Il primo approccio risulterebbe senz'altro più pulito in quanto
-permetterebbe ad un'unità di testing automatizzata di iscriversi al
-topic sul broker MQTT per poter verificare se vengono mandati
-messaggi da parte di Scale e MonitoringDevice, mentre nel secondo
-approccio si è obbligati ad osservare ogni attore interessato prima
-di poter constatare che i messaggi arrivino correttamente. Il
-problema però che è stato riscontrato con il primo approccio
-consiste nell'impossibilità data dall'ambiente di sviluppo fornito
-di specificare la QoS dei messaggi inviati via MQTT, che rimane
-sempre at most once. In questo modo purtroppo si
-impedirebbe al WIS di essere notiziato dell'arrivo di un RP mentre è
-in altri stati, ad esempio. Per questo motivo si è deciso di
-mantenere la seconda opzione anche in fase di progettazione. Rispetto
-alla fase precedente, quindi, si è deciso di aggiungere un attore
-ausiliario wistester che osservi scale e monitoringdevice e a cui sia
-possibile chiedere, tramite apposite request, se i due dispositivi
-siano stati avviati. La notifica da parte della scale al WIS
-relativamente all'arrivo di un nuovo RP in questa fase viene gestita
-come risorsa osservabile (per i motivi enunciati poc'anzi). Il test
-automatizzato può essere trovato <a href="../progetto/wis/src/main/java/test/Test_Scale_MonitoringDevice.java">qui</a>.
+<p>
+Il test automatizzato può essere trovato <a href="../progetto/wis/src/main/java/test/Test_Scale_MonitoringDevice.java">qui</a>.
 </p>
 
 <h2>Deployment</h2>
@@ -442,10 +492,6 @@ Scale e del MonitoringDevice i relativi contesti. Per farlo occorre:</p>
 	<li>Copiare il file zip generato su entrambi i raspberry;</li>
 	<li>Unzippare il file e lanciare il file eseguibile della sottocartella <b>bin</b>.</li>
 </ol>
-<p>
-<u>Nota:</u> Gli script che sono stati predisposti per il funzionamento del sonar e della scale sono stati pensati, rispettivamente, per sonar HC-SR04,
-	e per il convertitore hx711 per bilance digitali (<a href="hx711_datasheet.pdf">il cui datasheet</a>, dal quale si è riusciti a creare lo script, viene incluso nella userDocs).
-</p>
 
 <h2>Suddivisione dei compiti</h2>
 <p>

@@ -17,8 +17,6 @@ dispatch( disengage, disengage(ARG) ).
 request( moverobot, moverobot(TARGETX,TARGETY) ).
 reply( moverobotdone, moverobotok(ARG) ).  %%for moverobot
 reply( moverobotfailed, moverobotfailed(PLANDONE,PLANTODO) ).  %%for moverobot
-request( info, info(X) ).
-reply( inforeply, inforeply(X) ).  %%for info
 %====================================================================================
 context(ctx_waste_incinerator_service, "localhost",  "TCP", "8125").
 context(ctxbasicrobot, "127.0.0.1",  "TCP", "8020").
@@ -29,5 +27,7 @@ context(ctxbasicrobot, "127.0.0.1",  "TCP", "8020").
  static(oprobot).
   qactor( incinerator, ctx_waste_incinerator_service, "it.unibo.incinerator.Incinerator").
  static(incinerator).
-  qactor( wistester, ctx_waste_incinerator_service, "it.unibo.wistester.Wistester").
- static(wistester).
+  qactor( scalemock, ctx_waste_incinerator_service, "it.unibo.scalemock.Scalemock").
+ static(scalemock).
+  qactor( monitoring_device_mok, ctx_waste_incinerator_service, "it.unibo.monitoring_device_mok.Monitoring_device_mok").
+ static(monitoring_device_mok).

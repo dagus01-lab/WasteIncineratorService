@@ -50,7 +50,7 @@ class Sonardevice ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 								try{ 
 									val vd = Data.toFloat()
 									val v  = vd.toInt()
-									if( v <= 100 ){	//A first filter ...
+									if( v <= 500 ){	//A first filter ...
 										Distance = v				
 									}else Distance = 0
 								}catch(e: Exception){

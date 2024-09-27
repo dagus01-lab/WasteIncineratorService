@@ -25,26 +25,24 @@ def readCount():
   #print(Count)
   Count=Count ^ 0x800000
   return Count  
-
+def reLU(w):
+	if w < 0:
+		return 0
+	else:
+		return w
 def readAverage(num_samples=5):
   total = 0
   for _ in range(num_samples):
     total += readCount()
-    time.sleep(0.01)  
+    time.sleep(0.2)  
   return (total / num_samples)
 
-def movingAverage(new_value, window, window_size=20):
-    window.append(new_value)
-    if len(window) > window_size:
-        window.popleft()
-    return sum(window) / len(window)
-
-time.sleep(3)
-tare= readCount()
+time.sleep(2)
+tare= readAverage()
+time.sleep(1)
 #print("tare successfully calculated!")
 while 1:
-  curSample= readCount() #readAverage()
-#  curSampleSmoothed= movingAverage(curSample, window)
-  w=abs(int((curSample-tare)/calibration)) 
+  curSample= readAverage()
+  w=abs(int((curSample-tare)/calibration) )
+  w=reLU(-w)
   print(w, flush=True ) #measured in grams
-  time.sleep(0.25)

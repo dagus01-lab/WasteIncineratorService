@@ -153,7 +153,7 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					action { //it:State
 						delay(2000) 
 						CommUtils.outyellow("The ash has been taken out")
-						forward("newAshes", "newAshes(1)" ,"wistester" ) 
+						forward("newAshes", "newAshes(1)" ,"monitoring_device_mok" ) 
 						request("moverobot", "moverobot($HOMEx,$HOMEy)" ,"basicrobot" )  
 						//genTimer( actor, state )
 					}

@@ -27,6 +27,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					action { //it:State
 						delay(500) 
 						CommUtils.outgreen("$name STARTS")
+						observeResource("localhost","8125","ctx_waste_incinerator_service","monitoring_device_mok","statoAshStorage")
 						forward("activationCommand", "activationCommand(1)" ,"incinerator" ) 
 						//genTimer( actor, state )
 					}
