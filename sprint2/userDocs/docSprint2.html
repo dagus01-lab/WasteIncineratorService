@@ -289,8 +289,8 @@ Il MonitoringDevice verrà quindi visto dall'esterno come un unico componente (c
 <br>
 Incominciamo analizzando il problema P1.<br/>
 Da requisiti sappiamo che quando l'AshStorage è pieno, e finché l'operatore esterno non lo svuota, il WIS deve impedire che vengano bruciati altri RP.<br/>
-La scelta più adatta e coerente a quanto descritto nello SPRINT1 (attraverso il mok del MonitoringDevice) è rendere il
-WIS un Observer del MonitoringDevice, in particolare dell'informazione sullo stato del AshStorage.<br/>
+La scelta più adatta e coerente a quanto descritto nello SPRINT1 (attraverso il mok del MonitoringDevice) è <mark>rendere il
+WIS un Observer del MonitoringDevice, in particolare dell'informazione sullo stato del AshStorage</mark>.<br/>
 Quando il datacleaner del MonitoringDevice rileva una distanza minore o uguale a DLIMT, allora il container è da considerare pieno e quindi aggiorna lo stato.<br/>
 <br/>
 Ora consideriamo il problema P2.<br/>
@@ -302,7 +302,7 @@ attraverso la GUI), che indichi la distanza tra il sonar e il fondo del contenit
 <br/>
 Infine discutiamo il problema P3.<br/>
 Al MonitoringDevice l'unico componente del WIS che gli interessa realmente è l'Incinerator, in particolare sapere se sta bruciando o meno per accendere o spegnere il led di conseguenza.<br/>
-Il modo migliore per ottenere tale informazione è far si che il MonitoringDevice diventi un Observer dell'Incinerator, evitando quindi uno scambio di messaggi poco utili tra WIS e MonitoringDevice. 
+Il modo migliore per ottenere tale informazione è far si che <mark>il MonitoringDevice diventi un Observer dell'Incinerator</mark>, evitando quindi uno scambio di messaggi poco utili tra WIS e MonitoringDevice. 
 </p>
 
 <h4>Interazione WIS - Scale</h4>
@@ -329,8 +329,8 @@ per difetto su WRP per calcolare il numero di RPs misurati:
 <br/>
 Consideriamo ora il problema P5.<br/>
 Una volta ottenuto il numero di RPs presenti nel WasteStorage, occorre comunicare tale informazione al WIS.<br/>
-Un possibile approccio, simile a quanto fatto con il MonitoringDevice, è rendere la scale osservabile e farla osservare dal WIS.<br/>
-Tuttavia, per sfruttare quanto fatto negli sprint precedenti, si decide di comunicare il numero di RPs nel modo seguente:
+<mark>Un possibile approccio, simile a quanto fatto con il MonitoringDevice, è rendere la scale osservabile e farla osservare dal WIS.<br/>
+Tuttavia, per sfruttare quanto fatto negli sprint precedenti, si decide di comunicare il numero di RPs nel modo seguente:</mark>
 <ol>
 	<li>l'attore scale, dopo aver convertito da peso a numero di RP, calcola soltanto la differenza con il numero di RP precedenti. </li>
 	<li>sempre l'attore scale manda un Dispatch <b>arrived_rp</b>, per ciascuna unità calcolata, al WIS.</li>
@@ -353,14 +353,14 @@ dei messaggi di cui sono dotati gli attori qak.
 	</li>
 	<li>
 		<a href="../analisi_problema/monitoringDevice/src/monitoringdevice.qak"><b>MonitoringDevice</b></a><br/>
-		<a href="img/monitoringdevicearch.png">
-			<img src="img/monitoringdevicearch.png" name="Image3" align="bottom" width="1000" height="800" border="1"/>
+		<a href="img/monitoringdevice_problem_arch.png">
+			<img src="img/monitoringdevice_problem_arch.png" name="Image3" align="bottom" width="1000" height="800" border="1"/>
 		</a>
 	</li>
 	<li>
 		<a href="../analisi_problema/scale/src/scale.qak"><b>Scale</b></a><br/>
-		<a href="img/scalearch.png">
-			<img src="img/scalearch.png" name="Image4" align="bottom" width="1000" height="800" border="1"/>
+		<a href="img/scale_problem_arch.png">
+			<img src="img/scale_problem_arch.png" name="Image4" align="bottom" width="1000" height="800" border="1"/>
 		</a>
 	</li>
 </ul>
@@ -379,11 +379,11 @@ conversione dei dati e l'invio al WIS come descritto in precedenza.
 <p>
 <h2>Progetto</h2>
 <p>
-Mentre nella sezione di analisi del problema si è deciso di modellare l'interazione tra MonitoringDevice e WIS e tra scale e WIS con il meccanismo
-di observeResource in quanto più coerente con i requisiti dati dal committente, in questa fase si è deciso di optare per una comunicazione di tipo
-publish/subscribe, in cui ogni qualvolta un dispositivo in un contesto deve comunicare con un dispositivo in un altro contesto emette un evento ad un
-broker mqtt, che si occuperà di girarlo al contesto giusto. In questo modo si riesce a disaccoppiare i singoli contesti, che quindi possono
-effettivamente "funzionare" indipendentemente dagli altri.<br/>
+<mark>Mentre nella sezione di analisi del problema si è deciso di modellare l'interazione tra MonitoringDevice e WIS e tra scale e WIS con il meccanismo
+di observeResource</mark> in quanto più coerente con i requisiti dati dal committente, <mark>in questa fase si è deciso di optare per una comunicazione di tipo
+publish/subscribe</mark>, in cui ogni qualvolta un dispositivo in un contesto deve comunicare con un dispositivo in un altro contesto emette un evento ad un
+broker mqtt, che si occuperà di girarlo al contesto giusto. <mark>In questo modo si riesce a disaccoppiare i singoli contesti, che quindi possono
+effettivamente "funzionare" indipendentemente dagli altri.</mark><br/>
 </p>
 <p>
 Si pone ora un problema: supponiamo che il monitoringDevice aggiorni il suo stato di riempimento. Se il wis non fosse nello stato giusto per ricevere
@@ -411,7 +411,27 @@ publish/subscribe, si è deciso di fare in modo che il monitoringDevice invii co
 in cui non vi fossero aggiornamenti. Dal lato del wis, se non vi sono aggiornamenti da parte del monitoringDevice da più di 10 secondi, ci si posiziona
 in uno stato di stallo fintantoché non arrivino nuovi aggiornamenti.<br/>
 </p>
-Di seguito si trovano i modelli aggiornati: <a href="../progetto/wis/src/WasteIncineratorService_progetto.qak">WIS</a>, <a href="../progetto/monitoringDevice/src/monitoringdevice.qak">monitoringDevice</a>, <a href="../progetto/scale/src/scale.qak">Scale</a>.
+Di seguito si trovano i modelli aggiornati: 
+<ul>
+	<li>
+		<a href="../progetto/wis/src/WasteIncineratorService_progetto.qak"><b>WIS</b></a><br/>
+		<a href="img/waste_incinerator_progetto_servicearch.png">
+			<img src="img/waste_incinerator_progetto_servicearch.png" name="Image2" align="bottom" width="1000" height="800" border="1"/>
+		</a>
+	</li>
+	<li>
+		<a href="../progetto/monitoringDevice/src/monitoringdevice.qak"><b>MonitoringDevice</b></a><br/>
+		<a href="img/monitoringdevice_progetto_arch.png">
+			<img src="img/monitoringdevice_progetto_arch.png" name="Image3" align="bottom" width="1000" height="800" border="1"/>
+		</a>
+	</li>
+	<li>
+		<a href="../progetto/scale/src/scale.qak"><b>Scale</b></a><br/>
+		<a href="img/scale_progetto_arch.png">
+			<img src="img/scale_progetto_arch.png" name="Image4" align="bottom" width="1000" height="800" border="1"/>
+		</a>
+	</li>
+</ul>
 </p>
 <h3>Dispositivi utilizzati</h3>
 <img alt="raspberrypins" src="Raspberry-Pi-GPIO-Layout-Model-B-Plus.png"></img><br>
@@ -510,6 +530,12 @@ Scale e del MonitoringDevice i relativi contesti. Per farlo occorre:</p>
 			<li>Gabriele ed Emanuele: logica della scale + logica del monitoringdevice. </li>
 		</ul>
 	In questa fase di modellazione, si sono fatte diverse riunioni per allinearci sui problemi/soluzioni riscontrati durante lo sviluppo. 
+	</li>
+	<li><b>Progettazione:</b> tutti i membri hanno contribuito, in particolare:
+		<ul>
+			<li>Tutti: discusso assieme i vantaggi/svantaggi dell'uso di un metodo publish/subscribe anziché updateResource.</li>
+			<li>Emanuele e Gabriele: montaggio fisico dei componenti sui due RaspberryPi e modifiche al codice dei componenti.</li>
+		</ul>
 	</li>
 	<li><b>Testing:</b> piano dei test deciso assieme. L'effettiva realizzazione è stata affidata a Gabriele. </li>
 </ol>
