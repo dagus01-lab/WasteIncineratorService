@@ -33,7 +33,6 @@ class Sonardevice ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 						
 									p       = Runtime.getRuntime().exec("python sonar.py")
 									reader  = java.io.BufferedReader(  java.io.InputStreamReader(p.getInputStream() ))	
-						delay(100) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -52,7 +51,7 @@ class Sonardevice ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 									val v  = vd.toInt()
 									if( v <= 500 ){	//A first filter ...
 										Distance = v				
-									}else Distance = 0
+									}else Distance = 500
 								}catch(e: Exception){
 										CommUtils.outred("$name readSonarDataERROR: $e "   )
 								}

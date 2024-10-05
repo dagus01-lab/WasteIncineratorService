@@ -1,28 +1,21 @@
 package main.java.test;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.concurrent.Flow.Subscriber;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import unibo.basicomm23.*;
-import unibo.basicomm23.interfaces.IApplMessage;
 import unibo.basicomm23.interfaces.Interaction;
 import unibo.basicomm23.msg.ProtocolType;
 import unibo.basicomm23.utils.ColorsOut;
 import unibo.basicomm23.utils.CommUtils;
 import unibo.basicomm23.utils.ConnectionFactory;
 import unibo.basicomm23.mqtt.MqttConnection;
-
-import unibo.basicomm23.interfaces.*;
-import unibo.basicomm23.utils.*;
 
 public class Test_Scale_MonitoringDevice {
 	private static Interaction connSupport;

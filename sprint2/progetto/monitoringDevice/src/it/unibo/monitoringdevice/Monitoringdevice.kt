@@ -29,7 +29,7 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 					action { //it:State
 						delay(2000) 
 						CommUtils.outblue("$name STARTS")
-						connectToMqttBroker( "tcp://192.168.1.85:8081", "monitoringdevicenat" )
+						connectToMqttBroker( "tcp://localhost:8081", "monitoringdevicenat" )
 						CommUtils.outblue("$name | CREATED  (and connected to mosquitto) ... ")
 						subscribe(  "wisinfo" ) //mqtt.subscribe(this,topic)
 						subscribeToLocalActor("datacleaner") 

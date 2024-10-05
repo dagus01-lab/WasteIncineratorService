@@ -43,6 +43,6 @@ time.sleep(1)
 #print("tare successfully calculated!")
 while 1:
   curSample= readAverage()
-  w=abs(int((curSample-tare)/calibration) )
+  w=int((curSample-tare)/calibration) 
   w=reLU(-w)
   print(w, flush=True ) #measured in grams

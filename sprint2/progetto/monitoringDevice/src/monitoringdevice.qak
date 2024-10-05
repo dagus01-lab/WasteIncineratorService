@@ -17,12 +17,12 @@ Event statoIncinerator : statoIncinerator(N)  "Incinerator's burning status info
 Dispatch incineratorState : incineratorState(N) 
 //Definizione dei contesti
 Context ctxmonitoringdevice ip [ host= "localhost"      port= 8100 ] 
-
+ 
 //--------------------------------Attore monitoring device proxy----------------------------------------------
-QActor monitoringdeviceproxy context ctxmonitoringdevice{
+QActor monitoringdeviceproxy context ctxmonitoringdevice{ 
 	[#var Status = 0#]
 	State s0 initial{
-		connectToMqttBroker "tcp://192.168.1.85:8081" clientid "monitoringdeviceproxynat"
+		connectToMqttBroker "tcp://localhost:8081" clientid "monitoringdeviceproxynat"
 		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "monitoringdeviceproxynat"
  		println("$name | CREATED  (and connected to mosquitto) ... ") color red
  		subscribe "wisinfo"
@@ -61,7 +61,6 @@ QActor sonardevice context ctxmonitoringdevice{
 			p       = Runtime.getRuntime().exec("python sonar.py")
 			reader  = java.io.BufferedReader(  java.io.InputStreamReader(p.getInputStream() ))	
 		#]		
-		delay 100
 	}
 	Goto readSonarData
 	
@@ -76,7 +75,7 @@ QActor sonardevice context ctxmonitoringdevice{
 			val v  = vd.toInt()
 			if( v <= 500 ){	//A first filter ...
 				Distance = v				
-			}else Distance = 0
+			}else Distance = 500
 		}catch(e: Exception){
 				CommUtils.outred("$name readSonarDataERROR: $e "   )
 		}
@@ -153,7 +152,7 @@ QActor monitoringdevice context ctxmonitoringdevice{
 	State s0 initial{
 		delay 2000
 		println("$name STARTS") color blue
-		connectToMqttBroker "tcp://192.168.1.85:8081" clientid "monitoringdevicenat"
+		connectToMqttBroker "tcp://localhost:8081" clientid "monitoringdevicenat"
 		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "monitoringdevicenat"
  		println("$name | CREATED  (and connected to mosquitto) ... ") color blue
  		subscribe "wisinfo"

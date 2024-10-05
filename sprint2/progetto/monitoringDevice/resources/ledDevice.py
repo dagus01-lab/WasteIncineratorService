@@ -35,8 +35,8 @@ def blink_led():
         GPIO.output(LED, GPIO.HIGH)
         time.sleep(0.5)
         if blinking:
-	        GPIO.output(LED, GPIO.LOW)
-	        time.sleep(0.5)
+            GPIO.output(LED, GPIO.LOW)
+            time.sleep(0.5)
 
 for line in sys.stdin:
     line = line.strip()

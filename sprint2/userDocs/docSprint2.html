@@ -491,6 +491,7 @@ Il test automatizzato può essere trovato <a href="../progetto/wis/src/main/java
 </p>
 
 <h2>Deployment</h2>
+<h3>Deployment con gradle</h3>
 <p>Per poter provare questo primo prototipo del sistema, occorre
 eseguire i seguenti componenti nel seguente ordine: 
 </p>
@@ -512,6 +513,24 @@ Scale e del MonitoringDevice i relativi contesti. Per farlo occorre:</p>
 	<li>Copiare il file zip generato su entrambi i raspberry;</li>
 	<li>Unzippare il file e lanciare il file eseguibile della sottocartella <b>bin</b>.</li>
 </ol>
+<h3>Deployment con docker</h3>
+Si è scelto di effettuare anche il deployment con docker in modo da ottenere una 
+soluzione containerizzata, già pronta all'uso, che permettesse di disaccoppiare 
+ulteriormente i vari nodi del sistema e che permettesse di introdurre degli aspetti
+di sicurezza (come l'autenticazione e la cifratura con TLS dei messaggi tra i vari
+contesti). 
+Come prima cosa, per ogni entità coinvolta è stato creato un Dockerfile, che si può 
+trovare nelle rispettive cartelle, nel quale si possono trovare maggiori istruzioni
+su come fare build delle varie immagini.
+Per ognuna delle immagini che si collegano al broker MQTT è stato predisposto
+un opportuno supporto tramite stunnel che permettesse di effettuare mutua autenticazione
+e di cifrare il traffico scambiato con il broker. In questo modo si riesce a proteggere
+il sistema sia da tentativi di lettura da parte di utenti esterni dello stato
+dei vari dispositivi, sia da tentativi di intrusione del sistema.
+Una volta fatto questo, posizionarsi su sprint2/progetto/wis ed eseguire:<br/>
+<b>docker-compose -f wis.yaml up</b><br/>
+in modo da lanciare in una volta sola virtual robot, basic robot, mqtt broker, e wis.
+
 
 <h2>Suddivisione dei compiti</h2>
 <p>

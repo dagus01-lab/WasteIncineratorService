@@ -25,7 +25,7 @@ class Monitoringdeviceproxy ( name: String, scope: CoroutineScope, isconfined: B
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						connectToMqttBroker( "tcp://192.168.1.85:8081", "monitoringdeviceproxynat" )
+						connectToMqttBroker( "tcp://localhost:8081", "monitoringdeviceproxynat" )
 						CommUtils.outred("$name | CREATED  (and connected to mosquitto) ... ")
 						subscribe(  "wisinfo" ) //mqtt.subscribe(this,topic)
 						//genTimer( actor, state )

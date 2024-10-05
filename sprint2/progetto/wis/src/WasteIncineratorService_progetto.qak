@@ -39,7 +39,7 @@ Reply moverobotfailed:  moverobotfailed(PLANDONE, PLANTODO) for moverobot
 
 //Definizione dei contesti
 Context ctx_waste_incinerator_service ip [host="localhost" port=8125]
-Context ctxbasicrobot ip [host="127.0.0.1" port=8020] 
+Context ctxbasicrobot ip [host="basicrobot" port=8020] 
 
 //Attori esterni al WIS
 ExternalQActor basicrobot context ctxbasicrobot
@@ -282,7 +282,7 @@ QActor oprobot context ctx_waste_incinerator_service{
 	//Stato che rappresenta il robot che porta l'RP recuperato dal WasteStorage nella porta BURNIN
 	State bringRPtoBURNIN{
 		delay 2000 //simulazione del prelievo di un RP dal WasteStorage
-		request basicrobot -m moverobot:moverobot($BURNINx, $BURNINy)
+		request basicrobot -m moverobot:moverobot($BURNINx, $BURNINy) 
 	}
 	Transition t0 whenReply moverobotdone -> returnHOME
 				  whenReply moverobotfailed -> exit

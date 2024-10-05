@@ -2,8 +2,8 @@
 ## Dockerfile for unibo.basicrobot24
 ## ----------------------------------------------------------
 
-FROM openjdk:12.0.2
-EXPOSE 8020
+FROM alpine:latest
+## EXPOSE 8020
 ## ADD extracts the tar
 ADD ./build/distributions/basicrobot24-1.0.tar /
 WORKDIR /basicrobot24-1.0/bin
@@ -11,12 +11,10 @@ COPY ./*.pl ./
 COPY ./*.json ./
 COPY ./*.bin ./
 COPY ./*.txt ./
+RUN apk update 
+RUN apk add --no-cache openjdk11-jdk 
 
-## RUN apt-get update -y
-## RUN apt-get install -y wiringpi
-## RUN sudo apt-get install -y python
-
-CMD ["bash", "basicrobot24"]
+CMD ["sh", "-c", "./basicrobot24"]
 
 ## 1) gradlew distTar
 ## 2) docker build -t basicrobot24:1.0 .

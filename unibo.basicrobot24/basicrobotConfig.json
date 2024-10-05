@@ -1,2 +1,2 @@
-{"type":"virtual", "port":"8090", "iprobot":"localhost", "commtrace": "false"}
+{"type":"virtual", "port":"8090", "iprobot":"192.168.1.85", "commtrace": "false"}
 

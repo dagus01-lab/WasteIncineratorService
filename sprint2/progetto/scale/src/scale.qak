@@ -70,7 +70,7 @@ QActor scale context ctxscale {
 		delay 1000
 		subscribeTo scaledevice for scaledata		
 		println("$name subscribed to scaledevice") color blue
-		connectToMqttBroker "tcp://192.168.1.85:8081" clientid "scalenat"
+		connectToMqttBroker "tcp://localhost:8081" clientid "scalenat"
 		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "scalenat"
  		println("$name | CREATED  (and connected to mosquitto) ... ") color blue
  		subscribe "wisinfo"

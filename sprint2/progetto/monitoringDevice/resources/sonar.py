@@ -42,7 +42,7 @@ def takeAverage(num_samples=5):
 while True:
    distance = takeAverage()
    #print ('Distance:',distance,'cm')distance
-   print ( distance, flush=True ) 
+   print ( distance, flush=True) 
    time.sleep(0.25)
 
 
