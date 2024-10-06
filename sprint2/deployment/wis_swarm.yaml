@@ -1,0 +1,174 @@
+version: '3.8'
+services:
+  wis:
+    image: wis:1.0 
+    ports:
+      - "8125:8125"  
+    depends_on:
+      - basicrobot
+      - broker
+    networks:
+      - wis_LAN  
+    secrets:
+      - source: client_crt
+        target: /etc/stunnel/certs/client.crt
+      - source: client_key
+        target: /etc/stunnel/certs/client.key
+      - source: ca_crt
+        target: /etc/stunnel/certs/ca.crt
+    configs:
+      - source: stunnel_wis.conf
+        target: /etc/stunnel/stunnel.conf
+    command: ["sh", "-c", "sleep 5 && stunnel /etc/stunnel/stunnel.conf && ./waste_incinerator_service"]
+
+  scale:
+    image: scale:arm 
+    ports:
+      - "8200:8200"  
+    depends_on:
+      - basicrobot
+      - broker
+    networks:
+      - wis_LAN 
+    secrets:
+      - source: client_crt
+        target: /etc/stunnel/certs/client.crt
+      - source: client_key
+        target: /etc/stunnel/certs/client.key
+      - source: ca_crt
+        target: /etc/stunnel/certs/ca.crt 
+    command: ["sh", "-c", "sleep 10 && stunnel /etc/stunnel/stunnel.conf && ./scale"]
+    configs:
+      - source: stunnel_raspberry.conf
+        target: /etc/stunnel/stunnel.conf
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == raspberrypi
+
+  monitoringdevice:
+    image: monitoringdevice:arm 
+    ports:
+      - "8100:8100"  
+    depends_on:
+      - basicrobot
+      - broker
+    networks:
+      - wis_LAN 
+    secrets:
+      - source: client_crt
+        target: /etc/stunnel/certs/client.crt
+      - source: client_key
+        target: /etc/stunnel/certs/client.key
+      - source: ca_crt
+        target: /etc/stunnel/certs/ca.crt
+    command: ["sh", "-c", "sleep 10 && stunnel /etc/stunnel/stunnel.conf && ./monitoringdevice"]
+    configs:
+      - source: stunnel_raspberry.conf
+        target: /etc/stunnel/stunnel.conf
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == raspberrypi
+
+  basicrobot:
+    image: basicrobot24:1.0
+    ports:
+      - "8020:8020" 
+      - "8085:8085"
+    networks:
+      - wis_LAN 
+    secrets:
+      - source: basicrobot_key
+        target: /etc/stunnel/certs/basicrobot.key
+      - source: basicrobot_crt
+        target: /etc/stunnel/certs/basicrobot.crt
+      - source: ca_crt
+        target: /etc/stunnel/certs/ca.crt
+    depends_on:
+      - wenv
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    configs:
+      - source: basicrobot.conf
+        target: ./basicrobotConfig.json
+    healthcheck:
+      test: ["CMD", "java", "--version"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    command: ["sh", "-c", "sleep 5 && ./basicrobot24"]
+  
+  broker:
+    image: mqtt_broker:1.0
+    ports:
+      - "8081:8081"
+    networks:
+      - wis_LAN
+    secrets:
+      - source: server_crt
+        target: /etc/mosquitto/certs/server.crt
+      - source: server_key
+        target: /etc/mosquitto/certs/server.key
+      - source: ca_crt
+        target: /etc/mosquitto/certs/ca.crt
+    configs:
+      - source: mosquitto.conf
+        target: /etc/mosquitto/mosquitto.conf
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: ["CMD", "mosquitto", "--version"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    command: ["mosquitto", "-c", "/etc/mosquitto/mosquitto.conf"]
+  wenv:
+    image: docker.io/natbodocker/virtualrobotdisi23:1.0
+    ports:
+      - 8090:8090
+      - 8091:8091
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: ["CMD", "npm", "--version"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+secrets:
+  server_crt:
+    file: ./server.crt
+  server_key:
+    file: ./server.key
+  ca_crt:
+    file: ./ca.crt
+  client_crt:
+    file: ./client.crt
+  client_key:
+    file: ./client.key
+  basicrobot_key:
+    file: ./basicrobot.key
+  basicrobot_crt:
+    file: ./basicrobot.crt
+
+configs:
+  mosquitto.conf:
+    file: ../broker/mosquitto.conf
+  stunnel_basicrobot.conf:
+    file: ./stunnel_basicrobot.conf
+  stunnel_wis.conf:
+    file: ./stunnel_wis.conf
+  stunnel_raspberry.conf:
+    file: ./stunnel_raspberry.conf
+  basicrobot.conf:
+    file: ./basicrobotConfig.json
+networks:
+  wis_LAN:
+    external: true

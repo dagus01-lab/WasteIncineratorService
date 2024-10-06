@@ -12,7 +12,7 @@ COPY ./*.json ./
 COPY ./*.bin ./
 COPY ./*.txt ./
 RUN apk update 
-RUN apk add --no-cache openjdk11-jdk 
+RUN apk add --no-cache openjdk11-jdk stunnel openssl
 
 CMD ["sh", "-c", "./basicrobot24"]
 

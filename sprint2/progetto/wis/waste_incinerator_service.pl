@@ -22,7 +22,7 @@ reply( moverobotdone, moverobotok(ARG) ).  %%for moverobot
 reply( moverobotfailed, moverobotfailed(PLANDONE,PLANTODO) ).  %%for moverobot
 %====================================================================================
 context(ctx_waste_incinerator_service, "localhost",  "TCP", "8125").
-context(ctxbasicrobot, "basicrobot",  "TCP", "8020").
+context(ctxbasicrobot, "localhost",  "TCP", "8020").
  qactor( basicrobot, ctxbasicrobot, "external").
   qactor( wisscaleproxy, ctx_waste_incinerator_service, "it.unibo.wisscaleproxy.Wisscaleproxy").
  static(wisscaleproxy).
