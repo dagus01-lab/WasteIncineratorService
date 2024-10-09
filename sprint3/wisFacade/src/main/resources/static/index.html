@@ -1,0 +1,22 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Welcome</title></head>
+<body>
+<h1>Welcome to <b>WIS GUI!</b></h1>
+<p>
+	<table>
+	        <tr>
+	            <th>AshStorage level</th>
+	            <th>RPs in WasteStorage</th>
+	            <th>OpRobot status</th>
+	            <th>Incinerator burning</th>
+	        </tr>
+	        <tr>
+	            <td><span th:text="${ashStorageLevel}">Ash Storage Level</span></td>
+	            <td><span th:text="${wasteStoragePackets}">Waste Storage Packets</span></td>
+	            <td><span th:text="${opRobotStatus}">OpRobot status</span></td>
+	            <td><span th:text="${incineratorStatus}">Incinerator status</span></td>
+	        </tr>
+	    </table>
+</p>
+</body>
+</html>

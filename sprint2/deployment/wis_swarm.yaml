@@ -19,7 +19,7 @@ services:
     configs:
       - source: stunnel_wis.conf
         target: /etc/stunnel/stunnel.conf
-    command: ["sh", "-c", "sleep 5 && stunnel /etc/stunnel/stunnel.conf && ./waste_incinerator_service"]
+    command: ["sh", "-c", "sleep 15 && stunnel /etc/stunnel/stunnel.conf && ./waste_incinerator_service"]
 
   scale:
     image: scale:arm 
@@ -37,7 +37,7 @@ services:
         target: /etc/stunnel/certs/client.key
       - source: ca_crt
         target: /etc/stunnel/certs/ca.crt 
-    command: ["sh", "-c", "sleep 10 && stunnel /etc/stunnel/stunnel.conf && ./scale"]
+    command: ["sh", "-c", "sleep 15 && stunnel /etc/stunnel/stunnel.conf && ./scale"]
     configs:
       - source: stunnel_raspberry.conf
         target: /etc/stunnel/stunnel.conf
@@ -62,7 +62,7 @@ services:
         target: /etc/stunnel/certs/client.key
       - source: ca_crt
         target: /etc/stunnel/certs/ca.crt
-    command: ["sh", "-c", "sleep 10 && stunnel /etc/stunnel/stunnel.conf && ./monitoringdevice"]
+    command: ["sh", "-c", "sleep 15 && stunnel /etc/stunnel/stunnel.conf && ./monitoringdevice"]
     configs:
       - source: stunnel_raspberry.conf
         target: /etc/stunnel/stunnel.conf
@@ -101,7 +101,7 @@ services:
       retries: 5
     command: ["sh", "-c", "sleep 5 && ./basicrobot24"]
   
-  broker:
+  wis_broker:
     image: mqtt_broker:1.0
     ports:
       - "8081:8081"
@@ -136,6 +136,8 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+    networks:
+      - wis_LAN 
     healthcheck:
       test: ["CMD", "npm", "--version"]
       interval: 30s
@@ -160,7 +162,7 @@ secrets:
 
 configs:
   mosquitto.conf:
-    file: ../broker/mosquitto.conf
+    file: ./mosquitto.conf
   stunnel_basicrobot.conf:
     file: ./stunnel_basicrobot.conf
   stunnel_wis.conf:

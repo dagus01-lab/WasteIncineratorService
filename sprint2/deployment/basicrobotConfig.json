@@ -1,2 +1,2 @@
-{"type":"virtual", "port":"8090", "iprobot":"wenv", "commtrace": "false"}
+{"type":"virtual", "port":"8090", "iprobot":"my_stack_wenv", "commtrace": "false"}
 

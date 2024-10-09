@@ -1,11 +1,10 @@
 %====================================================================================
-% scale description   
+% monitoringdevicemock description   
 %====================================================================================
-event( scaledata, weight(W) ). %emitted  by scale
-event( new_RP, new_RP(N) ). %command that simulate the arrival of new RP
+event( statoAshStorage, statoAshStorage(N) ). %Event that simulate the status of the ash Storage (0=normal, 1=full)
 %====================================================================================
 context(ctxscale, "localhost",  "TCP", "8200").
- qactor( scaledevice, ctxscale, "it.unibo.scaledevice.Scaledevice").
- static(scaledevice).
+ qactor( inputreader, ctxscale, "it.unibo.inputreader.Inputreader").
+ static(inputreader).
   qactor( scale, ctxscale, "it.unibo.scale.Scale").
  static(scale).

@@ -147,7 +147,7 @@ eclipse {
 
 application {
     //Define the main class for the application.
-    mainClassName    = 'it.unibo.ctxmonitoringdevice.MainCtxmonitoringdeviceKt'
+    mainClassName    = 'it.unibo.ctxscale.MainCtxscaleKt'
 }
  
  jar {
@@ -170,9 +170,9 @@ task dovesiamo {
 
 distributions {
     main {
-        distributionBaseName = 'monitoringdevice'
+        distributionBaseName = 'monitoringdevicemock'
         contents { 
-             from './monitoringdevice.pl'
+             from './monitoringdevicemock.pl'
              from './sysRules.pl'
              from './facadeConfig.json'
         }
@@ -183,7 +183,7 @@ task run0(type: JavaExec) {
     group = "Execution"
     description = "Run the main class with JavaExecTask"
     classpath = sourceSets.main.runtimeClasspath
-    main = 'it.unibo.ctxmonitoringdevice.MainCtxmonitoringdeviceKt'
+    main = 'it.unibo.ctxscale.MainCtxscaleKt'
 }
 
 /*

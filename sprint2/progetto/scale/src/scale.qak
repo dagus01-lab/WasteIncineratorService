@@ -3,8 +3,7 @@
 System scale
 
 //Messaggi inerenti lo stato del WasteStorage
-Event scaledata : weight(W)   "emitted  by scale or (better) by datacleaner"
-Event wasteStorageRPs:wasteStorageRPs(N)   "emitted  by datacleaner"
+Event scaledata : weight(W)   "emitted  by scale"
 Event new_RP : new_RP(N) "command that simulate the arrival of new RP"
 
 //Definizione dei contesti
