@@ -17,25 +17,8 @@ function connect(){
   return socket;
 }//connect
 
-const incineratorStatus = document.getElementById("incineratorStatus")
-const ashStorageStatus = document.getElementById("ashStorageStatus")
-const opRobotStatus = document.getElementById("opRobotStatus")
-const wasteStoragePackets = document.getElementById("wasteStoragePackets")
-
 function updateGUI(message) {
-	if(message.includes("wasteStorageStatus")){
-		wasteStorageStatus.innerHTML = message.split("(")[1].split(")")[0]
-	}
-	else if(message.includes("ashStorageStatus")){
-		ashStorageStatus.innerHTML = message.split("(")[1].split(")")[0]
-	}
-	else if(message.includes("opRobotStatus")){
-		opRobotStatus.innerHTML = message.split("(")[1].split(")")[0]
-	}
-	else if(message.includes("wasteStoragePackets")){
-		wasteStoragePackets.innerHTML = message.split("(")[1].split(")")[0]
-	}
-	else{
-		alert("Unknown message: "+message)
-	}
+	payload = message.split("(")[1].split(")")[0]
+	element = message.split("(")[0]
+	document.getElementById(element).innerHTML = payload
 }

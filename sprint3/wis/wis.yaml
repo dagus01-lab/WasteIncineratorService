@@ -1,0 +1,51 @@
+version: '3.8'
+services:
+  wis:
+    image: wis:1.0 
+    ports:
+      - "8125:8125"  
+    depends_on:
+      - basicrobot
+      - wis_broker
+    networks:
+      - wis_LAN  
+    volumes:
+      - ./ca.crt:/etc/stunnel/certs/ca.crt
+      - ./client.crt:/etc/stunnel/certs/client.crt
+      - ./client.key:/etc/stunnel/certs/client.key
+    command: ["sh", "-c", "sleep 10 && stunnel && ./waste_incinerator_service"]
+
+  basicrobot:
+    image: basicrobot24:1.0
+    ports:
+      - "8020:8020" 
+      - "8085:8085"
+    networks:
+      - wis_LAN 
+    depends_on:
+      - wenv
+    volumes:
+      - ./basicrobotConfig.json:/basicrobot24-1.0/bin/basicrobotConfig.json
+    command: ["sh", "-c", "sleep 5 && ./basicrobot24"]
+  
+  wis_broker:
+    image: mqtt_broker:1.0
+    ports:
+      - "8081:8081"
+    networks:
+      - wis_LAN
+    volumes:
+      - ../broker/ca.crt:/etc/mosquitto/certs/ca.crt
+      - ../broker/server.crt:/etc/mosquitto/certs/server.crt
+      - ../broker/server.key:/etc/mosquitto/certs/server.key
+      - ../broker/mosquitto.conf:/etc/mosquitto/mosquitto.conf
+  wenv:
+    image: docker.io/natbodocker/virtualrobotdisi23:1.0
+    ports:
+      - 8090:8090
+      - 8091:8091
+    networks:
+      - wis_LAN
+
+networks:
+  wis_LAN:

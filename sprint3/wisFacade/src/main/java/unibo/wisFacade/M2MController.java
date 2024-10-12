@@ -1,10 +1,10 @@
 package unibo.wisFacade;
 
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import unibo.basicomm23.interfaces.IApplMessage;
 import unibo.basicomm23.msg.ApplMessage;
 import unibo.basicomm23.utils.CommUtils;

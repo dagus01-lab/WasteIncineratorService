@@ -1,21 +1,22 @@
 package unibo.wisFacade;
 
-import com.google.common.base.Charsets;
-import org.json.JSONException;
-
-import org.json.JSONObject;
-import unibo.basicomm23.utils.CommUtils;
-
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import unibo.basicomm23.utils.CommUtils;
+
 public class QaksysConfigSupport {
 
-    public static List<String> readConfig( String fName )  {
+    public static List<List<String>> readConfig( String fName )  {
         try{
             Path p = Paths.get(fName);
             String data = new String( Files.readAllBytes(Paths.get(fName)));
@@ -45,10 +46,19 @@ public class QaksysConfigSupport {
 
          */
     }
+    protected static List<List<String>> readTheContent(String config) throws JSONException, ParseException{
+    	List<List<String>> content = new ArrayList<List<String>>();
+    	CommUtils.outyellow("qaksysConfigSupport | readTheContent " + config);
+    	JSONParser parser = new JSONParser();
+        JSONArray jsonArray = (JSONArray) parser.parse(config);
+        for (Object o : jsonArray) {
+        	content.add(readHost((JSONObject)o));
+        }
+        return content;
+    }
 
-   protected static List<String> readTheContent( String config ) throws JSONException {
-       CommUtils.outyellow("qaksysConfigSupport | readTheContent " + config);
-       JSONObject jsonObject = new JSONObject(config); //jsonParser.parse(config) ;
+   protected static List<String> readHost( JSONObject jsonObject ) throws JSONException {
+        //jsonParser.parse(config) ;
        String host = jsonObject.get("host").toString();
        String port = jsonObject.get("port").toString();
        String context = jsonObject.get("context").toString();

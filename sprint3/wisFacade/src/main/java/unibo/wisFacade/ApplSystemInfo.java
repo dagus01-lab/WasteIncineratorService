@@ -1,14 +1,14 @@
 package unibo.wisFacade;
 
-import alice.tuprolog.Prolog;
-import alice.tuprolog.SolveInfo;
-import alice.tuprolog.Theory;
-import unibo.basicomm23.utils.CommUtils;
-
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import alice.tuprolog.Prolog;
+import alice.tuprolog.SolveInfo;
+import alice.tuprolog.Theory;
+import unibo.basicomm23.utils.CommUtils;
 
 /*
 readConfig invocato da CustomContainer
@@ -17,17 +17,10 @@ setup() e getActorNamesInApplCtx() invocati da
   ApplguiCore create da FacadeBuilder
  */
 public class ApplSystemInfo {
-    public static String qakSysHost;
-    public static String qakSysCtx;
-    public static String applActorName;
-    public static String ctxportStr;
-    public static int ctxport;
-    public static String facadeportStr;
-    public static int facadeport;
-    public static String appName;
 
     private static Prolog pengine;
-
+    public static String appName;
+    public static List<ActorHost> observedHosts;
     /*
     facadeConfig.json
 
@@ -36,16 +29,21 @@ public class ApplSystemInfo {
       "sysdescr":"<appName>" }
      */
     public static void readConfig(){
-        List<String> config = QaksysConfigSupport.readConfig("facadeConfig.json");
+        List<List<String>> config = QaksysConfigSupport.readConfig("facadeConfig.json");
         if( config != null ) {
-            qakSysHost    = config.get(0);
-            ctxportStr    = config.get(1);
-            qakSysCtx     = config.get(2);
-            applActorName = config.get(3);
-            facadeportStr = config.get(4);
-            appName       = config.get(5);
-            ctxport       = Integer.parseInt(ctxportStr);
-            facadeport    = Integer.parseInt(facadeportStr);
+        	String qakSysHost, ctxportStr, qakSysCtx, applActorName, facadeportStr, appName;
+			int ctxport, facadeport;
+        	for(List<String> hostConf : config) {
+        		qakSysHost    = hostConf.get(0);
+                ctxportStr    = hostConf.get(1);
+                qakSysCtx     = hostConf.get(2);
+                applActorName = hostConf.get(3);
+                facadeportStr = hostConf.get(4);
+                appName       = hostConf.get(5);
+                ctxport       = Integer.parseInt(ctxportStr);
+                facadeport    = Integer.parseInt(facadeportStr);
+                observedHosts.add(new ActorHost(applActorName, qakSysCtx, applActorName, ctxportStr, ctxport, facadeportStr, facadeport, appName));
+        	}
         }
 
         //setup();
@@ -54,7 +52,7 @@ public class ApplSystemInfo {
 
     public  static List<String> getActorNamesInApplCtx( ) {
         //CommUtils.outcyan( "ApplSystemInfo | getActorNames ctx=" + ctx  );
-        List<String> actors = getAllActorNames(qakSysCtx);
+        List<String> actors = getAllActorNames(observedHosts.get(0).qakSysCtx);
         CommUtils.outcyan( "ApplSystemInfo ACTORS ON THE localhost  "  );
         actors.forEach( a -> CommUtils.outcyan( a) );
 
