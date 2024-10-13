@@ -26,6 +26,7 @@ with Diagram('waste_incinerator_serviceArch', show=False, outformat='png', graph
      sys = Custom('','./qakicons/system.png')
 ### see https://renenyffenegger.ch/notes/tools/Graphviz/attributes/label/HTML-like/index
      with Cluster('ctx_waste_incinerator_service', graph_attr=nodeattr):
+          wisfacade=Custom('wisfacade','./qakicons/symActorSmall.png')
           wis=Custom('wis','./qakicons/symActorSmall.png')
           oprobot=Custom('oprobot','./qakicons/symActorSmall.png')
           incinerator=Custom('incinerator','./qakicons/symActorSmall.png')
@@ -39,7 +40,12 @@ with Diagram('waste_incinerator_serviceArch', show=False, outformat='png', graph
      incinerator >> Edge( label='endBurning', **eventedgeattr, decorate='true', fontcolor='red') >> sys
      oprobot >> Edge(color='magenta', style='solid', decorate='true', label='<engage<font color="darkgreen"> engagedone engagerefused</font> &nbsp; moverobot<font color="darkgreen"> moverobotdone moverobotfailed</font> &nbsp; >',  fontcolor='magenta') >> basicrobot
      oprobot >> Edge(color='blue', style='solid',  decorate='true', label='<rpInBurnin &nbsp; newAshes &nbsp; >',  fontcolor='blue') >> wis
+     monitoring_device_mok >> Edge(color='blue', style='solid',  decorate='true', label='<statoAshStorage &nbsp; >',  fontcolor='blue') >> wisfacade
+     oprobot >> Edge(color='blue', style='solid',  decorate='true', label='<opRobotState &nbsp; opRobotJob &nbsp; >',  fontcolor='blue') >> wisfacade
+     monitoring_device_mok >> Edge(color='blue', style='solid',  decorate='true', label='<statoAshStorage &nbsp; >',  fontcolor='blue') >> wis
+     incinerator >> Edge(color='blue', style='solid',  decorate='true', label='<incineratorState &nbsp; >',  fontcolor='blue') >> wisfacade
      scalemock >> Edge(color='blue', style='solid',  decorate='true', label='<arrived_RP &nbsp; >',  fontcolor='blue') >> wis
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<activationCommand &nbsp; startBurning &nbsp; >',  fontcolor='blue') >> incinerator
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<arrived_RP &nbsp; >',  fontcolor='blue') >> oprobot
+     scalemock >> Edge(color='blue', style='solid',  decorate='true', label='<arrived_RP &nbsp; >',  fontcolor='blue') >> wisfacade
 diag

@@ -54,9 +54,9 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 				 	 		stateTimer = TimerActor("timer_engage", 
 				 	 					  scope, context!!, "local_tout_"+name+"_engage", 1000.toLong() )  //OCT2023
 					}	 	 
-					 transition(edgeName="t014",targetState="noResponse",cond=whenTimeout("local_tout_"+name+"_engage"))   
-					transition(edgeName="t015",targetState="waitingWorking",cond=whenReply("engagedone"))
-					transition(edgeName="t016",targetState="end",cond=whenReply("engagerefused"))
+					 transition(edgeName="t019",targetState="noResponse",cond=whenTimeout("local_tout_"+name+"_engage"))   
+					transition(edgeName="t020",targetState="waitingWorking",cond=whenReply("engagedone"))
+					transition(edgeName="t021",targetState="end",cond=whenReply("engagerefused"))
 				}	 
 				state("noResponse") { //this:State
 					action { //it:State
@@ -80,7 +80,7 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t017",targetState="takeRP",cond=whenDispatch("arrived_RP"))
+					 transition(edgeName="t022",targetState="takeRP",cond=whenDispatch("arrived_RP"))
 				}	 
 				state("takeRP") { //this:State
 					action { //it:State
@@ -93,8 +93,8 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t018",targetState="bringRPtoBURNIN",cond=whenReply("moverobotdone"))
-					transition(edgeName="t019",targetState="exit",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t023",targetState="bringRPtoBURNIN",cond=whenReply("moverobotdone"))
+					transition(edgeName="t024",targetState="exit",cond=whenReply("moverobotfailed"))
 				}	 
 				state("bringRPtoBURNIN") { //this:State
 					action { //it:State
@@ -109,8 +109,8 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t020",targetState="returnHOME",cond=whenReply("moverobotdone"))
-					transition(edgeName="t021",targetState="exit",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t025",targetState="returnHOME",cond=whenReply("moverobotdone"))
+					transition(edgeName="t026",targetState="exit",cond=whenReply("moverobotfailed"))
 				}	 
 				state("returnHOME") { //this:State
 					action { //it:State
@@ -127,8 +127,8 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t022",targetState="waitingForIncinerator",cond=whenReply("moverobotdone"))
-					transition(edgeName="t023",targetState="exit",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t027",targetState="waitingForIncinerator",cond=whenReply("moverobotdone"))
+					transition(edgeName="t028",targetState="exit",cond=whenReply("moverobotfailed"))
 				}	 
 				state("waitingForIncinerator") { //this:State
 					action { //it:State
@@ -142,7 +142,7 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t024",targetState="takeAshFromBURNOUT",cond=whenEvent("endBurning"))
+					 transition(edgeName="t029",targetState="takeAshFromBURNOUT",cond=whenEvent("endBurning"))
 				}	 
 				state("takeAshFromBURNOUT") { //this:State
 					action { //it:State
@@ -154,8 +154,8 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t025",targetState="bringAshtoASHOUT",cond=whenReply("moverobotdone"))
-					transition(edgeName="t026",targetState="exit",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t030",targetState="bringAshtoASHOUT",cond=whenReply("moverobotdone"))
+					transition(edgeName="t031",targetState="exit",cond=whenReply("moverobotfailed"))
 				}	 
 				state("bringAshtoASHOUT") { //this:State
 					action { //it:State
@@ -170,8 +170,8 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t027",targetState="restartJob",cond=whenReply("moverobotdone"))
-					transition(edgeName="t028",targetState="exit",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t032",targetState="restartJob",cond=whenReply("moverobotdone"))
+					transition(edgeName="t033",targetState="exit",cond=whenReply("moverobotfailed"))
 				}	 
 				state("restartJob") { //this:State
 					action { //it:State
@@ -188,9 +188,9 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t029",targetState="takeRpBeforeFinishPlan",cond=whenDispatch("arrived_RP"))
-					transition(edgeName="t030",targetState="waitingWorking",cond=whenReply("moverobotdone"))
-					transition(edgeName="t031",targetState="exit",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t034",targetState="takeRpBeforeFinishPlan",cond=whenDispatch("arrived_RP"))
+					transition(edgeName="t035",targetState="waitingWorking",cond=whenReply("moverobotdone"))
+					transition(edgeName="t036",targetState="exit",cond=whenReply("moverobotfailed"))
 				}	 
 				state("takeRpBeforeFinishPlan") { //this:State
 					action { //it:State
@@ -202,8 +202,8 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t032",targetState="testko",cond=whenReply("moverobotdone"))
-					transition(edgeName="t033",targetState="takeRP",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t037",targetState="testko",cond=whenReply("moverobotdone"))
+					transition(edgeName="t038",targetState="takeRP",cond=whenReply("moverobotfailed"))
 				}	 
 				state("testko") { //this:State
 					action { //it:State

@@ -14,7 +14,7 @@ dispatch( opRobotJob, opRobotJob(N) ).
 event( alarm, alarm(X) ).
 dispatch( newAshes, newAshes(N) ). %command that simulate the arrival of new RP's ashes
 dispatch( ashesLevel, ashesLevel(N) ). %Event that simulates the level of the ashstorage container
-event( statoAshStorage, statoAshStorage(N) ). %AshStorage info: 0 is not empty, 1 otherwise
+dispatch( statoAshStorage, statoAshStorage(N) ). %AshStorage info: 0 is not empty, 1 otherwise
 dispatch( monitoringDeviceRuns, monitoringDeviceRuns(N) ). %message that represents the level of the ash storage (1 if it is up, 0 otherwise)
 request( engage, engage(OWNER,STEPTIME) ).
 reply( engagedone, engagedone(ARG) ).  %%for engage
@@ -27,6 +27,8 @@ reply( moverobotfailed, moverobotfailed(PLANDONE,PLANTODO) ).  %%for moverobot
 context(ctx_waste_incinerator_service, "localhost",  "TCP", "8125").
 context(ctxbasicrobot, "127.0.0.1",  "TCP", "8020").
  qactor( basicrobot, ctxbasicrobot, "external").
+  qactor( wisfacade, ctx_waste_incinerator_service, "it.unibo.wisfacade.Wisfacade").
+ static(wisfacade).
   qactor( wis, ctx_waste_incinerator_service, "it.unibo.wis.Wis").
  static(wis).
   qactor( oprobot, ctx_waste_incinerator_service, "it.unibo.oprobot.Oprobot").

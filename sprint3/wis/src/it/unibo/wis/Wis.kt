@@ -24,20 +24,26 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 		 
 				var AshStorageStatus = 0 
 				var RPs = 0
-				var monitoringDeviceRunning = 0
+				var monitoringDeviceRunning = 1
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						delay(500) 
+						delay(4000) 
+						observeResource("localhost","8125","ctx_waste_incinerator_service","scalemock","arrived_RP")
+						observeResource("localhost","8125","ctx_waste_incinerator_service","monitoring_device_mok","statoAshStorage")
+						delay(1000) 
 						CommUtils.outgreen("$name STARTS")
 						forward("activationCommand", "activationCommand(1)" ,"incinerator" ) 
-						delay(8000) 
+						delay(1000) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="waitingRP", cond=doswitch() )
+					 transition( edgeName="goto",targetState="waitingRP", cond=doswitchGuarded({monitoringDeviceRunning!=0 
+					}) )
+					transition( edgeName="goto",targetState="waitForMonitoringDeviceToRun", cond=doswitchGuarded({! (monitoringDeviceRunning!=0 
+					) }) )
 				}	 
 				state("waitingRP") { //this:State
 					action { //it:State
@@ -46,9 +52,9 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t00",targetState="handleMonitoringDeviceRunningStatus",cond=whenDispatch("monitoringDeviceRuns"))
-					transition(edgeName="t01",targetState="handleUpdateAshesLevel",cond=whenDispatch("ashesLevel"))
-					transition(edgeName="t02",targetState="handleRP",cond=whenDispatch("arrived_RP"))
+					 transition(edgeName="t05",targetState="handleMonitoringDeviceRunningStatus",cond=whenDispatch("monitoringDeviceRuns"))
+					transition(edgeName="t06",targetState="handleUpdateAshesLevel",cond=whenDispatch("ashesLevel"))
+					transition(edgeName="t07",targetState="handleRP",cond=whenDispatch("arrived_RP"))
 				}	 
 				state("handleMonitoringDeviceRunningStatus") { //this:State
 					action { //it:State
@@ -63,8 +69,8 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				 	 		stateTimer = TimerActor("timer_handleMonitoringDeviceRunningStatus", 
 				 	 					  scope, context!!, "local_tout_"+name+"_handleMonitoringDeviceRunningStatus", 1000.toLong() )  //OCT2023
 					}	 	 
-					 transition(edgeName="t03",targetState="ackMonitoringDeviceRunningStatus",cond=whenTimeout("local_tout_"+name+"_handleMonitoringDeviceRunningStatus"))   
-					transition(edgeName="t04",targetState="handleMonitoringDeviceRunningStatus",cond=whenDispatch("monitoringDeviceRuns"))
+					 transition(edgeName="t08",targetState="ackMonitoringDeviceRunningStatus",cond=whenTimeout("local_tout_"+name+"_handleMonitoringDeviceRunningStatus"))   
+					transition(edgeName="t09",targetState="handleMonitoringDeviceRunningStatus",cond=whenDispatch("monitoringDeviceRuns"))
 				}	 
 				state("ackMonitoringDeviceRunningStatus") { //this:State
 					action { //it:State
@@ -80,13 +86,13 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				}	 
 				state("waitForMonitoringDeviceToRun") { //this:State
 					action { //it:State
-						CommUtils.outred("$name waiting for monitoringDevice to run again")
+						CommUtils.outred("$name waiting for monitoringDevice to run")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t05",targetState="handleMonitoringDeviceRunningStatus",cond=whenDispatch("monitoringDeviceRuns"))
+					 transition(edgeName="t010",targetState="handleMonitoringDeviceRunningStatus",cond=whenDispatch("monitoringDeviceRuns"))
 				}	 
 				state("handleRP") { //this:State
 					action { //it:State
@@ -97,7 +103,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t06",targetState="handleRPInBurnin",cond=whenDispatch("rpInBurnin"))
+					 transition(edgeName="t011",targetState="handleRPInBurnin",cond=whenDispatch("rpInBurnin"))
 				}	 
 				state("handleRPInBurnin") { //this:State
 					action { //it:State
@@ -108,7 +114,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t07",targetState="handleEndBurning",cond=whenEvent("endBurning"))
+					 transition(edgeName="t012",targetState="handleEndBurning",cond=whenEvent("endBurning"))
 				}	 
 				state("handleEndBurning") { //this:State
 					action { //it:State
@@ -118,7 +124,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t08",targetState="endRoute",cond=whenDispatch("newAshes"))
+					 transition(edgeName="t013",targetState="endRoute",cond=whenDispatch("newAshes"))
 				}	 
 				state("endRoute") { //this:State
 					action { //it:State
@@ -130,8 +136,8 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				 	 		stateTimer = TimerActor("timer_endRoute", 
 				 	 					  scope, context!!, "local_tout_"+name+"_endRoute", 2000.toLong() )  //OCT2023
 					}	 	 
-					 transition(edgeName="t09",targetState="waitingRP",cond=whenTimeout("local_tout_"+name+"_endRoute"))   
-					transition(edgeName="t010",targetState="handleUpdateAshesLevel",cond=whenDispatch("ashesLevel"))
+					 transition(edgeName="t014",targetState="waitingRP",cond=whenTimeout("local_tout_"+name+"_endRoute"))   
+					transition(edgeName="t015",targetState="handleUpdateAshesLevel",cond=whenDispatch("ashesLevel"))
 				}	 
 				state("handleUpdateAshesLevel") { //this:State
 					action { //it:State
@@ -149,8 +155,8 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				 	 		stateTimer = TimerActor("timer_handleUpdateAshesLevel", 
 				 	 					  scope, context!!, "local_tout_"+name+"_handleUpdateAshesLevel", 2000.toLong() )  //OCT2023
 					}	 	 
-					 transition(edgeName="t011",targetState="ashCheckFinish",cond=whenTimeout("local_tout_"+name+"_handleUpdateAshesLevel"))   
-					transition(edgeName="t012",targetState="handleUpdateAshesLevel",cond=whenDispatch("ashesLevel"))
+					 transition(edgeName="t016",targetState="ashCheckFinish",cond=whenTimeout("local_tout_"+name+"_handleUpdateAshesLevel"))   
+					transition(edgeName="t017",targetState="handleUpdateAshesLevel",cond=whenDispatch("ashesLevel"))
 				}	 
 				state("ashCheckFinish") { //this:State
 					action { //it:State
@@ -172,7 +178,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t013",targetState="handleUpdateAshesLevel",cond=whenDispatch("ashesLevel"))
+					 transition(edgeName="t018",targetState="handleUpdateAshesLevel",cond=whenDispatch("ashesLevel"))
 				}	 
 			}
 		}

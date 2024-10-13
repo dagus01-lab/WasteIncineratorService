@@ -24,7 +24,7 @@ Dispatch newAshes : newAshes(N) "command that simulate the arrival of new RP's a
 
 //Messaggio per notificare lo stato del AshStorage al WIS
 Dispatch ashesLevel : ashesLevel(N) "Event that simulates the level of the ashstorage container"
-Event statoAshStorage : statoAshStorage(N)  "AshStorage info: 0 is not empty, 1 otherwise"
+/*Event*/Dispatch statoAshStorage : statoAshStorage(N)  "AshStorage info: 0 is not empty, 1 otherwise"
 
 //Messaggio per notificare al wis che il monitoringDevice non sta più mandando aggiornamenti o che è ripartito
 Dispatch monitoringDeviceRuns:monitoringDeviceRuns(N) "message that represents the level of the ash storage (1 if it is up, 0 otherwise)"
@@ -128,23 +128,81 @@ QActor wismonitoringdeviceproxy context ctx_waste_incinerator_service{
 	Goto wait
 }
 */
+QActor wisfacade context ctx_waste_incinerator_service{
+	State s0 initial{
+		delay 1000
+		println("$name STARTS") color yellow
+		observeResource scalemock msgid arrived_RP
+		observeResource monitoring_device_mok msgid statoAshStorage
+		observeResource incinerator msgid incineratorState
+		observeResource oprobot msgid opRobotState
+		observeResource oprobot msgid opRobotJob
+	}
+	Goto wait
+	State wait{
+		
+	}
+	Transition t0 whenMsg arrived_RP-> handle_arrived_RP
+				  whenMsg statoAshStorage -> handle_statoAshStorage
+				  whenMsg incineratorState -> handle_incineratorState
+				  whenMsg opRobotState -> handle_opRobotState
+				  whenMsg opRobotJob -> handle_opRobotJob
+	State handle_arrived_RP{
+		onMsg(arrived_RP:arrived_RP(N)){
+			[#var Payload = payloadArg(0)#]
+			updateResource[#"arrived_RP($Payload)"#]
+		}
+	}
+	Goto wait
+	State handle_statoAshStorage{
+		onMsg(statoAshStorage:statoAshStorage(N)){
+			[#var Payload = payloadArg(0)#]
+			updateResource[#"statoAshStorage($Payload)"#]
+		}
+	}
+	Goto wait
+	State handle_incineratorState{
+		onMsg(incineratorState:incineratorState(N)){
+			[#var Payload = payloadArg(0)#]
+			updateResource[#"incineratorState($Payload)"#]
+		}
+	}
+	Goto wait
+	State handle_opRobotState{
+		onMsg(opRobotState:opRobotState(N)){
+			[#var Payload = payloadArg(0)#]
+			updateResource[#"opRobotState($Payload)"#]
+		}
+	}
+	Goto wait
+	State handle_opRobotJob{
+		onMsg(opRobotJob:opRobotJob(N)){
+			[#var Payload = payloadArg(0)#]
+			updateResource[#"opRobotJob($Payload)"#]
+		}
+	}
+	Goto wait
+}
+
 //--------------------------------Attore WIS-----------------------------------------------------------------
 QActor wis context ctx_waste_incinerator_service{
 	[# 
 		var AshStorageStatus = 0 
 		var RPs = 0
-		var monitoringDeviceRunning = 0
+		var monitoringDeviceRunning = 1
 	#]
 	
 	State s0 initial{
-		delay 500
+		delay 4000
+		observeResource scalemock msgid arrived_RP
+		observeResource monitoring_device_mok msgid statoAshStorage
+		delay 1000
 		println("$name STARTS") color green
 		//mando messaggio di attivazione del Incinerator
 		forward incinerator -m activationCommand : activationCommand(1)
-		delay 8000
+		delay 1000
 	}
-	Goto waitingRP
-	
+	Goto waitingRP if [#monitoringDeviceRunning!=0#] else waitForMonitoringDeviceToRun
 	//Stato che simula l'attesa di un nuovo RP nel WasteStorage
 	State waitingRP{
 	}
@@ -167,7 +225,7 @@ QActor wis context ctx_waste_incinerator_service{
 	}
 	Goto waitForMonitoringDeviceToRun if [#monitoringDeviceRunning==0#] else waitingRP
 	State waitForMonitoringDeviceToRun{
-		println("$name waiting for monitoringDevice to run again") color red
+		println("$name waiting for monitoringDevice to run") color red
 	}
 	Transition t0 whenMsg monitoringDeviceRuns -> handleMonitoringDeviceRunningStatus
 	
@@ -417,7 +475,7 @@ QActor scalemock context ctx_waste_incinerator_service{
 	
 	State simulateRP {
 		delay 5000
-		forward wis -m arrived_RP:arrived_RP(1)
+		updateResource[#"arrived_RP(1)"#]
 		//delay 38000
 		//forward wis -m arrived_RP : arrived_RP(1)
 	}

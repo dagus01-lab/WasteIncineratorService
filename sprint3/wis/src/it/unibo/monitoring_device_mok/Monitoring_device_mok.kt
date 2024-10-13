@@ -44,7 +44,7 @@ class Monitoring_device_mok ( name: String, scope: CoroutineScope, isconfined: B
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t039",targetState="handleAshes",cond=whenDispatch("newAshes"))
+					 transition(edgeName="t044",targetState="handleAshes",cond=whenDispatch("newAshes"))
 				}	 
 				state("handleAshes") { //this:State
 					action { //it:State
@@ -65,8 +65,8 @@ class Monitoring_device_mok ( name: String, scope: CoroutineScope, isconfined: B
 				 	 		stateTimer = TimerActor("timer_handleAshes", 
 				 	 					  scope, context!!, "local_tout_"+name+"_handleAshes", 40000.toLong() )  //OCT2023
 					}	 	 
-					 transition(edgeName="t040",targetState="simulateRemoveAshes",cond=whenTimeout("local_tout_"+name+"_handleAshes"))   
-					transition(edgeName="t041",targetState="handleAshes",cond=whenDispatch("newAshes"))
+					 transition(edgeName="t045",targetState="simulateRemoveAshes",cond=whenTimeout("local_tout_"+name+"_handleAshes"))   
+					transition(edgeName="t046",targetState="handleAshes",cond=whenDispatch("newAshes"))
 				}	 
 				state("simulateRemoveAshes") { //this:State
 					action { //it:State
@@ -79,7 +79,7 @@ class Monitoring_device_mok ( name: String, scope: CoroutineScope, isconfined: B
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t042",targetState="handleAshes",cond=whenDispatch("newAshes"))
+					 transition(edgeName="t047",targetState="handleAshes",cond=whenDispatch("newAshes"))
 				}	 
 			}
 		}

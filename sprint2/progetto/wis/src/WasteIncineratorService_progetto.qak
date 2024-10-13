@@ -140,7 +140,7 @@ QActor wis context ctx_waste_incinerator_service{
 		forward incinerator -m activationCommand : activationCommand(1)
 		delay 8000
 	}
-	Goto waitingRP
+	Goto waitingRP if [#monitoringDeviceRunning!=0#] else waitForMonitoringDeviceToRun
 	
 	//Stato che simula l'attesa di un nuovo RP nel WasteStorage
 	State waitingRP{

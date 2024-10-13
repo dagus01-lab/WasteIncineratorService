@@ -22,22 +22,20 @@ public class FacadeBuilder {
         //CommUtils.outred("FacadeBuilder create wsHandler=" + wsHandler);
 //        List<String> config = QaksysConfigSupport.readConfig("facadeConfig.json");
 //        if( config != null ) {
-        for(ActorHost a: ApplSystemInfo.observedHosts) {
-        	String qakSysHost    = a.qakSysHost;
-            String ctxportStr    = a.ctxportStr;
-            String qakSysCtx     = a.qakSysCtx;
-            String applActorName = a.applActorName;
+            String qakSysHost    = ApplSystemInfo.qakSysHost;
+            String ctxportStr    = ApplSystemInfo.ctxportStr;
+            String qakSysCtx     = ApplSystemInfo.qakSysCtx;
+            String applActorName = ApplSystemInfo.applActorName;
 
-            a.obs = new CoapObserver(guiCore, applActorName);
+            CoapObserver obs = new CoapObserver(guiCore, applActorName);
             String saddr   = qakSysHost + ":" + ctxportStr;
             String resource = qakSysCtx + "/" + applActorName;
             CommUtils.outblue("FacadeBuilder | coapConn : " + saddr + " " + resource);
-            a.coapConn = new CoapConnection(qakSysHost + ":" + ctxportStr,
+            CoapConnection coapConn = new CoapConnection(qakSysHost + ":" + ctxportStr,
                     qakSysCtx + "/" + applActorName);
-            CommUtils.outblue("FacadeBuilder | Stabilita coapConn : " + a.coapConn);
-            a.coapConn.observeResource(a.obs);
-        }
-            
+            CommUtils.outblue("FacadeBuilder | Stabilita coapConn : " + coapConn);
+  
+            coapConn.observeResource(obs);
         //}
     }
 }

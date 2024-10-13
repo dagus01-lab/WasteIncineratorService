@@ -1,3 +1,8 @@
+{"actor":"wisfacade", "msgType":"dispatch", "curstate":"wait", "nextstate":"handle_arrived_RP", "msgId":"arrived_RP"}
+{"actor":"wisfacade", "msgType":"dispatch", "curstate":"wait", "nextstate":"handle_statoAshStorage", "msgId":"statoAshStorage"}
+{"actor":"wisfacade", "msgType":"dispatch", "curstate":"wait", "nextstate":"handle_incineratorState", "msgId":"incineratorState"}
+{"actor":"wisfacade", "msgType":"dispatch", "curstate":"wait", "nextstate":"handle_opRobotState", "msgId":"opRobotState"}
+{"actor":"wisfacade", "msgType":"dispatch", "curstate":"wait", "nextstate":"handle_opRobotJob", "msgId":"opRobotJob"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"waitingRP", "nextstate":"handleMonitoringDeviceRunningStatus", "msgId":"monitoringDeviceRuns"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"waitingRP", "nextstate":"handleUpdateAshesLevel", "msgId":"ashesLevel"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"waitingRP", "nextstate":"handleRP", "msgId":"arrived_RP"}
