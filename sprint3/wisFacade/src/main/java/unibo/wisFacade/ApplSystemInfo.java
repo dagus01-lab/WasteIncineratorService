@@ -17,16 +17,14 @@ setup() e getActorNamesInApplCtx() invocati da
   ApplguiCore create da FacadeBuilder
  */
 public class ApplSystemInfo {
-    public static String qakSysHost;
-    public static String qakSysCtx;
-    public static String applActorName;
-    public static String ctxportStr;
-    public static int ctxport;
-    public static String facadeportStr;
-    public static int facadeport;
-    public static String appName;
-
-    private static Prolog pengine;
+	public static String brokerProto;
+	public static String brokerHost;
+	public static String brokerPortStr;
+	public static int brokerPort;
+	public static String brokerURL;
+	public static String clientID;
+	public static String topic;
+	public static String appName = "wisFacade";
 
     /*
     facadeConfig.json
@@ -36,54 +34,18 @@ public class ApplSystemInfo {
       "sysdescr":"<appName>" }
      */
     public static void readConfig(){
-        List<String> config = QaksysConfigSupport.readConfig("facadeConfig.json");
+        List<String> config = MQTTConfigSupport.readConfig("facadeConfig.json");
         if( config != null ) {
-            qakSysHost    = config.get(0);
-            ctxportStr    = config.get(1);
-            qakSysCtx     = config.get(2);
-            applActorName = config.get(3);
-            facadeportStr = config.get(4);
-            appName       = config.get(5);
-            ctxport       = Integer.parseInt(ctxportStr);
-            facadeport    = Integer.parseInt(facadeportStr);
+            brokerProto    = config.get(0);
+            brokerHost    = config.get(1);
+            brokerPortStr     = config.get(2);
+            clientID = config.get(3);
+            topic = config.get(4);
+            brokerPort       = Integer.parseInt(brokerPortStr);
+            brokerURL = brokerProto+"://"+brokerHost+":"+brokerPortStr;
         }
 
         //setup();
         //getActorNamesInApplCtx( );
-    }
-
-    public  static List<String> getActorNamesInApplCtx( ) {
-        //CommUtils.outcyan( "ApplSystemInfo | getActorNames ctx=" + ctx  );
-        List<String> actors = getAllActorNames(qakSysCtx);
-        CommUtils.outcyan( "ApplSystemInfo ACTORS ON THE localhost  "  );
-        actors.forEach( a -> CommUtils.outcyan( a) );
-
-        return actors;
-    }
-
-    public static List<String> getAllActorNames(String ctxName )  {
-        try {
-            SolveInfo actorNamesSol = pengine.solve("getActorNames(A," + ctxName + ")."  );
-            String actorNames = actorNamesSol.getVarValue("A").toString();
-            return  Arrays.asList(actorNames.replace("[", "")
-                    .replace("]", "").split(","));
-        } catch (Exception e) {
-            CommUtils.outred("ApplSystemInfo | getAllActorNames");
-            return new ArrayList<String>();
-        }
-    }
-
-    public static void setup() {
-        try {
-            pengine = new Prolog();
-            Theory systemTh = new Theory(new FileInputStream(appName + ".pl"));
-            Theory rulesTh  = new Theory(new FileInputStream("sysRules.pl"));
-            //CommUtils.outblue("ApplSystemInfo | setup systemTh:\n" + systemTh);
-            CommUtils.outblue("" + systemTh);
-            pengine.addTheory(systemTh);
-            pengine.addTheory(rulesTh);
-        } catch (Exception e) {
-            CommUtils.outred("ApplSystemInfo | setup ERROR:" + e.getMessage());
-        }
     }
 }

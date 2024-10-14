@@ -24,14 +24,7 @@ public class WSHandler extends AbstractWebSocketHandler {
     private final List<WebSocketSession> sessions               = new ArrayList<>();
     private final Map<String, WebSocketSession> pendingRequests = new HashMap<>();
     private final Map<String, WebSocketSession> curSessions     = new HashMap<>();
-    private ApplguiCore guiCore;
 
-    private static int namecounter = 1;  
-
-    //Injiection
-    public void setGuiCore(ApplguiCore gui) {
-        guiCore = gui;
-    }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -49,19 +42,6 @@ public class WSHandler extends AbstractWebSocketHandler {
         curSessions.remove( session.getId() );
         System.out.println("WSH | Removed " + session);
         super.afterConnectionClosed(session, status);
-    }
-
-    // messaggi in arrivo da client
-    @Override
-    protected void handleTextMessage(WebSocketSession session,
-                                     TextMessage message) {
-        String msg = message.getPayload();
-        CommUtils.outgreen("WSH | Received: " + msg + " " + session.getId()) ;
-        String sendermockname  = "gui" + namecounter++;
-        CommUtils.outgreen("WSH | sendermockname: " + sendermockname) ;
-        //Memorizzo la sessione del sendermockname
-        curSessions.put(sendermockname,session);
-        guiCore.handleWsMsg( sendermockname,  msg ); //gestisce dorequest e docmd e reply ad ask
     }
 
     protected  void sendToOne(String msg) {

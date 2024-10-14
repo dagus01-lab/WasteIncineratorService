@@ -36,6 +36,8 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outyellow("$name STARTS")
+						connectToMqttBroker( "tcp://localhost:8081", "oprobotnat" )
+						CommUtils.outblack("$name connected to MQTT server")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -54,9 +56,9 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 				 	 		stateTimer = TimerActor("timer_engage", 
 				 	 					  scope, context!!, "local_tout_"+name+"_engage", 1000.toLong() )  //OCT2023
 					}	 	 
-					 transition(edgeName="t019",targetState="noResponse",cond=whenTimeout("local_tout_"+name+"_engage"))   
-					transition(edgeName="t020",targetState="waitingWorking",cond=whenReply("engagedone"))
-					transition(edgeName="t021",targetState="end",cond=whenReply("engagerefused"))
+					 transition(edgeName="t018",targetState="noResponse",cond=whenTimeout("local_tout_"+name+"_engage"))   
+					transition(edgeName="t019",targetState="waitingWorking",cond=whenReply("engagedone"))
+					transition(edgeName="t020",targetState="end",cond=whenReply("engagerefused"))
 				}	 
 				state("noResponse") { //this:State
 					action { //it:State
@@ -70,22 +72,22 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 				}	 
 				state("waitingWorking") { //this:State
 					action { //it:State
-						updateResourceRep("opRobotState(HOME)" 
-						)
-						updateResourceRep("opRobotJob(Waiting for an RP)" 
-						)
+						//val m = MsgUtil.buildEvent(name, "opRobotState", "opRobotState("HOME")" ) 
+						publish(MsgUtil.buildEvent(name,"opRobotState","opRobotState("HOME")").toString(), "wisinfo" )   
+						//val m = MsgUtil.buildEvent(name, "opRobotJob", "opRobotJob("Waiting for an RP")" ) 
+						publish(MsgUtil.buildEvent(name,"opRobotJob","opRobotJob("Waiting for an RP")").toString(), "wisinfo" )   
 						CommUtils.outyellow("$name is in HOME position waiting for working")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t022",targetState="takeRP",cond=whenDispatch("arrived_RP"))
+					 transition(edgeName="t021",targetState="takeRP",cond=whenDispatch("arrived_RP"))
 				}	 
 				state("takeRP") { //this:State
 					action { //it:State
-						updateResourceRep("opRobotJob(Going to WASTEIN..)" 
-						)
+						//val m = MsgUtil.buildEvent(name, "opRobotJob", "opRobotJob("Going to WASTEIN..")" ) 
+						publish(MsgUtil.buildEvent(name,"opRobotJob","opRobotJob("Going to WASTEIN..")").toString(), "wisinfo" )   
 						CommUtils.outyellow("OpRobot is going to take an RP..")
 						request("moverobot", "moverobot($WASTEINx,$WASTEINy)" ,"basicrobot" )  
 						//genTimer( actor, state )
@@ -93,24 +95,24 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t023",targetState="bringRPtoBURNIN",cond=whenReply("moverobotdone"))
-					transition(edgeName="t024",targetState="exit",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t022",targetState="bringRPtoBURNIN",cond=whenReply("moverobotdone"))
+					transition(edgeName="t023",targetState="exit",cond=whenReply("moverobotfailed"))
 				}	 
 				state("bringRPtoBURNIN") { //this:State
 					action { //it:State
 						delay(2000) 
 						request("moverobot", "moverobot($BURNINx,$BURNINy)" ,"basicrobot" )  
-						updateResourceRep("opRobotState(WASTEIN)" 
-						)
-						updateResourceRep("opRobotJob(Going to BURNIN..)" 
-						)
+						//val m = MsgUtil.buildEvent(name, "opRobotState", "opRobotState("WASTEIN")" ) 
+						publish(MsgUtil.buildEvent(name,"opRobotState","opRobotState("WASTEIN")").toString(), "wisinfo" )   
+						//val m = MsgUtil.buildEvent(name, "opRobotJob", "opRobotJob("Going to BURNIN..")" ) 
+						publish(MsgUtil.buildEvent(name,"opRobotJob","opRobotJob("Going to BURNIN..")").toString(), "wisinfo" )   
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t025",targetState="returnHOME",cond=whenReply("moverobotdone"))
-					transition(edgeName="t026",targetState="exit",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t024",targetState="returnHOME",cond=whenReply("moverobotdone"))
+					transition(edgeName="t025",targetState="exit",cond=whenReply("moverobotfailed"))
 				}	 
 				state("returnHOME") { //this:State
 					action { //it:State
@@ -118,60 +120,60 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 						forward("rpInBurnin", "rpInBurnin(1)" ,"wis" ) 
 						CommUtils.outyellow("An RP is in BURNIN port")
 						request("moverobot", "moverobot($HOMEx,$HOMEy)" ,"basicrobot" )  
-						updateResourceRep("opRobotState(BURNIN)" 
-						)
-						updateResourceRep("opRobotJob(Returning HOME..)" 
-						)
+						//val m = MsgUtil.buildEvent(name, "opRobotState", "opRobotState("BURNIN")" ) 
+						publish(MsgUtil.buildEvent(name,"opRobotState","opRobotState("BURNIN")").toString(), "wisinfo" )   
+						//val m = MsgUtil.buildEvent(name, "opRobotJob", "opRobotJob("Returning HOME..")" ) 
+						publish(MsgUtil.buildEvent(name,"opRobotJob","opRobotJob("Returning HOME..")").toString(), "wisinfo" )   
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t027",targetState="waitingForIncinerator",cond=whenReply("moverobotdone"))
-					transition(edgeName="t028",targetState="exit",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t026",targetState="waitingForIncinerator",cond=whenReply("moverobotdone"))
+					transition(edgeName="t027",targetState="exit",cond=whenReply("moverobotfailed"))
 				}	 
 				state("waitingForIncinerator") { //this:State
 					action { //it:State
 						CommUtils.outyellow("Waiting for incinerator to finish its job")
-						updateResourceRep("opRobotState(HOME)" 
-						)
-						updateResourceRep("opRobotJob(Waiting for incinerator to finish its job)" 
-						)
+						//val m = MsgUtil.buildEvent(name, "opRobotState", "opRobotState("HOME")" ) 
+						publish(MsgUtil.buildEvent(name,"opRobotState","opRobotState("HOME")").toString(), "wisinfo" )   
+						//val m = MsgUtil.buildEvent(name, "opRobotJob", "opRobotJob("Waiting for incinerator to finish its job")" ) 
+						publish(MsgUtil.buildEvent(name,"opRobotJob","opRobotJob("Waiting for incinerator to finish its job")").toString(), "wisinfo" )   
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t029",targetState="takeAshFromBURNOUT",cond=whenEvent("endBurning"))
+					 transition(edgeName="t028",targetState="takeAshFromBURNOUT",cond=whenEvent("endBurning"))
 				}	 
 				state("takeAshFromBURNOUT") { //this:State
 					action { //it:State
 						request("moverobot", "moverobot($BURNOUTx,$BURNOUTy)" ,"basicrobot" )  
-						updateResourceRep("opRobotJob(Going to take ashes from BURNOUT..)" 
-						)
+						//val m = MsgUtil.buildEvent(name, "opRobotJob", "opRobotJob("Going to take ashes from BURNOUT..")" ) 
+						publish(MsgUtil.buildEvent(name,"opRobotJob","opRobotJob("Going to take ashes from BURNOUT..")").toString(), "wisinfo" )   
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t030",targetState="bringAshtoASHOUT",cond=whenReply("moverobotdone"))
-					transition(edgeName="t031",targetState="exit",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t029",targetState="bringAshtoASHOUT",cond=whenReply("moverobotdone"))
+					transition(edgeName="t030",targetState="exit",cond=whenReply("moverobotfailed"))
 				}	 
 				state("bringAshtoASHOUT") { //this:State
 					action { //it:State
 						delay(2000) 
 						request("moverobot", "moverobot($ASHOUTx,$ASHOUTy)" ,"basicrobot" )  
-						updateResourceRep("opRobotState(BURNOUT)" 
-						)
-						updateResourceRep("opRobotJob(Going to take out ashes to ASHOUT..)" 
-						)
+						//val m = MsgUtil.buildEvent(name, "opRobotState", "opRobotState("BURNOUT")" ) 
+						publish(MsgUtil.buildEvent(name,"opRobotState","opRobotState("BURNOUT")").toString(), "wisinfo" )   
+						//val m = MsgUtil.buildEvent(name, "opRobotJob", "opRobotJob("Going to take out ashes to ASHOUT..")" ) 
+						publish(MsgUtil.buildEvent(name,"opRobotJob","opRobotJob("Going to take out ashes to ASHOUT..")").toString(), "wisinfo" )   
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t032",targetState="restartJob",cond=whenReply("moverobotdone"))
-					transition(edgeName="t033",targetState="exit",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t031",targetState="restartJob",cond=whenReply("moverobotdone"))
+					transition(edgeName="t032",targetState="exit",cond=whenReply("moverobotfailed"))
 				}	 
 				state("restartJob") { //this:State
 					action { //it:State
@@ -179,18 +181,18 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 						CommUtils.outyellow("The ash has been taken out")
 						forward("newAshes", "newAshes(1)" ,"wis" ) 
 						request("moverobot", "moverobot($HOMEx,$HOMEy)" ,"basicrobot" )  
-						updateResourceRep("opRobotState(ASHOUT)" 
-						)
-						updateResourceRep("opRobotJob(Returning HOME..)" 
-						)
+						//val m = MsgUtil.buildEvent(name, "opRobotState", "opRobotState("ASHOUT")" ) 
+						publish(MsgUtil.buildEvent(name,"opRobotState","opRobotState("ASHOUT")").toString(), "wisinfo" )   
+						//val m = MsgUtil.buildEvent(name, "opRobotJob", "opRobotJob("Returning HOME..")" ) 
+						publish(MsgUtil.buildEvent(name,"opRobotJob","opRobotJob("Returning HOME..")").toString(), "wisinfo" )   
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t034",targetState="takeRpBeforeFinishPlan",cond=whenDispatch("arrived_RP"))
-					transition(edgeName="t035",targetState="waitingWorking",cond=whenReply("moverobotdone"))
-					transition(edgeName="t036",targetState="exit",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t033",targetState="takeRpBeforeFinishPlan",cond=whenDispatch("arrived_RP"))
+					transition(edgeName="t034",targetState="waitingWorking",cond=whenReply("moverobotdone"))
+					transition(edgeName="t035",targetState="exit",cond=whenReply("moverobotfailed"))
 				}	 
 				state("takeRpBeforeFinishPlan") { //this:State
 					action { //it:State
@@ -202,8 +204,8 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t037",targetState="testko",cond=whenReply("moverobotdone"))
-					transition(edgeName="t038",targetState="takeRP",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t036",targetState="testko",cond=whenReply("moverobotdone"))
+					transition(edgeName="t037",targetState="takeRP",cond=whenReply("moverobotfailed"))
 				}	 
 				state("testko") { //this:State
 					action { //it:State

@@ -1,1 +1,1 @@
-{"host":"localhost", "port":"8125", "context":"ctx_waste_incinerator_service", "facade": "wisfacade", "facadeport":"8085", "sysdescr":"waste incinerator service"}
+{"brokerProto":"tcp", "brokerHost":"localhost", "brokerPort":"8081", "clientID": "wisfacade", "topic":"wisinfo"}

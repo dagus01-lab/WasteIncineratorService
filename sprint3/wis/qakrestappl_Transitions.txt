@@ -1,8 +1,3 @@
-{"actor":"wisfacade", "msgType":"dispatch", "curstate":"wait", "nextstate":"handle_arrived_RP", "msgId":"arrived_RP"}
-{"actor":"wisfacade", "msgType":"dispatch", "curstate":"wait", "nextstate":"handle_statoAshStorage", "msgId":"statoAshStorage"}
-{"actor":"wisfacade", "msgType":"dispatch", "curstate":"wait", "nextstate":"handle_incineratorState", "msgId":"incineratorState"}
-{"actor":"wisfacade", "msgType":"dispatch", "curstate":"wait", "nextstate":"handle_opRobotState", "msgId":"opRobotState"}
-{"actor":"wisfacade", "msgType":"dispatch", "curstate":"wait", "nextstate":"handle_opRobotJob", "msgId":"opRobotJob"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"waitingRP", "nextstate":"handleMonitoringDeviceRunningStatus", "msgId":"monitoringDeviceRuns"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"waitingRP", "nextstate":"handleUpdateAshesLevel", "msgId":"ashesLevel"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"waitingRP", "nextstate":"handleRP", "msgId":"arrived_RP"}
@@ -18,6 +13,3 @@
 {"actor":"incinerator", "msgType":"dispatch", "curstate":"s0", "nextstate":"turnOn", "msgId":"activationCommand"}
 {"actor":"incinerator", "msgType":"dispatch", "curstate":"turnOn", "nextstate":"handleStartBurning", "msgId":"startBurning"}
 {"actor":"incinerator", "msgType":"dispatch", "curstate":"handleEndBurning", "nextstate":"handleStartBurning", "msgId":"startBurning"}
-{"actor":"monitoring_device_mok", "msgType":"dispatch", "curstate":"emitState", "nextstate":"handleAshes", "msgId":"newAshes"}
-{"actor":"monitoring_device_mok", "msgType":"dispatch", "curstate":"handleAshes", "nextstate":"handleAshes", "msgId":"newAshes"}
-{"actor":"monitoring_device_mok", "msgType":"dispatch", "curstate":"simulateRemoveAshes", "nextstate":"handleAshes", "msgId":"newAshes"}
