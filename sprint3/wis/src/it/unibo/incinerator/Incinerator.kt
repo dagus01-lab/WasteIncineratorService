@@ -25,16 +25,13 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						delay(1000) 
 						CommUtils.outred("$name STARTS")
-						connectToMqttBroker( "tcp://localhost:8081", "incineratornat" )
-						CommUtils.outgreen("$name | CREATED  (and connected to mosquitto) ... ")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t038",targetState="turnOn",cond=whenDispatch("activationCommand"))
+					 transition(edgeName="t028",targetState="turnOn",cond=whenDispatch("activationCommand"))
 				}	 
 				state("turnOn") { //this:State
 					action { //it:State
@@ -44,13 +41,14 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t039",targetState="handleStartBurning",cond=whenDispatch("startBurning"))
+					 transition(edgeName="t029",targetState="handleStartBurning",cond=whenDispatch("startBurning"))
 				}	 
 				state("handleStartBurning") { //this:State
 					action { //it:State
 						CommUtils.outred("Incinerator is burning...")
-						//val m = MsgUtil.buildEvent(name, "statoIncinerator", "statoIncinerator(1)" ) 
-						publish(MsgUtil.buildEvent(name,"statoIncinerator","statoIncinerator(1)").toString(), "wisinfo" )   
+						 stato = 1  
+						updateResourceRep( "statoIncinerator(1)"  
+						)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -58,19 +56,20 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 				 	 		stateTimer = TimerActor("timer_handleStartBurning", 
 				 	 					  scope, context!!, "local_tout_"+name+"_handleStartBurning", BTIME )  //OCT2023
 					}	 	 
-					 transition(edgeName="t040",targetState="handleEndBurning",cond=whenTimeout("local_tout_"+name+"_handleStartBurning"))   
+					 transition(edgeName="t030",targetState="handleEndBurning",cond=whenTimeout("local_tout_"+name+"_handleStartBurning"))   
 				}	 
 				state("handleEndBurning") { //this:State
 					action { //it:State
 						emit("endBurning", "endBurning(1)" ) 
-						//val m = MsgUtil.buildEvent(name, "statoIncinerator", "statoIncinerator(0)" ) 
-						publish(MsgUtil.buildEvent(name,"statoIncinerator","statoIncinerator(0)").toString(), "wisinfo" )   
+						updateResourceRep( "statoIncinerator(0)"  
+						)
+						 stato = 0  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t041",targetState="handleStartBurning",cond=whenDispatch("startBurning"))
+					 transition(edgeName="t031",targetState="handleStartBurning",cond=whenDispatch("startBurning"))
 				}	 
 			}
 		}

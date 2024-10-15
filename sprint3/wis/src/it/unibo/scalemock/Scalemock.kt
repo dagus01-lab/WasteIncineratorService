@@ -32,13 +32,12 @@ class Scalemock ( name: String, scope: CoroutineScope, isconfined: Boolean=false
 				 	 		stateTimer = TimerActor("timer_s0", 
 				 	 					  scope, context!!, "local_tout_"+name+"_s0", 1000.toLong() )  //OCT2023
 					}	 	 
-					 transition(edgeName="t043",targetState="simulateRP",cond=whenTimeout("local_tout_"+name+"_s0"))   
+					 transition(edgeName="t037",targetState="simulateRP",cond=whenTimeout("local_tout_"+name+"_s0"))   
 				}	 
 				state("simulateRP") { //this:State
 					action { //it:State
 						delay(5000) 
-						updateResourceRep("arrived_RP(1)" 
-						)
+						forward("arrived_RP", "arrived_RP(1)" ,"wis" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

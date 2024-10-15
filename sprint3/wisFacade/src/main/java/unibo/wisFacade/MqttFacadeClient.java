@@ -8,14 +8,12 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Component
 public class MqttFacadeClient {
 
     private MqttClient client;
     private String mytopic;
     private int MAX_RETRIES = 10;
 
-    @Autowired
     public MqttFacadeClient(ApplguiCore guiCore, String brokerURL, String clientID, String topic) throws MqttException {
     	for(int i = 0; i<MAX_RETRIES; i++) {
     		try {

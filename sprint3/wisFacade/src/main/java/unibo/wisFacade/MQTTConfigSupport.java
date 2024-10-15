@@ -53,6 +53,7 @@ public class MQTTConfigSupport {
        String port = jsonObject.get("brokerPort").toString();
        String clientID = jsonObject.get("clientID").toString();
        String topic = jsonObject.get("topic").toString();
+       String facadePort = jsonObject.get("facadeport").toString();
 
        List<String> outS = new ArrayList<String>();
        outS.add(protocol);
@@ -60,6 +61,7 @@ public class MQTTConfigSupport {
        outS.add(port);
        outS.add(clientID);
        outS.add(topic);
+       outS.add(facadePort);
        CommUtils.outyellow("MQTTConfigSupport | readTheContent " + outS.toString());
        return outS;
     }

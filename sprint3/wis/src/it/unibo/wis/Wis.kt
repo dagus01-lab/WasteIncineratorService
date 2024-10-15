@@ -21,26 +21,20 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
-		 
-				var AshStorageStatus = 0 
-				var RPs = 0
-				var monitoringDeviceRunning = 1
+		 var statoAshStorage = 0  
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						delay(1000) 
+						delay(500) 
 						CommUtils.outgreen("$name STARTS")
+						observeResource("192.168.1.105","8100","ctxmonitoringdevice","monitoringdevice","statoAshStorage")
 						forward("activationCommand", "activationCommand(1)" ,"incinerator" ) 
-						delay(1000) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="waitingRP", cond=doswitchGuarded({monitoringDeviceRunning!=0 
-					}) )
-					transition( edgeName="goto",targetState="waitForMonitoringDeviceToRun", cond=doswitchGuarded({! (monitoringDeviceRunning!=0 
-					) }) )
+					 transition( edgeName="goto",targetState="waitingRP", cond=doswitch() )
 				}	 
 				state("waitingRP") { //this:State
 					action { //it:State
@@ -49,47 +43,8 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t04",targetState="handleMonitoringDeviceRunningStatus",cond=whenDispatch("monitoringDeviceRuns"))
-					transition(edgeName="t05",targetState="handleUpdateAshesLevel",cond=whenDispatch("ashesLevel"))
-					transition(edgeName="t06",targetState="handleRP",cond=whenDispatch("arrived_RP"))
-				}	 
-				state("handleMonitoringDeviceRunningStatus") { //this:State
-					action { //it:State
-						if( checkMsgContent( Term.createTerm("monitoringDeviceRuns(N)"), Term.createTerm("monitoringDeviceRuns(N)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								monitoringDeviceRunning=payloadArg(0).toInt() 
-						}
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-				 	 		stateTimer = TimerActor("timer_handleMonitoringDeviceRunningStatus", 
-				 	 					  scope, context!!, "local_tout_"+name+"_handleMonitoringDeviceRunningStatus", 1000.toLong() )  //OCT2023
-					}	 	 
-					 transition(edgeName="t07",targetState="ackMonitoringDeviceRunningStatus",cond=whenTimeout("local_tout_"+name+"_handleMonitoringDeviceRunningStatus"))   
-					transition(edgeName="t08",targetState="handleMonitoringDeviceRunningStatus",cond=whenDispatch("monitoringDeviceRuns"))
-				}	 
-				state("ackMonitoringDeviceRunningStatus") { //this:State
-					action { //it:State
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="waitForMonitoringDeviceToRun", cond=doswitchGuarded({monitoringDeviceRunning==0 
-					}) )
-					transition( edgeName="goto",targetState="waitingRP", cond=doswitchGuarded({! (monitoringDeviceRunning==0 
-					) }) )
-				}	 
-				state("waitForMonitoringDeviceToRun") { //this:State
-					action { //it:State
-						CommUtils.outred("$name waiting for monitoringDevice to run")
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t09",targetState="handleMonitoringDeviceRunningStatus",cond=whenDispatch("monitoringDeviceRuns"))
+					 transition(edgeName="t00",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
+					transition(edgeName="t01",targetState="handleRP",cond=whenDispatch("arrived_RP"))
 				}	 
 				state("handleRP") { //this:State
 					action { //it:State
@@ -100,7 +55,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t010",targetState="handleRPInBurnin",cond=whenDispatch("rpInBurnin"))
+					 transition(edgeName="t02",targetState="handleRPInBurnin",cond=whenDispatch("rpInBurnin"))
 				}	 
 				state("handleRPInBurnin") { //this:State
 					action { //it:State
@@ -111,7 +66,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t011",targetState="handleEndBurning",cond=whenEvent("endBurning"))
+					 transition(edgeName="t03",targetState="handleEndBurning",cond=whenEvent("endBurning"))
 				}	 
 				state("handleEndBurning") { //this:State
 					action { //it:State
@@ -121,61 +76,46 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t012",targetState="endRoute",cond=whenDispatch("newAshes"))
+					 transition(edgeName="t04",targetState="endRoute",cond=whenDispatch("newAshes"))
 				}	 
 				state("endRoute") { //this:State
 					action { //it:State
-						CommUtils.outgreen("$name OpRobot has finished its route")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 				 	 		stateTimer = TimerActor("timer_endRoute", 
-				 	 					  scope, context!!, "local_tout_"+name+"_endRoute", 2000.toLong() )  //OCT2023
+				 	 					  scope, context!!, "local_tout_"+name+"_endRoute", 1000.toLong() )  //OCT2023
 					}	 	 
-					 transition(edgeName="t013",targetState="waitingRP",cond=whenTimeout("local_tout_"+name+"_endRoute"))   
-					transition(edgeName="t014",targetState="handleUpdateAshesLevel",cond=whenDispatch("ashesLevel"))
+					 transition(edgeName="t05",targetState="waitingRP",cond=whenTimeout("local_tout_"+name+"_endRoute"))   
+					transition(edgeName="t06",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
 				}	 
-				state("handleUpdateAshesLevel") { //this:State
+				state("handleUpdateStatoAshStorage") { //this:State
 					action { //it:State
-						CommUtils.outgreen("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
-						 	   
-						if( checkMsgContent( Term.createTerm("ashesLevel(N)"), Term.createTerm("ashesLevel(N)"), 
+						if( checkMsgContent( Term.createTerm("statoAshStorage(N)"), Term.createTerm("statoAshStorage(N)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								 AshStorageStatus = payloadArg(0).toInt() 
-								CommUtils.outgreen("AshStorageStatus: $AshStorageStatus")
+								 statoAshStorage = payloadArg(0).toInt()  
+								CommUtils.outgreen("AshStorageStatus: $statoAshStorage")
 						}
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
-				 	 		stateTimer = TimerActor("timer_handleUpdateAshesLevel", 
-				 	 					  scope, context!!, "local_tout_"+name+"_handleUpdateAshesLevel", 2000.toLong() )  //OCT2023
 					}	 	 
-					 transition(edgeName="t015",targetState="ashCheckFinish",cond=whenTimeout("local_tout_"+name+"_handleUpdateAshesLevel"))   
-					transition(edgeName="t016",targetState="handleUpdateAshesLevel",cond=whenDispatch("ashesLevel"))
-				}	 
-				state("ashCheckFinish") { //this:State
-					action { //it:State
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="waitingRP", cond=doswitchGuarded({ AshStorageStatus == 0  
+					 transition( edgeName="goto",targetState="waitingRP", cond=doswitchGuarded({ statoAshStorage == 0  
 					}) )
-					transition( edgeName="goto",targetState="waitingAshesToBeRemoved", cond=doswitchGuarded({! ( AshStorageStatus == 0  
+					transition( edgeName="goto",targetState="waitingAshesToBeRemoved", cond=doswitchGuarded({! ( statoAshStorage == 0  
 					) }) )
 				}	 
 				state("waitingAshesToBeRemoved") { //this:State
 					action { //it:State
-						CommUtils.outgreen("WIS is waiting for an operator to remove ashes in AshStorage...")
+						CommUtils.outgreen("WIS is waiting an operator to remove ashes in AshStorage...")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t017",targetState="handleUpdateAshesLevel",cond=whenDispatch("ashesLevel"))
+					 transition(edgeName="t07",targetState="handleUpdateStatoAshStorage",cond=whenDispatch("statoAshStorage"))
 				}	 
 			}
 		}
