@@ -1,0 +1,45 @@
+System scalemock
+
+Event new_RP : new_RP(N) "command that simulates the arrival of new RP"
+
+//Definizione dei contesti
+Context ctxscale ip [ host= "localhost"      port= 8200 ]
+
+QActor inputreader context ctxscale{
+	[#var input = ""#]
+	State s0 initial{
+		println("$name | STARTS") color green
+		println("Write arrived_RP to simulate the arrival of an RP") color green
+	}
+	Goto readinput
+	State readinput{
+		[#input = readLine()#]
+		if [#input.contentEquals("arrived_RP")#]{
+			emit new_RP:new_RP(1)
+		}
+		else {
+			println("Invalid input!") color green
+		}
+	}
+	Goto readinput
+}
+QActor scale context ctxscale{
+	State s0 initial{
+		println("$name | STARTS") color yellow
+		connectToMqttBroker "tcp://localhost:8081" clientid "scalenat"
+		publish "wisinfo" -m new_RP:new_RP(0)
+	}
+	Goto wait
+	State wait{
+		
+	}
+	Transition t0 	whenTime 10000->keepConnectionAlive
+					whenEvent new_RP->notifyNewRP
+	State notifyNewRP{
+		publish "wisinfo" -m new_RP:new_RP(1)
+	}
+	Goto wait
+	State keepConnectionAlive{
+		publish "wisinfo" -m new_RP:new_RP(0)
+	}
+}

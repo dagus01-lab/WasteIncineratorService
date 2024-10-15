@@ -53,7 +53,7 @@ class Wismonitoringdeviceproxy ( name: String, scope: CoroutineScope, isconfined
 				}	 
 				state("handleUpdateStatoAshStorage") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("statoAshStorage(N)"), Term.createTerm("statoAshStorage(N)"), 
+						if( checkMsgContent( Term.createTerm("statoAshStorage(N,D)"), Term.createTerm("statoAshStorage(N,D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 												if(timeoutExpired){

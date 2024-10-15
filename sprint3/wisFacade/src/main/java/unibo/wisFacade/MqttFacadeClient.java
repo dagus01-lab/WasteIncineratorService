@@ -6,7 +6,6 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Component
@@ -20,6 +19,8 @@ public class MqttFacadeClient {
     public MqttFacadeClient(ApplguiCore guiCore, String brokerURL, String clientID, String topic) throws MqttException {
     	for(int i = 0; i<MAX_RETRIES; i++) {
     		try {
+                System.out.println("ApplConfig: {url:"+brokerURL+", clientID:"+clientID+", topic:"+topic+"}");
+
     			client = new MqttClient(brokerURL, clientID);
                 this.mytopic = topic;
                 // Set a callback handler, similar to CoapHandler in CoAP

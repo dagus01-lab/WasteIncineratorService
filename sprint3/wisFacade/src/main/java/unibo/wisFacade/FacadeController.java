@@ -17,7 +17,7 @@ public class FacadeController {
     @Value("${spring.application.name}")
     String appNameOld;  //vedi application.properties
      
-    protected String mainPage = "WISGui"; //TODO: "WebRobot24Gui";  
+    protected String mainPage = "WISGui"; 
 
     public FacadeController(){
         CommUtils.outgreen (" --- FacadeController | STARTS " );

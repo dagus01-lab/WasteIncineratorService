@@ -43,6 +43,7 @@ public class ApplSystemInfo {
             topic = config.get(4);
             brokerPort       = Integer.parseInt(brokerPortStr);
             brokerURL = brokerProto+"://"+brokerHost+":"+brokerPortStr;
+            System.out.println("ApplConfig: {url:"+brokerURL+", clientID:"+clientID+", topic:"+topic+"}");
         }
 
         //setup();

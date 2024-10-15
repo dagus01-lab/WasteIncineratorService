@@ -21,6 +21,9 @@ class Wisscaleproxy ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
+		
+				var RPs = 0;
+				var previous_RPs = 0;
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -32,19 +35,24 @@ class Wisscaleproxy ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t00",targetState="handle_new_RP",cond=whenEvent("new_RP"))
+					 transition(edgeName="t00",targetState="handle_new_RP",cond=whenEvent("num_RP"))
 				}	 
 				state("handle_new_RP") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("new_RP(N)"), Term.createTerm("new_RP(N)"), 
+						if( checkMsgContent( Term.createTerm("num_RP(N)"), Term.createTerm("num_RP(N)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 												try{
-													var Status = payloadArg(0).toInt()
-								if( Status>0 
-								 ){forward("arrived_RP", "arrived_RP(1)" ,"wis" ) 
+													RPs = payloadArg(0).toInt()
+								if( RPs > 0 && RPs>previous_RPs 
+								 ){
+											      			for (i in previous_RPs..RPs-1) {
+								forward("arrived_RP", "arrived_RP(1)" ,"wis" ) 
+								
+											      			}
 								}
 								
+													previous_RPs = RPs
 												} catch(e:Exception){
 								CommUtils.outred("$name received invalid payload:${payloadArg(0)}")
 								
@@ -55,7 +63,7 @@ class Wisscaleproxy ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t01",targetState="handle_new_RP",cond=whenEvent("new_RP"))
+					 transition(edgeName="t01",targetState="handle_new_RP",cond=whenEvent("num_RP"))
 				}	 
 			}
 		}

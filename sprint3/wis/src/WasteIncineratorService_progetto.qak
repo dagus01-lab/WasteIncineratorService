@@ -3,7 +3,7 @@
 System waste_incinerator_service
 
 //Messaggio per la ricezione di un nuovo RP
-Event new_RP : new_RP(N) "event that simulates the arrival of a new RP"
+Event num_RP : num_RP(N) "event that simulates the arrival of a new RP"
 Dispatch arrived_RP : arrived_RP(N) 
 
 //Messaggio per notificare lo stato del Incinerator al WIS
@@ -24,7 +24,7 @@ Dispatch newAshes : newAshes(N) "command that simulate the arrival of new RP's a
 
 //Messaggio per notificare lo stato del AshStorage al WIS
 Dispatch ashesLevel : ashesLevel(N) "Event that simulates the level of the ashstorage container"
-Event statoAshStorage : statoAshStorage(N)  "AshStorage info: 0 is not empty, 1 otherwise"
+Event statoAshStorage : statoAshStorage(N, D)  "AshStorage info: 0 is not empty, 1 otherwise"
 
 //Messaggio per notificare al wis che il monitoringDevice non sta più mandando aggiornamenti o che è ripartito
 Dispatch monitoringDeviceRuns:monitoringDeviceRuns(N) "message that represents the level of the ash storage (1 if it is up, 0 otherwise)"
@@ -48,6 +48,10 @@ ExternalQActor basicrobot context ctxbasicrobot
 
 //--------------------------------Attori WIS-proxy-----------------------------------------------------------
 QActor wisscaleproxy context ctx_waste_incinerator_service{
+	[#
+		var RPs = 0;
+		var previous_RPs = 0;
+	#]
 	State s0 initial{
 		connectToMqttBroker "tcp://localhost:8081" clientid "wisscaleproxynat"
 		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "wisscaleproxynat"
@@ -55,24 +59,31 @@ QActor wisscaleproxy context ctx_waste_incinerator_service{
  		subscribe "wisinfo"
 		//si mette ad osservare lo stato del AshStorage fornito dal MonitoringDevice
 	}
-	Transition t0 whenEvent new_RP -> handle_new_RP
+	Transition t0 whenEvent num_RP -> handle_new_RP
 	State handle_new_RP{
-		onMsg(new_RP:new_RP(N)){
+		onMsg(num_RP:num_RP(N)){
 			[#
 				try{
-					var Status = payloadArg(0).toInt()
-			#]
-			if[#Status>0#]{
-				forward wis -m arrived_RP:arrived_RP(1)
-			}
-			[#
+					RPs = payloadArg(0).toInt()
+					#]
+					if[#RPs > 0 && RPs>previous_RPs#]{
+						[#
+			      			for (i in previous_RPs..RPs-1) {
+			      				#]
+									forward wis -m arrived_RP:arrived_RP(1)
+			      				[#
+			      			}
+			      		#]
+					}
+					[#
+					previous_RPs = RPs
 				} catch(e:Exception){
 					#]println("$name received invalid payload:${payloadArg(0)}") color red[#
 				}
 			#]
 		}
 	}
-	Transition t0 whenEvent new_RP -> handle_new_RP
+	Transition t0 whenEvent num_RP -> handle_new_RP
 }
 
 QActor wismonitoringdeviceproxy context ctx_waste_incinerator_service{
@@ -96,7 +107,7 @@ QActor wismonitoringdeviceproxy context ctx_waste_incinerator_service{
 	Transition t0 	whenTime 15000 -> handleTimeoutExpired
 					whenEvent statoAshStorage -> handleUpdateStatoAshStorage
 	State handleUpdateStatoAshStorage{
-		onMsg(statoAshStorage:statoAshStorage(N)){
+		onMsg(statoAshStorage:statoAshStorage(N, D)){
 			[#
 				if(timeoutExpired){
 					timeoutExpired = false

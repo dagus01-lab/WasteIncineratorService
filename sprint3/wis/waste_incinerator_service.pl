@@ -1,7 +1,7 @@
 %====================================================================================
 % waste_incinerator_service description   
 %====================================================================================
-event( new_RP, new_RP(N) ). %event that simulates the arrival of a new RP
+event( num_RP, num_RP(N) ). %event that simulates the arrival of a new RP
 dispatch( arrived_RP, arrived_RP(N) ).
 event( statoIncinerator, statoIncinerator(N) ). %Incinerator's burning status info: 0 is not burning, 1 otherwise
 dispatch( incineratorState, incineratorState(N) ).
@@ -14,7 +14,7 @@ event( opRobotJob, opRobotJob(N) ).
 event( alarm, alarm(X) ).
 dispatch( newAshes, newAshes(N) ). %command that simulate the arrival of new RP's ashes
 dispatch( ashesLevel, ashesLevel(N) ). %Event that simulates the level of the ashstorage container
-event( statoAshStorage, statoAshStorage(N) ). %AshStorage info: 0 is not empty, 1 otherwise
+event( statoAshStorage, statoAshStorage(N,D) ). %AshStorage info: 0 is not empty, 1 otherwise
 dispatch( monitoringDeviceRuns, monitoringDeviceRuns(N) ). %message that represents the level of the ash storage (1 if it is up, 0 otherwise)
 request( engage, engage(OWNER,STEPTIME) ).
 reply( engagedone, engagedone(ARG) ).  %%for engage
