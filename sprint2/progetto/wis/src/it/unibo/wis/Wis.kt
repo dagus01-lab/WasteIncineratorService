@@ -11,6 +11,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
 
@@ -37,7 +43,10 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="waitingRP", cond=doswitch() )
+					 transition( edgeName="goto",targetState="waitingRP", cond=doswitchGuarded({monitoringDeviceRunning!=0 
+					}) )
+					transition( edgeName="goto",targetState="waitForMonitoringDeviceToRun", cond=doswitchGuarded({! (monitoringDeviceRunning!=0 
+					) }) )
 				}	 
 				state("waitingRP") { //this:State
 					action { //it:State

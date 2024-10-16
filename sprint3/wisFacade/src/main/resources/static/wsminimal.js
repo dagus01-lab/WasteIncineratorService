@@ -1,5 +1,4 @@
 var socket = connect();
-
 function connect(){
   var host     = document.location.host;
   var pathname =  document.location.pathname;
@@ -18,9 +17,28 @@ function connect(){
   };
   return socket;
 }//connect
-
+const incineratorState = document.getElementById("incineratorState")
+const ashStorageState = document.getElementById("ashStorageLevel")
+const opRobotState = document.getElementById("opRobotState")
+const wasteStoragePackets = document.getElementById("wasteStoragePackets")
+const opRobotJob = document.getElementById("opRobotJob")
 function updateGUI(message) {
-	payload = message.split("(")[1].split(")")[0]
-	element = message.split("(")[0]
-	document.getElementById(element).innerHTML = payload
+	if(message.includes("statoAshStorage")){
+		ashStorageState.innerHTML = message.split(",")[1].split(")")[0]
+	}
+	else if(message.includes("statoIncinerator")){
+		incineratorState.innerHTML = message.split("(")[1].split(")")[0]
+	}
+	else if(message.includes("opRobotState")){
+		opRobotState.innerHTML = message.split("(")[1].split(")")[0]
+	}
+	else if(message.includes("opRobotJob")){
+		opRobotJob.innerHTML = message.split("(")[1].split(")")[0].replace(/_/g, " ");
+	}
+	else if(message.includes("num_RP")){
+		wasteStoragePackets.innerHTML = message.split("(")[1].split(")")[0]
+	}
+	else{
+		alert("Unknown message: "+message)
+	}
 }

@@ -45,10 +45,7 @@ public class ApplSystemInfo {
             facadeport = Integer.parseInt(facadePortStr);
             brokerPort       = Integer.parseInt(brokerPortStr);
             brokerURL = brokerProto+"://"+brokerHost+":"+brokerPortStr;
-            System.out.println("ApplConfig: {url:"+brokerURL+", clientID:"+clientID+", topic:"+topic+"}");
+            CommUtils.outmagenta("ApplConfig: {url:"+brokerURL+", clientID:"+clientID+", topic:"+topic+"}");
         }
-
-        //setup();
-        //getActorNamesInApplCtx( );
     }
 }

@@ -28,9 +28,8 @@ class Wismonitoringdeviceproxy ( name: String, scope: CoroutineScope, isconfined
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		
-				var timeoutExpired = true;
-				var Status = 0;
-				var previousStatus = 0;
+				var Status = -1;
+				var previousStatus = -1;
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -62,15 +61,10 @@ class Wismonitoringdeviceproxy ( name: String, scope: CoroutineScope, isconfined
 						if( checkMsgContent( Term.createTerm("statoAshStorage(N,D)"), Term.createTerm("statoAshStorage(N,D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
-												if(timeoutExpired){
-													timeoutExpired = false
-								forward("monitoringDeviceRuns", "monitoringDeviceRuns(1)" ,"wis" ) 
-								
-												}
 												try{
 													var Status = payloadArg(0).toInt()
 								if( Status>=0 && Status != previousStatus 
-								 ){forward("ashesLevel", "ashesLevel($Status)" ,"wis" ) 
+								 ){forward("ashesLevel", "ashesLevel($Status)" ,"raspberryinfocontroller" ) 
 								}
 									
 												previousStatus=Status
@@ -88,8 +82,8 @@ class Wismonitoringdeviceproxy ( name: String, scope: CoroutineScope, isconfined
 				}	 
 				state("handleTimeoutExpired") { //this:State
 					action { //it:State
-						timeoutExpired = true 
-						forward("monitoringDeviceRuns", "monitoringDeviceRuns(0)" ,"wis" ) 
+						previousStatus=-1 
+						forward("monitoringDeviceOff", "monitoringDeviceOff(1)" ,"raspberryinfocontroller" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

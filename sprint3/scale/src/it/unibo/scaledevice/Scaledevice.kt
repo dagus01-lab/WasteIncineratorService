@@ -63,7 +63,7 @@ class Scaledevice ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 									}
 								}
 								
-						if(  Weight > 0  
+						if(  Weight >= 0  
 						 ){emitLocalStreamEvent("scaledata", "weight($Weight)" ) 
 						}
 						//genTimer( actor, state )

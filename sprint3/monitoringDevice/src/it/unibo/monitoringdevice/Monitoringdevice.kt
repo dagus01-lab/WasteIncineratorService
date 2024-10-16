@@ -29,6 +29,7 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		
 				var levelAshStorage = -1;
+				var previousLevelAshStorage = -1;
 				var D = -1;
 				var IncineratorStatus = 0;
 		return { //this:ActionBasciFsm
@@ -92,23 +93,22 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 								
 												levelAshStorage = payloadArg(0).toInt()
 												D = payloadArg(1).toInt()
-								CommUtils.outblue("$name current AshStorageLevel=$levelAshStorage")
-								if( IncineratorStatus==0 
-								 ){if( levelAshStorage==1 
+								if( IncineratorStatus==0 && levelAshStorage != previousLevelAshStorage 
+								 ){CommUtils.outblue("$name current AshStorageLevel=$levelAshStorage")
+								if( levelAshStorage==1 
 								 ){forward("led_off", "led_off(1)" ,"led" ) 
 								}
 								else
 								 {forward("led_blink", "led_blink(1)" ,"led" ) 
 								 }
+								previousLevelAshStorage = levelAshStorage 
 								}
 								if( levelAshStorage==2 
-								 ){CommUtils.outblue("$name Updating AshStorageStatus to 1")
-								//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(1,$D)" ) 
+								 ){//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(1,$D)" ) 
 								publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(1,$D)").toString(), "wisinfo" )   
 								}
 								else
-								 {CommUtils.outblue("$name Updating AshStorageStatus to 0")
-								 //val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(0,$D)" ) 
+								 {//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(0,$D)" ) 
 								 publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(0,$D)").toString(), "wisinfo" )   
 								 }
 						}

@@ -50,15 +50,11 @@ class Wisscaleproxy ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 								
 												try{
 													RPs = payloadArg(0).toInt()
-								if( RPs > 0 && RPs>previous_RPs 
-								 ){
-											      			for (i in previous_RPs..RPs-1) {
-								forward("arrived_RP", "arrived_RP(1)" ,"wis" ) 
-								
-											      			}
+								if( RPs >= 0 && RPs != previous_RPs 
+								 ){forward("arrived_RP", "arrived_RP($RPs)" ,"raspberryinfocontroller" ) 
+								previous_RPs = RPs 
 								}
 								
-													previous_RPs = RPs
 												} catch(e:Exception){
 								CommUtils.outred("$name received invalid payload:${payloadArg(0)}")
 								

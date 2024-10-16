@@ -45,7 +45,7 @@ QActor scaledevice context ctxscale{
 		}
 		
 	#]	
-		if [# Weight > 0 #] { 
+		if [# Weight >= 0 #] { 
 		    //println("$name with python: data = $Weight"   ) color yellow
 			emitlocalstream scaledata : weight($Weight)			 
 		}
