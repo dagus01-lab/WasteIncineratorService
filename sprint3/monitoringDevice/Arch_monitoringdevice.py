@@ -26,14 +26,14 @@ with Diagram('monitoringdeviceArch', show=False, outformat='png', graph_attr=gra
      sys = Custom('','./qakicons/system.png')
 ### see https://renenyffenegger.ch/notes/tools/Graphviz/attributes/label/HTML-like/index
      with Cluster('ctxmonitoringdevice', graph_attr=nodeattr):
+          monitoringdeviceproxy=Custom('monitoringdeviceproxy','./qakicons/symActorSmall.png')
           sonardevice=Custom('sonardevice','./qakicons/symActorSmall.png')
           datacleaner=Custom('datacleaner','./qakicons/symActorSmall.png')
           monitoringdevice=Custom('monitoringdevice','./qakicons/symActorSmall.png')
           led=Custom('led','./qakicons/symActorSmall.png')
-     with Cluster('ctx_waste_incinerator_service', graph_attr=nodeattr):
-          incinerator=Custom('incinerator(ext)','./qakicons/externalQActor.png')
+     sys >> Edge( label='statoIncinerator', **evattr, decorate='true', fontcolor='darkgreen') >> monitoringdeviceproxy
      sonardevice >> Edge( label='sonardata', **eventedgeattr, decorate='true', fontcolor='red') >> datacleaner
      datacleaner >> Edge( label='ashStorageLevel', **eventedgeattr, decorate='true', fontcolor='red') >> monitoringdevice
      monitoringdevice >> Edge(color='blue', style='solid',  decorate='true', label='<led_on &nbsp; led_off &nbsp; led_blink &nbsp; >',  fontcolor='blue') >> led
-     incinerator >> Edge(color='blue', style='solid',  decorate='true', label='<statoIncinerator &nbsp; >',  fontcolor='blue') >> monitoringdevice
+     monitoringdeviceproxy >> Edge(color='blue', style='solid',  decorate='true', label='<incineratorState &nbsp; >',  fontcolor='blue') >> monitoringdevice
 diag

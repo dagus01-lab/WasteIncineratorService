@@ -282,15 +282,15 @@ QActor oprobot context ctx_waste_incinerator_service{
 	
 	//Stato che rappresenta il robot in attesa di lavoro
 	State waitingWorking{
-		publish "wisinfo" -m opRobotState:opRobotState("HOME")
-		publish "wisinfo" -m opRobotJob:opRobotJob("Waiting for an RP")
+		publish "wisinfo" -m opRobotState:opRobotState(HOME)
+		publish "wisinfo" -m opRobotJob:opRobotJob(Waiting_for_an_RP)
 		println("$name is in HOME position waiting for working") color yellow
 	}
 	Transition t0 whenMsg arrived_RP -> takeRP
 	
 	//Stato che rappresenta il robot che va a recuperare un RP dal WasteStorage
 	State takeRP{
-		publish "wisinfo" -m opRobotJob:opRobotJob("Going to WASTEIN..")
+		publish "wisinfo" -m opRobotJob:opRobotJob(Going_to_WASTEIN)
 		println("OpRobot is going to take an RP..") color yellow
 		request basicrobot -m moverobot:moverobot($WASTEINx,$WASTEINy)
 	}
@@ -301,8 +301,8 @@ QActor oprobot context ctx_waste_incinerator_service{
 	State bringRPtoBURNIN{
 		delay 2000 //simulazione del prelievo di un RP dal WasteStorage
 		request basicrobot -m moverobot:moverobot($BURNINx, $BURNINy) 
-		publish "wisinfo" -m opRobotState:opRobotState("WASTEIN")
-		publish "wisinfo" -m opRobotJob:opRobotJob("Going to BURNIN..")
+		publish "wisinfo" -m opRobotState:opRobotState(WASTEIN)
+		publish "wisinfo" -m opRobotJob:opRobotJob(Going_to_BURNIN)
 	}
 	Transition t0 whenReply moverobotdone -> returnHOME
 				  whenReply moverobotfailed -> exit
@@ -313,8 +313,8 @@ QActor oprobot context ctx_waste_incinerator_service{
 		forward wis -m rpInBurnin : rpInBurnin(1)
 		println("An RP is in BURNIN port") color yellow
 		request basicrobot -m moverobot:moverobot($HOMEx, $HOMEy)
-		publish "wisinfo" -m opRobotState:opRobotState("BURNIN")
-		publish "wisinfo" -m opRobotJob:opRobotJob("Returning HOME..")
+		publish "wisinfo" -m opRobotState:opRobotState(BURNIN)
+		publish "wisinfo" -m opRobotJob:opRobotJob(Returning_HOME)
 		//then, return HOME
 	}
 	Transition t0 whenReply moverobotdone -> waitingForIncinerator
@@ -323,15 +323,15 @@ QActor oprobot context ctx_waste_incinerator_service{
 	//Stato che rappresenta l'attesa del incinerator che sta bruciando
 	State waitingForIncinerator{
 		println("Waiting for incinerator to finish its job") color yellow
-		publish "wisinfo" -m opRobotState:opRobotState("HOME")
-		publish "wisinfo" -m opRobotJob:opRobotJob("Waiting for incinerator to finish its job")
+		publish "wisinfo" -m opRobotState:opRobotState(HOME)
+		publish "wisinfo" -m opRobotJob:opRobotJob(Waiting_for_incinerator_to_finish_its_job)
 	}
 	Transition t0 whenEvent endBurning -> takeAshFromBURNOUT
 	
 	//Stato che rappresenta il robot che preleva la cenere dalla porta BURNOUT
 	State takeAshFromBURNOUT{
 		request basicrobot -m moverobot:moverobot($BURNOUTx, $BURNOUTy)
-		publish "wisinfo" -m opRobotJob:opRobotJob("Going to take ashes from BURNOUT..")
+		publish "wisinfo" -m opRobotJob:opRobotJob(Going_to_take_ashes_from_BURNOUT)
 	}
 	Transition t0 whenReply moverobotdone -> bringAshtoASHOUT
 				  whenReply moverobotfailed -> exit
@@ -340,8 +340,8 @@ QActor oprobot context ctx_waste_incinerator_service{
 	State bringAshtoASHOUT{
 		delay 2000 //simulo il prelievo della cenere da BURNOUT
 		request basicrobot -m moverobot:moverobot($ASHOUTx, $ASHOUTy)
-		publish "wisinfo" -m opRobotState:opRobotState("BURNOUT")
-		publish "wisinfo" -m opRobotJob:opRobotJob("Going to take out ashes to ASHOUT..")
+		publish "wisinfo" -m opRobotState:opRobotState(BURNOUT)
+		publish "wisinfo" -m opRobotJob:opRobotJob(Going_to_take_out_ashes_to_ASHOUT)
 	}
 	Transition t0 whenReply moverobotdone -> restartJob 
 				  whenReply moverobotfailed -> exit
@@ -353,8 +353,8 @@ QActor oprobot context ctx_waste_incinerator_service{
 		//mando notifica di nuova cenere
 		forward wis -m newAshes : newAshes(1)
 		request basicrobot -m moverobot:moverobot($HOMEx, $HOMEy)  
-		publish "wisinfo" -m opRobotState:opRobotState("ASHOUT")
-		publish "wisinfo" -m opRobotJob:opRobotJob("Returning HOME..")  
+		publish "wisinfo" -m opRobotState:opRobotState(ASHOUT)
+		publish "wisinfo" -m opRobotJob:opRobotJob(Returning_HOME)  
 	}
 	Transition t0 whenMsg arrived_RP -> takeRpBeforeFinishPlan
 				  whenReply moverobotdone -> waitingWorking

@@ -11,6 +11,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
 
@@ -33,7 +39,7 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 						delay(1000) 
 						subscribeToLocalActor("scaledevice") 
 						CommUtils.outblue("$name subscribed to scaledevice")
-						connectToMqttBroker( "tcp://localhost:8081", "scalenat" )
+						connectToMqttBroker( "tcp://192.168.1.102:8081", "scalenat" )
 						CommUtils.outblue("$name | CREATED  (and connected to mosquitto) ... ")
 						subscribe(  "wisinfo" ) //mqtt.subscribe(this,topic)
 						//val m = MsgUtil.buildEvent(name, "num_RP", "num_RP(0)" ) 
@@ -52,7 +58,7 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 								  
 									      		var W = payloadArg(0).toInt() 
 									      		RPs = (W/WRP).toInt()
-								if( previous_RP != RPs 
+								if( previous_RPs != RPs 
 								 ){//val m = MsgUtil.buildEvent(name, "num_RP", "num_RP($RPs)" ) 
 								publish(MsgUtil.buildEvent(name,"num_RP","num_RP($RPs)").toString(), "wisinfo" )   
 								}

@@ -11,6 +11,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
 
@@ -22,8 +28,13 @@ class Datacleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		 
-				var D = 0;
-				var previous_D = 0; 
+				var Level = -1;
+				var previous_D = -1;
+				var D = -1; 
+				val DLIMIT = 10;
+				val DMIN = 100; //rappresenta l'altezza del contenitore
+				var timeLastUpdate = System.currentTimeMillis();
+				var timeout = 10000;
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -35,26 +46,37 @@ class Datacleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t00",targetState="filter",cond=whenEvent("sonardata"))
+					 transition(edgeName="t02",targetState="filter",cond=whenEvent("sonardata"))
 				}	 
 				state("filter") { //this:State
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("distance(D)"), Term.createTerm("distance(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								  D = payloadArg(0).toInt()  
-								CommUtils.outblack("$name D=$D")
+								  
+									      		D = payloadArg(0).toInt()
+									      		Level = if (D > DMIN) {
+													    0
+													} else if (D < DLIMIT) {
+													    2
+													} else {
+													    1
+													}
 								if( D != previous_D 
 								 ){CommUtils.outmagenta("$name emit newLevel of Ash")
-								emitLocalStreamEvent("ashStorageLevel", "ashStorageLevel($D)" ) 
+								emitLocalStreamEvent("ashStorageLevel", "ashStorageLevel($Level,$D)" ) 
+								previous_D = D 
 								}
-								 previous_D = D;  
+								if( System.currentTimeMillis()-timeLastUpdate>=timeout 
+								 ){emitLocalStreamEvent("ashStorageLevel", "ashStorageLevel($Level)" ) 
+								timeLastUpdate=System.currentTimeMillis() 
+								}
 						}
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t01",targetState="filter",cond=whenEvent("sonardata"))
+					 transition(edgeName="t03",targetState="filter",cond=whenEvent("sonardata"))
 				}	 
 			}
 		}

@@ -11,6 +11,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
 
@@ -25,7 +31,7 @@ class Monitoringdeviceproxy ( name: String, scope: CoroutineScope, isconfined: B
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						connectToMqttBroker( "tcp://localhost:8081", "monitoringdeviceproxynat" )
+						connectToMqttBroker( "tcp://192.168.1.102:8081", "monitoringdeviceproxynat" )
 						CommUtils.outred("$name | CREATED  (and connected to mosquitto) ... ")
 						subscribe(  "wisinfo" ) //mqtt.subscribe(this,topic)
 						//genTimer( actor, state )

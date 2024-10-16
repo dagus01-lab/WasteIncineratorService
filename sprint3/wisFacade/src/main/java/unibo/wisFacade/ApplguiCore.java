@@ -18,7 +18,10 @@ public class ApplguiCore {
     }
 
     public void handleMsgFromMqttBroker(MqttMessage msg) {
-    	wsHandler.sendToAll(new String(msg.getPayload()));
+    	String message = new String(msg.getPayload());
+    	String payload = CommUtils.getContent(message);
+    	CommUtils.outgreen("Message payload received: "+payload);
+    	wsHandler.sendToAll(payload);
     }
     
 }

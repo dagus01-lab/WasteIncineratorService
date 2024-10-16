@@ -17,12 +17,12 @@ Event statoIncinerator : statoIncinerator(N)  "Incinerator's burning status info
 Dispatch incineratorState : incineratorState(N) 
 //Definizione dei contesti
 Context ctxmonitoringdevice ip [ host= "localhost"      port= 8100 ] 
- 
+  
 //--------------------------------Attore monitoring device proxy----------------------------------------------
 QActor monitoringdeviceproxy context ctxmonitoringdevice{ 
 	[#var Status = 0#]
 	State s0 initial{
-		connectToMqttBroker "tcp://localhost:8081" clientid "monitoringdeviceproxynat"
+		connectToMqttBroker "tcp://192.168.1.102:8081" clientid "monitoringdeviceproxynat"
 		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "monitoringdeviceproxynat"
  		println("$name | CREATED  (and connected to mosquitto) ... ") color red
  		subscribe "wisinfo"
@@ -96,10 +96,9 @@ QActor sonardevice context ctxmonitoringdevice{
 QActor datacleaner context ctxmonitoringdevice {
 	[# 
 		var Level = -1;
-		var previous_level = -1;
 		var previous_D = -1;
 		var D = -1; 
-		val DLIMIT = 30;
+		val DLIMIT = 10;
 		val DMIN = 100; //rappresenta l'altezza del contenitore
 		var timeLastUpdate = System.currentTimeMillis();
 		var timeout = 10000;
@@ -130,13 +129,12 @@ QActor datacleaner context ctxmonitoringdevice {
 	      	if [#D != previous_D#]{ //verificare il margine della misura
 	      		println("$name emit newLevel of Ash") color magenta
 	 			emitlocalstream ashStorageLevel:ashStorageLevel($Level, $D)
+	 			[#previous_D = D#]
 	     	}
 	     	if[#System.currentTimeMillis()-timeLastUpdate>=timeout#]{
 	     		emitlocalstream ashStorageLevel:ashStorageLevel($Level)
 	     		[#timeLastUpdate=System.currentTimeMillis()#]
 	     	}
-	     	
-	      	[# previous_level = Level; #]
      	}
 	}	
 	Transition t0 whenEvent sonardata -> filter
@@ -147,13 +145,14 @@ QActor datacleaner context ctxmonitoringdevice {
 QActor monitoringdevice context ctxmonitoringdevice{
 	[#
 		var levelAshStorage = -1;
+		var D = -1;
 		var IncineratorStatus = 0;
 	#]
 	
 	State s0 initial{
 		delay 2000
 		println("$name STARTS") color blue
-		connectToMqttBroker "tcp://localhost:8081" clientid "monitoringdevicenat"
+		connectToMqttBroker "tcp://192.168.1.102:8081" clientid "monitoringdevicenat"
 		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "monitoringdevicenat"
  		println("$name | CREATED  (and connected to mosquitto) ... ") color blue
  		subscribe "wisinfo"
