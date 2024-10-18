@@ -27,6 +27,6 @@ with Diagram('scaleArch', show=False, outformat='png', graph_attr=graphattr) as 
 ### see https://renenyffenegger.ch/notes/tools/Graphviz/attributes/label/HTML-like/index
      with Cluster('ctxscale', graph_attr=nodeattr):
           scaledevice=Custom('scaledevice','./qakicons/symActorSmall.png')
-          scale=Custom('scale','./qakicons/symActorSmall.png')
+          scale=Custom('scale','./qakicons/symActorWithobjSmall.png')
      scaledevice >> Edge( label='scaledata', **eventedgeattr, decorate='true', fontcolor='red') >> scale
 diag

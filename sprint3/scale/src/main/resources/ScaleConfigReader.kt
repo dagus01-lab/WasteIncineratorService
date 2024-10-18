@@ -2,12 +2,12 @@ package main.resources
 import com.fasterxml.jackson.module.kotlin.*
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.io.File
-object WISConfigReader {
+object ScaleConfigReader {
 
     private val mapper = ObjectMapper().registerKotlinModule()
-    private lateinit var config : WISConfig
+    private lateinit var config : ScaleConfig
 
-    fun loadWISConfig(filePath: String): WISConfig {
+    fun loadSCaleConfig(filePath: String): ScaleConfig {
         if(!::config.isInitialized)
             config = mapper.readValue(File(filePath))
         return config

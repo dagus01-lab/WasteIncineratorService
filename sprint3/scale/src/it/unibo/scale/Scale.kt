@@ -11,14 +11,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
-//Sept2024
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory 
-import org.json.simple.parser.JSONParser
-import org.json.simple.JSONObject
-
 
 //User imports JAN2024
+import main.resources.ScaleConfigReader
+import main.resources.ScaleConfig
 
 class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : ActorBasicFsm( name, scope, confined=isconfined ){
 
@@ -27,19 +23,21 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
+		 val config = ScaleConfigReader.loadScaleConfig("scale_conf.json")
 		 
 				var RPs = 0;
 				var previous_RPs = 0; 
-				val WRP = 100;
+				val WRP = config.WRP;
 				var timeLastUpdate = System.currentTimeMillis();
-				var timeout = 10000;
+				var timeout = config.timeout;
+				var broker_url = config.broker_url
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						delay(1000) 
 						subscribeToLocalActor("scaledevice") 
 						CommUtils.outblue("$name subscribed to scaledevice")
-						connectToMqttBroker( "tcp://192.168.1.102:8081", "scalenat" )
+						connectToMqttBroker( "$broker_url", "scalenat" )
 						CommUtils.outblue("$name | CREATED  (and connected to mosquitto) ... ")
 						subscribe(  "wisinfo" ) //mqtt.subscribe(this,topic)
 						//val m = MsgUtil.buildEvent(name, "num_RP", "num_RP(0)" ) 

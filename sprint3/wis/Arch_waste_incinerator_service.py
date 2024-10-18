@@ -26,12 +26,12 @@ with Diagram('waste_incinerator_serviceArch', show=False, outformat='png', graph
      sys = Custom('','./qakicons/system.png')
 ### see https://renenyffenegger.ch/notes/tools/Graphviz/attributes/label/HTML-like/index
      with Cluster('ctx_waste_incinerator_service', graph_attr=nodeattr):
-          wisscaleproxy=Custom('wisscaleproxy','./qakicons/symActorSmall.png')
-          wismonitoringdeviceproxy=Custom('wismonitoringdeviceproxy','./qakicons/symActorSmall.png')
+          wisscaleproxy=Custom('wisscaleproxy','./qakicons/symActorWithobjSmall.png')
+          wismonitoringdeviceproxy=Custom('wismonitoringdeviceproxy','./qakicons/symActorWithobjSmall.png')
           raspberryinfocontroller=Custom('raspberryinfocontroller','./qakicons/symActorSmall.png')
           wis=Custom('wis','./qakicons/symActorSmall.png')
-          oprobot=Custom('oprobot','./qakicons/symActorSmall.png')
-          incinerator=Custom('incinerator','./qakicons/symActorSmall.png')
+          oprobot=Custom('oprobot','./qakicons/symActorWithobjSmall.png')
+          incinerator=Custom('incinerator','./qakicons/symActorWithobjSmall.png')
      with Cluster('ctxbasicrobot', graph_attr=nodeattr):
           basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
      sys >> Edge( label='num_RP', **evattr, decorate='true', fontcolor='darkgreen') >> wisscaleproxy

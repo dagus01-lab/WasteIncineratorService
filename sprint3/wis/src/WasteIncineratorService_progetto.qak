@@ -1,5 +1,4 @@
 /** Modello per l'architettura logica dello SPRINT2 del WasteIncineratorService */
-
 System waste_incinerator_service
 
 //Messaggio per la ricezione di un nuovo RP
@@ -48,13 +47,16 @@ Context ctxbasicrobot ip [host="127.0.0.1" port=8020]
 ExternalQActor basicrobot context ctxbasicrobot
 
 //--------------------------------Attori WIS-proxy-----------------------------------------------------------
-QActor wisscaleproxy context ctx_waste_incinerator_service{
+QActor wisscaleproxy context ctx_waste_incinerator_service withobj config using "WISConfigReader.loadWISConfig(\"wis_conf.json\")"{
+	import "main.resources.WISConfigReader"
+	import "main.resources.WISConfig" 
 	[#
 		var RPs = 0;
 		var previous_RPs = 0;
+		var broker_url = config.broker_url
 	#]
 	State s0 initial{
-		connectToMqttBroker "tcp://localhost:8081" clientid "wisscaleproxynat"
+		connectToMqttBroker "$broker_url" clientid "wisscaleproxynat"
 		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "wisscaleproxynat"
  		println("$name | CREATED  (and connected to mosquitto) ... ") color magenta
  		subscribe "wisinfo"
@@ -81,13 +83,17 @@ QActor wisscaleproxy context ctx_waste_incinerator_service{
 	Transition t0 whenEvent num_RP -> handle_new_RP
 }
 
-QActor wismonitoringdeviceproxy context ctx_waste_incinerator_service{
+QActor wismonitoringdeviceproxy context ctx_waste_incinerator_service withobj config using "WISConfigReader.loadWISConfig(\"wis_conf.json\")"{
+	import "main.resources.WISConfigReader"
+	import "main.resources.WISConfig" 
+
 	[#
 		var Status = -1;
 		var previousStatus = -1;
+		var broker_url = config.broker_url
 	#]
 	State s0 initial{
-		connectToMqttBroker "tcp://localhost:8081" clientid "wismonitoringdeviceproxynat"
+		connectToMqttBroker "$broker_url" clientid "wismonitoringdeviceproxynat"
 		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "wismonitoringdevicenat"
  		println("$name | CREATED  (and connected to mosquitto) ... ") color cyan
  		delay 1000
@@ -257,22 +263,28 @@ QActor wis context ctx_waste_incinerator_service{
 //-----------------------------------------------------------------------------------------------------------
 
 //----------------------------------------Attore OpRobot-----------------------------------------------------
-QActor oprobot context ctx_waste_incinerator_service{
+QActor oprobot context ctx_waste_incinerator_service withobj config using "WISConfigReader.loadWISConfig(\"wis_conf.json\")"{
+	import "main.resources.WISConfigReader"
+	import "main.resources.WISConfig" 
 	[#	
-		var HOMEx = 0
-		var HOMEy = 0
-		var WASTEINx = 0
-		var WASTEINy = 4
-		var BURNINx = 3
-		var BURNINy = 2
-		var BURNOUTx = 4
-		var BURNOUTy = 3
-		var ASHOUTx = 6
-		var ASHOUTy = 4
+		//TODO: evitare di creare variabili per poter usare direttamente gli attributi di config nei messaggi.
+		//		Il problema al momento sta nel fatto che il payload dei messaggi nel modello qak non può contenere il carattere "."
+		var HOMEx = config.HOMEx
+		var HOMEy = config.HOMEy
+		var WASTEINx = config.WASTEINx
+		var WASTEINy = config.WASTEINy
+		var BURNINx = config.BURNINx
+		var BURNINy = config.BURNINy
+		var BURNOUTx = config.BURNOUTx
+		var BURNOUTy = config.BURNOUTy
+		var ASHOUTx = config.ASHOUTx
+		var ASHOUTy = config.ASHOUTy
+		var StepTime = config.step_time
+		var broker_url = config.broker_url
 	#]
 	State s0 initial{
 		println("$name STARTS") color yellow
-		connectToMqttBroker "tcp://localhost:8081" clientid "oprobotnat"
+		connectToMqttBroker "$broker_url" clientid "oprobotnat"
 		println("$name connected to MQTT server")
 	}
 	Goto engage
@@ -280,7 +292,7 @@ QActor oprobot context ctx_waste_incinerator_service{
 	//Stato per provare ad "ingaggiare" il BasicRobot
 	State engage{
 		println("$name | $MyName engaging ... ") color yellow 
-		request basicrobot -m engage : engage($MyName,260) //pc Emanuele 112, fisso Gabriele 260, portatile Gabriele 330
+		request basicrobot -m engage : engage($MyName,$StepTime) //pc Emanuele 112, fisso Gabriele 260, portatile Gabriele 330
 	}
 	Transition t0 whenTime 1000 -> noResponse
 				  whenReply engagedone   -> waitingWorking
@@ -397,13 +409,17 @@ QActor oprobot context ctx_waste_incinerator_service{
 //-----------------------------------------------------------------------------------------------------------
 
 //---------------------------------Attore Incinerator--------------------------------------------------------
-QActor incinerator context ctx_waste_incinerator_service{
-	[# val BTIME = 10000L; var stato = 0; #]
-	
+QActor incinerator context ctx_waste_incinerator_service withobj config using "WISConfigReader.loadWISConfig(\"wis_conf.json\")" {
+	import "main.resources.WISConfigReader"
+	import "main.resources.WISConfig" 
+	[#
+		var BTIME = config.incineration_duration
+		var broker_url = config.broker_url
+	#]
 	State s0 initial{
 		delay 1000
 		println("$name STARTS") color red 
-		connectToMqttBroker "tcp://localhost:8081" clientid "incineratornat"
+		connectToMqttBroker "$broker_url" clientid "incineratornat"
 		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "incineratornat" 
  		println("$name | CREATED  (and connected to mosquitto) ... ") color green
 	}

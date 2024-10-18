@@ -11,14 +11,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
-//Sept2024
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory 
-import org.json.simple.parser.JSONParser
-import org.json.simple.JSONObject
-
 
 //User imports JAN2024
+import main.resources.WISConfigReader
+import main.resources.WISConfig
 
 class Wismonitoringdeviceproxy ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : ActorBasicFsm( name, scope, confined=isconfined ){
 
@@ -27,13 +23,15 @@ class Wismonitoringdeviceproxy ( name: String, scope: CoroutineScope, isconfined
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
+		 val config = WISConfigReader.loadWISConfig("wis_conf.json")
 		
 				var Status = -1;
 				var previousStatus = -1;
+				var broker_url = config.broker_url
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						connectToMqttBroker( "tcp://localhost:8081", "wismonitoringdeviceproxynat" )
+						connectToMqttBroker( "$broker_url", "wismonitoringdeviceproxynat" )
 						CommUtils.outcyan("$name | CREATED  (and connected to mosquitto) ... ")
 						delay(1000) 
 						subscribe(  "wisinfo" ) //mqtt.subscribe(this,topic)

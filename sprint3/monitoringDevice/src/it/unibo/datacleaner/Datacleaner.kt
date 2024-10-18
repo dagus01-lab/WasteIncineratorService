@@ -11,14 +11,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
-//Sept2024
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory 
-import org.json.simple.parser.JSONParser
-import org.json.simple.JSONObject
-
 
 //User imports JAN2024
+import main.resources.MonitoringDeviceConfigReader
+import main.resources.MonitoringDeviceConfig
 
 class Datacleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : ActorBasicFsm( name, scope, confined=isconfined ){
 
@@ -27,14 +23,15 @@ class Datacleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
+		 val config = MonitoringDeviceConfigReader.loadMDConfig("monitoringdevice_conf.json")
 		 
 				var Level = -1;
 				var previous_D = -1;
 				var D = -1; 
-				val DLIMIT = 10;
-				val DMIN = 100; //rappresenta l'altezza del contenitore
+				val DLIMIT = config.DLIMIT;
+				val DMIN = config.DMIN; //rappresenta l'altezza del contenitore
 				var timeLastUpdate = System.currentTimeMillis();
-				var timeout = 10000;
+				var timeout = config.timeout;
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State

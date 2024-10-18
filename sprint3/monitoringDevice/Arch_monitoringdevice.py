@@ -26,10 +26,10 @@ with Diagram('monitoringdeviceArch', show=False, outformat='png', graph_attr=gra
      sys = Custom('','./qakicons/system.png')
 ### see https://renenyffenegger.ch/notes/tools/Graphviz/attributes/label/HTML-like/index
      with Cluster('ctxmonitoringdevice', graph_attr=nodeattr):
-          monitoringdeviceproxy=Custom('monitoringdeviceproxy','./qakicons/symActorSmall.png')
+          monitoringdeviceproxy=Custom('monitoringdeviceproxy','./qakicons/symActorWithobjSmall.png')
           sonardevice=Custom('sonardevice','./qakicons/symActorSmall.png')
-          datacleaner=Custom('datacleaner','./qakicons/symActorSmall.png')
-          monitoringdevice=Custom('monitoringdevice','./qakicons/symActorSmall.png')
+          datacleaner=Custom('datacleaner','./qakicons/symActorWithobjSmall.png')
+          monitoringdevice=Custom('monitoringdevice','./qakicons/symActorWithobjSmall.png')
           led=Custom('led','./qakicons/symActorSmall.png')
      sys >> Edge( label='statoIncinerator', **evattr, decorate='true', fontcolor='darkgreen') >> monitoringdeviceproxy
      sonardevice >> Edge( label='sonardata', **eventedgeattr, decorate='true', fontcolor='red') >> datacleaner

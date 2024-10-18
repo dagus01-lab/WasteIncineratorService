@@ -11,14 +11,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
-//Sept2024
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory 
-import org.json.simple.parser.JSONParser
-import org.json.simple.JSONObject
-
 
 //User imports JAN2024
+import main.resources.WISConfigReader
+import main.resources.WISConfig
 
 class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : ActorBasicFsm( name, scope, confined=isconfined ){
 
@@ -27,13 +23,16 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
-		 val BTIME = 10000L; var stato = 0;  
+		 val config = WISConfigReader.loadWISConfig("wis_conf.json")
+		
+				var BTIME = config.incineration_duration
+				var broker_url = config.broker_url
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						delay(1000) 
 						CommUtils.outred("$name STARTS")
-						connectToMqttBroker( "tcp://localhost:8081", "incineratornat" )
+						connectToMqttBroker( "$broker_url", "incineratornat" )
 						CommUtils.outgreen("$name | CREATED  (and connected to mosquitto) ... ")
 						//genTimer( actor, state )
 					}

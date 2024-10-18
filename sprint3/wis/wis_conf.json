@@ -1,7 +1,7 @@
 {
-	"broker_url":"tcp://localhost:8081", 
+	"incineration_duration":10000,
+	"broker_url":"tcp://localhost:8081",
 	"step_time":330, 
-	"incineration_duration":10000, 
 	"HOMEx":0,"HOMEy":0,
 	"WASTEINx":0,"WASTEINy":4,
 	"BURNINx":3, "BURNINy":2,

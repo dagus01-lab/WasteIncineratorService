@@ -1,12 +1,12 @@
-{"actor":"wis", "msgType":"dispatch", "curstate":"waitingRP", "nextstate":"handleMonitoringDeviceRunningStatus", "msgId":"monitoringDeviceRuns"}
+{"actor":"raspberryinfocontroller", "msgType":"dispatch", "curstate":"wait", "nextstate":"handleMonitoringDeviceOff", "msgId":"monitoringDeviceOff"}
+{"actor":"raspberryinfocontroller", "msgType":"dispatch", "curstate":"wait", "nextstate":"handleNewAshesLevel", "msgId":"ashesLevel"}
+{"actor":"raspberryinfocontroller", "msgType":"dispatch", "curstate":"wait", "nextstate":"handleNewScaleState", "msgId":"arrived_RP"}
+{"actor":"raspberryinfocontroller", "msgType":"dispatch", "curstate":"wait", "nextstate":"handleWISReady", "msgId":"waitingForNewRPs"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"waitingRP", "nextstate":"handleUpdateAshesLevel", "msgId":"ashesLevel"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"waitingRP", "nextstate":"handleRP", "msgId":"arrived_RP"}
-{"actor":"wis", "msgType":"dispatch", "curstate":"handleMonitoringDeviceRunningStatus", "nextstate":"handleMonitoringDeviceRunningStatus", "msgId":"monitoringDeviceRuns"}
-{"actor":"wis", "msgType":"dispatch", "curstate":"waitForMonitoringDeviceToRun", "nextstate":"handleMonitoringDeviceRunningStatus", "msgId":"monitoringDeviceRuns"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"handleRP", "nextstate":"handleRPInBurnin", "msgId":"rpInBurnin"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"handleEndBurning", "nextstate":"endRoute", "msgId":"newAshes"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"endRoute", "nextstate":"handleUpdateAshesLevel", "msgId":"ashesLevel"}
-{"actor":"wis", "msgType":"dispatch", "curstate":"handleUpdateAshesLevel", "nextstate":"handleUpdateAshesLevel", "msgId":"ashesLevel"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"waitingAshesToBeRemoved", "nextstate":"handleUpdateAshesLevel", "msgId":"ashesLevel"}
 {"actor":"oprobot", "msgType":"dispatch", "curstate":"waitingWorking", "nextstate":"takeRP", "msgId":"arrived_RP"}
 {"actor":"oprobot", "msgType":"dispatch", "curstate":"restartJob", "nextstate":"takeRpBeforeFinishPlan", "msgId":"arrived_RP"}

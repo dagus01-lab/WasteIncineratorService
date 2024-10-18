@@ -1,4 +1,4 @@
-/** Modello per l'architettura logica dello SPRINT2 del monitoringDevice */
+/** Modello per l'architettura logica dello SPRINT3 del monitoringDevice */
 
 System monitoringdevice
 
@@ -19,10 +19,15 @@ Dispatch incineratorState : incineratorState(N)
 Context ctxmonitoringdevice ip [ host= "localhost"      port= 8100 ] 
   
 //--------------------------------Attore monitoring device proxy----------------------------------------------
-QActor monitoringdeviceproxy context ctxmonitoringdevice{ 
-	[#var Status = 0#]
+QActor monitoringdeviceproxy context ctxmonitoringdevice withobj config using "MonitoringDeviceConfigReader.loadMDConfig(\"monitoringdevice_conf.json\")"{
+	import "main.resources.MonitoringDeviceConfigReader"
+	import "main.resources.MonitoringDeviceConfig" 
+	[#
+		var Status = 0
+		val broker_url = config.broker_url
+	#]
 	State s0 initial{
-		connectToMqttBroker "tcp://192.168.1.102:8081" clientid "monitoringdeviceproxynat"
+		connectToMqttBroker "$broker_url" clientid "monitoringdeviceproxynat"
 		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "monitoringdeviceproxynat"
  		println("$name | CREATED  (and connected to mosquitto) ... ") color red
  		subscribe "wisinfo"
@@ -93,15 +98,17 @@ QActor sonardevice context ctxmonitoringdevice{
 //----------------------------------------------------------------------------------------------------------
 
 //--------------------------------Attore datacleaner--------------------------------------------------------
-QActor datacleaner context ctxmonitoringdevice {
+QActor datacleaner context ctxmonitoringdevice withobj config using "MonitoringDeviceConfigReader.loadMDConfig(\"monitoringdevice_conf.json\")"{
+	import "main.resources.MonitoringDeviceConfigReader"
+	import "main.resources.MonitoringDeviceConfig" 
 	[# 
 		var Level = -1;
 		var previous_D = -1;
 		var D = -1; 
-		val DLIMIT = 10;
-		val DMIN = 100; //rappresenta l'altezza del contenitore
+		val DLIMIT = config.DLIMIT;
+		val DMIN = config.DMIN; //rappresenta l'altezza del contenitore
 		var timeLastUpdate = System.currentTimeMillis();
-		var timeout = 10000;
+		var timeout = config.timeout;
 	#]
 	
 	State s0 initial {
@@ -142,18 +149,21 @@ QActor datacleaner context ctxmonitoringdevice {
 //--------------------------------------------------------------------------------------------------------
 
 //--------------------------------Attore monitoringDevice-------------------------------------------------
-QActor monitoringdevice context ctxmonitoringdevice{
+QActor monitoringdevice context ctxmonitoringdevice withobj config using "MonitoringDeviceConfigReader.loadMDConfig(\"monitoringdevice_conf.json\")"{
+	import "main.resources.MonitoringDeviceConfigReader"
+	import "main.resources.MonitoringDeviceConfig" 
 	[#
 		var levelAshStorage = -1;
 		var previousLevelAshStorage = -1;
 		var D = -1;
 		var IncineratorStatus = 0;
+		var broker_url = config.broker_url
 	#]
 	
 	State s0 initial{
 		delay 2000
 		println("$name STARTS") color blue
-		connectToMqttBroker "tcp://192.168.1.102:8081" clientid "monitoringdevicenat"
+		connectToMqttBroker "$broker_url" clientid "monitoringdevicenat"
 		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "monitoringdevicenat"
  		println("$name | CREATED  (and connected to mosquitto) ... ") color blue
  		subscribe "wisinfo"

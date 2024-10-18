@@ -11,14 +11,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
-//Sept2024
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory 
-import org.json.simple.parser.JSONParser
-import org.json.simple.JSONObject
-
 
 //User imports JAN2024
+import main.resources.MonitoringDeviceConfigReader
+import main.resources.MonitoringDeviceConfig
 
 class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : ActorBasicFsm( name, scope, confined=isconfined ){
 
@@ -27,17 +23,19 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
+		 val config = MonitoringDeviceConfigReader.loadMDConfig("monitoringdevice_conf.json")
 		
 				var levelAshStorage = -1;
 				var previousLevelAshStorage = -1;
 				var D = -1;
 				var IncineratorStatus = 0;
+				var broker_url = config.broker_url
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						delay(2000) 
 						CommUtils.outblue("$name STARTS")
-						connectToMqttBroker( "tcp://192.168.1.102:8081", "monitoringdevicenat" )
+						connectToMqttBroker( "$broker_url", "monitoringdevicenat" )
 						CommUtils.outblue("$name | CREATED  (and connected to mosquitto) ... ")
 						subscribe(  "wisinfo" ) //mqtt.subscribe(this,topic)
 						subscribeToLocalActor("datacleaner") 

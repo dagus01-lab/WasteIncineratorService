@@ -11,14 +11,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
-//Sept2024
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory 
-import org.json.simple.parser.JSONParser
-import org.json.simple.JSONObject
-
 
 //User imports JAN2024
+import main.resources.MonitoringDeviceConfigReader
+import main.resources.MonitoringDeviceConfig
 
 class Monitoringdeviceproxy ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : ActorBasicFsm( name, scope, confined=isconfined ){
 
@@ -27,11 +23,14 @@ class Monitoringdeviceproxy ( name: String, scope: CoroutineScope, isconfined: B
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
-		var Status = 0 
+		 val config = MonitoringDeviceConfigReader.loadMDConfig("monitoringdevice_conf.json")
+		
+				var Status = 0
+				val broker_url = config.broker_url
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						connectToMqttBroker( "tcp://192.168.1.102:8081", "monitoringdeviceproxynat" )
+						connectToMqttBroker( "$broker_url", "monitoringdeviceproxynat" )
 						CommUtils.outred("$name | CREATED  (and connected to mosquitto) ... ")
 						subscribe(  "wisinfo" ) //mqtt.subscribe(this,topic)
 						//genTimer( actor, state )

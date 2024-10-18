@@ -56,20 +56,23 @@ QActor scaledevice context ctxscale{
 //--------------------------------------------------------------------------------------------------------
 
 //--------------------------------Attore scale------------------------------------------------------------
-QActor scale context ctxscale { 
+QActor scale context ctxscale withobj config using "ScaleConfigReader.loadScaleConfig(\"scale_conf.json\")"{
+	import "main.resources.ScaleConfigReader"
+	import "main.resources.ScaleConfig" 
 	[# 
 		var RPs = 0;
 		var previous_RPs = 0; 
-		val WRP = 100;
+		val WRP = config.WRP;
 		var timeLastUpdate = System.currentTimeMillis();
-		var timeout = 10000;
+		var timeout = config.timeout;
+		var broker_url = config.broker_url
 	#]
 	
 	State s0 initial {
 		delay 1000
 		subscribeTo scaledevice for scaledata		
 		println("$name subscribed to scaledevice") color blue
-		connectToMqttBroker "tcp://192.168.1.102:8081" clientid "scalenat"
+		connectToMqttBroker "$broker_url" clientid "scalenat"
 		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "scalenat"
  		println("$name | CREATED  (and connected to mosquitto) ... ") color blue
  		subscribe "wisinfo"

@@ -11,14 +11,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
-//Sept2024
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory 
-import org.json.simple.parser.JSONParser
-import org.json.simple.JSONObject
-
 
 //User imports JAN2024
+import main.resources.WISConfigReader
+import main.resources.WISConfig
 
 class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : ActorBasicFsm( name, scope, confined=isconfined ){
 
@@ -27,22 +23,27 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
+		 val config = WISConfigReader.loadWISConfig("wis_conf.json")
 			
-				var HOMEx = 0
-				var HOMEy = 0
-				var WASTEINx = 0
-				var WASTEINy = 4
-				var BURNINx = 3
-				var BURNINy = 2
-				var BURNOUTx = 4
-				var BURNOUTy = 3
-				var ASHOUTx = 6
-				var ASHOUTy = 4
+				//TODO: evitare di creare variabili per poter usare direttamente gli attributi di config nei messaggi.
+				//		Il problema al momento sta nel fatto che il payload dei messaggi nel modello qak non può contenere il carattere "."
+				var HOMEx = config.HOMEx
+				var HOMEy = config.HOMEy
+				var WASTEINx = config.WASTEINx
+				var WASTEINy = config.WASTEINy
+				var BURNINx = config.BURNINx
+				var BURNINy = config.BURNINy
+				var BURNOUTx = config.BURNOUTx
+				var BURNOUTy = config.BURNOUTy
+				var ASHOUTx = config.ASHOUTx
+				var ASHOUTy = config.ASHOUTy
+				var StepTime = config.step_time
+				var broker_url = config.broker_url
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outyellow("$name STARTS")
-						connectToMqttBroker( "tcp://localhost:8081", "oprobotnat" )
+						connectToMqttBroker( "$broker_url", "oprobotnat" )
 						CommUtils.outblack("$name connected to MQTT server")
 						//genTimer( actor, state )
 					}
@@ -54,7 +55,7 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 				state("engage") { //this:State
 					action { //it:State
 						CommUtils.outyellow("$name | $MyName engaging ... ")
-						request("engage", "engage($MyName,260)" ,"basicrobot" )  
+						request("engage", "engage($MyName,$StepTime)" ,"basicrobot" )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
