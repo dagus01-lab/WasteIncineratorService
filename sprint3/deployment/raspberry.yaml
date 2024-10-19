@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  scale:
+    image: scale:arm 
+    privileged: true
+    ports:
+      - "8200:8200"  
+    volumes:
+      - ./ca.crt:/etc/stunnel/certs/ca.crt
+      - ./client.crt:/etc/stunnel/certs/client.crt
+      - ./client.key:/etc/stunnel/certs/client.key
+      - ./stunnel:raspberry.conf:/etc/stunnel/stunnel.conf
+      - ./monitoringdevice_conf.json:/root/monitoringdevice_conf.json
+    command: ["sh", "-c", "sleep 10 && stunnel && ./scale"]
+   
+  monitoringdevice:
+    image: monitoringdevice:arm 
+    privileged: true
+    ports:
+      - "8100:8100"  
+    volumes:
+      - ./ca.crt:/etc/stunnel/certs/ca.crt
+      - ./client.crt:/etc/stunnel/certs/client.crt
+      - ./client.key:/etc/stunnel/certs/client.key
+      - ./stunnel_raspberry.conf:/etc/stunnel/stunnel.conf
+      - ./scale_conf.json:/root/scale_conf.json
+    command: ["sh", "-c", "sleep 10 && stunnel && ./monitoringdevice"]

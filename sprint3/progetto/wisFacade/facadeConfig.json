@@ -1,0 +1,1 @@
+{"brokerProto":"tcp", "brokerHost":"localhost", "brokerPort":"8081", "clientID": "wisfacade", "topic":"wisinfo", "facadeport":"8085"}

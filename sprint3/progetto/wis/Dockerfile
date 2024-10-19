@@ -13,6 +13,7 @@
     COPY ./*.pl ./
     COPY ./*.bin ./
     COPY ./*.txt ./
+    COPY ./*.json ./
     
     RUN apk update 
     ##RUN apk add --no-cache openjdk11-jdk nginx
