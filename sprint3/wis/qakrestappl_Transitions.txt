@@ -6,7 +6,6 @@
 {"actor":"wis", "msgType":"dispatch", "curstate":"waitingRP", "nextstate":"handleRP", "msgId":"arrived_RP"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"handleRP", "nextstate":"handleRPInBurnin", "msgId":"rpInBurnin"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"handleEndBurning", "nextstate":"endRoute", "msgId":"newAshes"}
-{"actor":"wis", "msgType":"dispatch", "curstate":"endRoute", "nextstate":"handleUpdateAshesLevel", "msgId":"ashesLevel"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"waitingAshesToBeRemoved", "nextstate":"handleUpdateAshesLevel", "msgId":"ashesLevel"}
 {"actor":"oprobot", "msgType":"dispatch", "curstate":"waitingWorking", "nextstate":"takeRP", "msgId":"arrived_RP"}
 {"actor":"oprobot", "msgType":"dispatch", "curstate":"restartJob", "nextstate":"takeRpBeforeFinishPlan", "msgId":"arrived_RP"}

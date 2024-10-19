@@ -298,7 +298,65 @@ opposta ai pattern più classici di istanziazione di componenti o Service Locato
 </p>
 
 <p>
-<mark>Decidere assieme come gestire le info (se tramite updateResource con COAP o publish/subscribe)</mark>
+	<h3>Interazione WIS-WISFacade</h3>
+	Riguardo l'interazione tra WIS e WISFacade, si presentano due possibili protocolli di comunicazione:
+	<ul>
+		<li><b>MQTT (publish/subscribe)</b>: questo tipo di interazione permette di ottenere 
+			un disaccoppiamento maggiore tra i nodi dell'applicazione e di apportare meno 
+			modifiche allo sprint precedente</li>
+		<li><b>COAP</b>: questo tipo di interazione permetterebbe di aumentare l'accoppiamento 
+			tra il WIS e la facade (permettendo tra le altre cose di verificare in tempo reale 
+			che il WIS non presenti guasti), ma costringerebbe ad un refactoring più sostanzioso 
+			del modello Qak
+		</li>
+	</ul>
+	Siccome un maggiore disaccoppiamento sarebbe preferibile (in quanto il funzionamento della facade
+	non obbliga il WIS ad essere up and running), e si preferisce riutilizzare il più possibile 
+	il lavoro già svolto, si è deciso di optare per la prima opzione.<br>
+	<b>
+		Rimane da discutere con il committente se la facade deve potersi accorgere (ad esempio
+		tramite un meccanismo di timeout) se i nodi dell'applicazione stanno mandando regolarmente
+		aggiornamenti riguardo il loro stato.
+	</b>
+</p>
+<p>
+	Per poter permettere l'utilizzo di questo paradigma sono comunque state necessarie alcune
+	modifiche:
+	<ul>
+		<li><b>Lato Monitoring Device:</b> all'evento di tipo ashStorageState è stato aggiunto
+			un secondo payload che indica il livello di riempimento dell' Ash Storage.
+			Quindi, l'attore monitoringdevice invia aggiornamenti relativi al suo stato ogni 
+			volta che vi sono variazioni nella distanza misurata. <br>
+			Il modello aggiornato si può trovare <a href="../progetto/monitoringDevice/src/monitoringdevice.qak">qui</a>
+		</li>
+		<li><b>Lato scale:</b> dovendo l'interfaccia grafica monitorare il numero di RP presenti
+			nel WasteStorage, gli aggiornamenti da parte della scale vengono ora fatti comunicando
+			direttamente questo dato (a differenza di prima, che venivano inviati aggiornamenti
+			che notificavano soltanto l'arrivo di un nuovo RP).<br>
+			Il modello aggiornato si può trovare <a href="../progetto/scale/src/scale.qak">qui</a>
+		</li>
+		<li><b>Lato WIS:</b> sono stati introdotti due nuovi eventi (opRobotState e opRobotJob) 
+			da inviare al broker MQTT a fronte di update dello stato dell'opRobot (HOME, WASTEIN, etc) 
+			e del lavoro che sta svolgendo.<br>
+			Inoltre, a livello di proxy si è deciso di introdurre un ulteriore attore ausiliario raspberryinfocontroller
+			che permetta al WIS di ricevere sempre dati aggiornati: quest'ultimo ora effettua un updateResource 
+			che notifichi chiunque sia iscritto che è pronto a prendere un nuovo RP.
+			Ricevuto questo messaggio, raspberryinfocontroller può notificare l'arrivo di un RP
+			al WIS, oppure comunicargli che l'Ash Storage è pieno. 
+			Contestualmente a ciò, questo attore ausiliario mantiene lo stato aggiornato del 
+			monitoring device, della scale, e del wis stesso, in modo tale da poterlo aggiornare
+			nel momento in cui il WIS si trova nello stato iniziale di attesa.<br>
+			Grazie all'introduzione di quest'entità, si è riusciti ad alleggerire i compiti
+			del wis e a permettergli di ricevere aggiornamenti "up to date" e al momento giusto.
+			Il modello aggiornato si può trovare <a href="../progetto/wis/src/wis.qak">qui</a>
+		</li>
+	</ul>
+	In funzione del deployment con docker, ma soprattutto per disaccoppiare il modello dai parametri
+	di configurazione (come ad esempio l'indirizzo del broker mqtt), si è deciso di creare per ciascun
+	contesto un file di configurazione e un corrispondente oggetto kotlin (ad esempio per il wis abbiamo
+	creato <a href="../progetto/wis/src/main/resources/WISConfigReader.kt">WISConfigReader.kt</a>), 
+	in modo tale che gli attori che necessitino di configurazione possano invocarlo per leggerle
+	dal file di configurazione.
 </p>
 
 <h2>Piano di test</h2>

@@ -45,6 +45,11 @@ class Raspberryinfocontroller ( name: String, scope: CoroutineScope, isconfined:
 						 ){forward("arrived_RP", "arrived_RP(1)" ,"wis" ) 
 						wisReady = 0 
 						}
+						else
+						 {if( wisReady == 1 
+						  ){forward("ashesLevel", "ashesLevel($AshesLevel)" ,"wis" ) 
+						 }
+						 }
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -98,7 +103,6 @@ class Raspberryinfocontroller ( name: String, scope: CoroutineScope, isconfined:
 								
 											AshesLevel = payloadArg(0).toInt()
 											monitoringDeviceRunning=1
-								forward("ashesLevel", "ashesLevel($AshesLevel)" ,"wis" ) 
 						}
 						//genTimer( actor, state )
 					}

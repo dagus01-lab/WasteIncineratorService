@@ -89,11 +89,8 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
-				 	 		stateTimer = TimerActor("timer_endRoute", 
-				 	 					  scope, context!!, "local_tout_"+name+"_endRoute", 2000.toLong() )  //OCT2023
 					}	 	 
-					 transition(edgeName="t013",targetState="waitingRP",cond=whenTimeout("local_tout_"+name+"_endRoute"))   
-					transition(edgeName="t014",targetState="handleUpdateAshesLevel",cond=whenDispatch("ashesLevel"))
+					 transition( edgeName="goto",targetState="waitingRP", cond=doswitch() )
 				}	 
 				state("handleUpdateAshesLevel") { //this:State
 					action { //it:State
@@ -120,7 +117,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t015",targetState="handleUpdateAshesLevel",cond=whenDispatch("ashesLevel"))
+					 transition(edgeName="t013",targetState="handleUpdateAshesLevel",cond=whenDispatch("ashesLevel"))
 				}	 
 			}
 		}
