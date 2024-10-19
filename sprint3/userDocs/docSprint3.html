@@ -358,6 +358,20 @@ opposta ai pattern più classici di istanziazione di componenti o Service Locato
 	in modo tale che gli attori che necessitino di configurazione possano invocarlo per leggerle
 	dal file di configurazione.
 </p>
+<p>
+	<h3>Sicurezza dei dati</h3>
+	Sarebbe stato incompleto non includere una discussione riguardo le misure di sicurezza 
+	da predisporre, trattandosi di un'applicazione web accessibile dall'esterno.<br>
+	In particolare, l'applicazione spring permette ai client di leggere lo stato dei nodi del
+	sistema, ma non permette in alcun modo di ricevere messaggi dai client. Va sottolineato anche
+	il fatto che i dati forniti dall'applicazione non sono da ritenersi sensibili.<br>
+	In ogni caso, la mancanza di un meccanismo di autenticazione potrebbe permettere a malintenzionati
+	di effettuare più facilmente attacchi di tipo DoS. 
+	Inoltre, la mancanza di cifratura di messaggi potrebbe permettere a dei malintenzionati,
+	tra le altre cose, di effettuare attacchi di tipo "man in the middle": questo consentirebbe
+	loro di manomettere le informazioni che provengono dall'applicazione spring verso i client.<br>
+	Riguardo questo specifico requisito di sicurezza si è deciso di demandare la questione al committente.
+</p>
 
 <h2>Piano di test</h2>
 <p>
