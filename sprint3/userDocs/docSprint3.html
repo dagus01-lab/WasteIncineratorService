@@ -274,7 +274,9 @@ Facendo riferimento al "progetto" dello sprint precedente, le informazioni recup
 Per sfruttare tale soluzione, si dovrebbero aggiungere nuove publish per gestire anche lo stato del OpRobot.<br><br>
 
 La soluzione di osservabilità del WIS da parte della GUI non necessita di ulteriori iscrizioni al broker, in quanto ci basta osservare le info del WIS.<br>
-In pratica, lasciamo al WIS la responsabilità di ottenere le varie informazioni del sistema (tramite il broker) e la GUI non fa altro che osservare tali info.
+In pratica, lasciamo al WIS la responsabilità di ottenere le varie informazioni del sistema (tramite il broker) e la GUI non fa altro che osservare tali info.<br><br>
+
+Entrambe le soluzioni hanno i loro vantaggi/svantaggi e quindi lasciamo la scelta ai progettisti.
 </p>
 
 <h2>Progetto</h2>
@@ -293,7 +295,7 @@ e quindi evitare al programmatore il cosiddetto "boilerplate" code.<br>
 In particolare, Spring è a container leggero, ovvero non è necessario caricare l'intero "pacchetto" ma si possono scegliere soltanto i moduli che ci interessano. (framework modulare. Architettura a layer, possibilità di utilizzare anche solo alcune parti in isolamento)<br>
 Infine, il punto di forza principale di Spring è la <b>Dependency Injection</b>, ovvero la possibilità di ottenere una risorsa senza effettuare il binding a mano,
 ma essa viene fornita in automatico dal container.<br>
-Dunque, il container si occupa di risolvere (injection) le dipendenze dei componenti attraverso l’opportuna configurazione dell’implementazione dell’oggetto (push); <br>
+Dunque, il container si occupa di risolvere (injection) le dipendenze dei componenti attraverso l’opportuna configurazione dell’implementazione dell’oggetto (push);
 opposta ai pattern più classici di istanziazione di componenti o Service Locator, dove è il componente che deve determinare l’implementazione della risorsa desiderata.
 </p>
 
@@ -338,7 +340,7 @@ opposta ai pattern più classici di istanziazione di componenti o Service Locato
 		<li><b>Lato WIS:</b> sono stati introdotti due nuovi eventi (opRobotState e opRobotJob) 
 			da inviare al broker MQTT a fronte di update dello stato dell'opRobot (HOME, WASTEIN, etc) 
 			e del lavoro che sta svolgendo.<br>
-			Inoltre, a livello di proxy si è deciso di introdurre un ulteriore attore ausiliario raspberryinfocontroller
+			Inoltre, a livello di proxy si è deciso di introdurre un ulteriore attore ausiliario <b>raspberryinfocontroller</b>
 			che permetta al WIS di ricevere sempre dati aggiornati: quest'ultimo ora effettua un updateResource 
 			che notifichi chiunque sia iscritto che è pronto a prendere un nuovo RP.
 			Ricevuto questo messaggio, raspberryinfocontroller può notificare l'arrivo di un RP
@@ -348,15 +350,15 @@ opposta ai pattern più classici di istanziazione di componenti o Service Locato
 			nel momento in cui il WIS si trova nello stato iniziale di attesa.<br>
 			Grazie all'introduzione di quest'entità, si è riusciti ad alleggerire i compiti
 			del wis e a permettergli di ricevere aggiornamenti "up to date" e al momento giusto.
-			Il modello aggiornato si può trovare <a href="../progetto/wis/src/wis.qak">qui</a>
+			Il modello aggiornato si può trovare <a href="../progetto/wis/src/WasteIncineratorService_progetto.qak">qui</a>
 		</li>
 	</ul>
-	In funzione del deployment con docker, ma soprattutto per disaccoppiare il modello dai parametri
+	<mark>In funzione del deployment con docker, ma soprattutto per disaccoppiare il modello dai parametri
 	di configurazione (come ad esempio l'indirizzo del broker mqtt), si è deciso di creare per ciascun
 	contesto un file di configurazione e un corrispondente oggetto kotlin (ad esempio per il wis abbiamo
 	creato <a href="../progetto/wis/src/main/resources/WISConfigReader.kt">WISConfigReader.kt</a>), 
 	in modo tale che gli attori che necessitino di configurazione possano invocarlo per leggerle
-	dal file di configurazione.
+	dal file di configurazione.</mark>
 </p>
 <p>
 	<h3>Sicurezza dei dati</h3>
@@ -452,25 +454,13 @@ Per poter vedere in tempo reale i log dei container: <br/>
 <h2>Suddivisione dei compiti</h2>
 <p>
 <ol>
-	<li><b>Analisi del problema:</b> tutti i membri hanno contribuito, in particolare: 
-		<ul>
-			<li>Bryan: concentrato principalmente sull'interazione WIS - MonitoringDevice.</li>
-			<li>Gabriele: concentrato principalmente su Interazione WIS - Scale.</li>
-			<li>Emanuele: concentrato principalmente sull'Architettura del MonitoringDevice.</li>
-		</ul>
-	Alla fine delle singole analisi, si è fatto una piccola revisione interna per discutere assieme dei punti analizzati e modificarli/validarli. 
-	</li>
-	<li><b>Definizione del modello:</b> tutti i membri hanno contribuito, in particolare: 
-		<ul>
-			<li>Bryan: modifica del WIS, in particolare per ricevere gli updateResource da contesti esterni, e supporto nell'interazione tra i componenti. </li>
-			<li>Gabriele ed Emanuele: logica della scale + logica del monitoringdevice. </li>
-		</ul>
-	In questa fase di modellazione, si sono fatte diverse riunioni per allinearci sui problemi/soluzioni riscontrati durante lo sviluppo. 
+	<li><b>Analisi del problema:</b> tutti i membri hanno contribuito, in particolare per discutere i vantaggi/svantaggi delle soluzioni proposte.  
 	</li>
 	<li><b>Progettazione:</b> tutti i membri hanno contribuito, in particolare:
 		<ul>
 			<li>Tutti: discusso assieme i vantaggi/svantaggi dell'uso di un metodo publish/subscribe anziché updateResource.</li>
-			<li>Emanuele e Gabriele: montaggio fisico dei componenti sui due RaspberryPi e modifiche al codice dei componenti.</li>
+			<li>Bryan: ragionato su vantaggi/svantaggi di gui sviluppata come applicazione mobile/web e implementazione della pagina della GUI.</li>
+			<li>Gabriele ed Emanuele: creazione/modifica dei componenti lato Facade e lato qak.</li>
 		</ul>
 	</li>
 	<li><b>Testing:</b> piano dei test deciso assieme. L'effettiva realizzazione è stata affidata a Gabriele. </li>
@@ -478,7 +468,7 @@ Per poter vedere in tempo reale i log dei container: <br/>
 </p>
 
 <h2>Sprint futuri</h2>
-<p>Nel prossimo sprint si prevede di implementare la ServiceStatusGUI. 
+<p>Nel prossimo sprint si prevede di implementare il robot fisico. 
 </p>
 </div>
 
