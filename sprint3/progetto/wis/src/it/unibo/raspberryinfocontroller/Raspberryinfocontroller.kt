@@ -11,6 +11,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
 
@@ -24,6 +30,7 @@ class Raspberryinfocontroller ( name: String, scope: CoroutineScope, isconfined:
 		
 				var RPs = 0;
 				var AshesLevel = 0;
+				var previousAshesLevel = 0;
 				var wisReady = 0;
 				var monitoringDeviceRunning = 0;
 		return { //this:ActionBasciFsm
@@ -46,8 +53,9 @@ class Raspberryinfocontroller ( name: String, scope: CoroutineScope, isconfined:
 						wisReady = 0 
 						}
 						else
-						 {if( wisReady == 1 
+						 {if( wisReady == 1 && previousAshesLevel != AshesLevel 
 						  ){forward("ashesLevel", "ashesLevel($AshesLevel)" ,"wis" ) 
+						 previousAshesLevel = AshesLevel 
 						 }
 						 }
 						//genTimer( actor, state )

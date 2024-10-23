@@ -11,6 +11,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
 
@@ -22,16 +28,16 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		
-				var levelAshStorage = -1;
-				var IncineratorStatus = 0;
+				var levelAshStorage = 0;
+				var statoIncinerator = 0;
+				val DLIMIT = 10;
+				val DMIN = 100;
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						delay(2000) 
-						CommUtils.outblue("$name STARTS")
-						connectToMqttBroker( "tcp://localhost:8081", "monitoringdevicenat" )
-						CommUtils.outblue("$name | CREATED  (and connected to mosquitto) ... ")
-						subscribe(  "wisinfo" ) //mqtt.subscribe(this,topic)
+						delay(1000) 
+						CommUtils.outblack("$name STARTS")
+						observeResource("192.168.1.85","8125","ctx_waste_incinerator_service","incinerator","statoIncinerator")
 						subscribeToLocalActor("datacleaner") 
 						//genTimer( actor, state )
 					}
@@ -42,28 +48,25 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 				}	 
 				state("wait") { //this:State
 					action { //it:State
-						CommUtils.outblue("$name Waiting data from sonar or updates from Incinerator...")
+						CommUtils.outblack("Waiting data from sonar or updates from Incinerator...")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t04",targetState="handleUpdateIncineratorState",cond=whenDispatch("incineratorState"))
-					transition(edgeName="t05",targetState="handleAshStorageLevel",cond=whenEvent("ashStorageLevel"))
+					 transition(edgeName="t02",targetState="handleUpdateStatoIncinerator",cond=whenDispatch("statoIncinerator"))
+					transition(edgeName="t03",targetState="handleAshStorageLevel",cond=whenEvent("ashStorageLevel"))
 				}	 
-				state("handleUpdateIncineratorState") { //this:State
+				state("handleUpdateStatoIncinerator") { //this:State
 					action { //it:State
-						CommUtils.outgreen("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
-						 	   
-						if( checkMsgContent( Term.createTerm("incineratorState(N)"), Term.createTerm("incineratorState(N)"), 
+						if( checkMsgContent( Term.createTerm("statoIncinerator(N)"), Term.createTerm("statoIncinerator(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								IncineratorStatus = payloadArg(0).toInt() 
-								CommUtils.outblue("$name Current incinerator state: $IncineratorStatus")
-								if( IncineratorStatus==1 
+								 statoIncinerator = payloadArg(0).toInt()  
+								if( statoIncinerator==1 
 								 ){forward("led_on", "led_on(1)" ,"led" ) 
 								}
 								else
-								 {if( levelAshStorage==1 
+								 {if( levelAshStorage < DMIN && levelAshStorage > DLIMIT 
 								  ){forward("led_off", "led_off(1)" ,"led" ) 
 								 }
 								 else
@@ -80,28 +83,25 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 				}	 
 				state("handleAshStorageLevel") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("ashStorageLevel(D)"), Term.createTerm("ashStorageLevel(L)"), 
+						if( checkMsgContent( Term.createTerm("ashStorageLevel(D)"), Term.createTerm("ashStorageLevel(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 												levelAshStorage = payloadArg(0).toInt()
-								CommUtils.outblue("$name current AshStorageLevel=$levelAshStorage")
-								if( IncineratorStatus==0 
-								 ){if( levelAshStorage==1 
+								if( statoIncinerator==0 
+								 ){if( levelAshStorage < DMIN && levelAshStorage > DLIMIT 
 								 ){forward("led_off", "led_off(1)" ,"led" ) 
 								}
 								else
 								 {forward("led_blink", "led_blink(1)" ,"led" ) 
 								 }
 								}
-								if( levelAshStorage==2 
-								 ){CommUtils.outblue("$name Updating AshStorageStatus to 1")
-								//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(1)" ) 
-								publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(1)").toString(), "wisinfo" )   
+								if( levelAshStorage <= DLIMIT 
+								 ){updateResourceRep( "statoAshStorage(1)"  
+								)
 								}
 								else
-								 {CommUtils.outblue("$name Updating AshStorageStatus to 0")
-								 //val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(0)" ) 
-								 publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(0)").toString(), "wisinfo" )   
+								 {updateResourceRep( "statoAshStorage(0)"  
+								 )
 								 }
 						}
 						//genTimer( actor, state )

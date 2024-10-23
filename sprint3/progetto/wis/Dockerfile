@@ -16,10 +16,8 @@
     COPY ./*.json ./
     
     RUN apk update 
-    ##RUN apk add --no-cache openjdk11-jdk nginx
     RUN apk add --no-cache openjdk11-jdk stunnel openssl
-    ## COPY nginx.conf /etc/nginx/nginx.conf
-    COPY ./stunnel.conf /etc/stunnel/stunnel.conf
+    COPY ./stunnel.conf /etc/stunnel/stunnel_wis.conf
     ##CMD ["sh", "-c", "nginx && ./waste_incinerator_service"]
     CMD ["sh", "-c", "stunnel /etc/stunnel/stunnel.conf && ./waste_incinerator_service"]
     #type docker_password.txt | docker login --username natbodocker --password-stdin

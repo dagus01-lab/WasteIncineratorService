@@ -13,9 +13,9 @@ services:
       - ./ca.crt:/etc/stunnel/certs/ca.crt
       - ./client.crt:/etc/stunnel/certs/client.crt
       - ./client.key:/etc/stunnel/certs/client.key
-      - ./stunnel_wis.conf:/etc/stunnel/stunnel.conf
-      - ./wis_conf.json:/root/wis_conf.json
-    command: ["sh", "-c", "sleep 10 && stunnel && ./waste_incinerator_service"]
+      - ./stunnel_wis.conf:/etc/stunnel/stunnel_wis.conf
+      - ./wis_conf.json:/wis_conf.json
+    command: ["sh", "-c", "sleep 10 && stunnel /etc/stunnel/stunnel_wis.conf && ./waste_incinerator_service"]
 
   basicrobot:
     image: basicrobot24:1.0
@@ -31,22 +31,25 @@ services:
       - ./ca.crt:/etc/stunnel/certs/ca.crt
       - ./basicrobot.crt:/etc/stunnel/certs/basicrobot.crt
       - ./basicrobot.key:/etc/stunnel/certs/basicrobot.key
-      - ./stunnel_basicrobot.conf:/etc/stunnel/stunnel.conf       
-    command: ["sh", "-c", "sleep 5 && stunnel && ./basicrobot24"]
+      - ./stunnel_basicrobot.conf:/etc/stunnel/stunnel_basicrobot.conf       
+    command: ["sh", "-c", "sleep 5 && stunnel /etc/stunnel/stunnel_basicrobot.conf && ./basicrobot24"]
+
   wis_facade:
     image: wisfacade:1.0
+    ports:
+      - "8080:8080"
     depends_on:
       - wis_broker
-    ports:
-      - "8085:8085"
     networks:
       - wis_LAN
     volumes:
-      - ./ca.crt:/etc/mosquitto/certs/ca.crt
-      - ./server.crt:/etc/mosquitto/certs/server.crt
-      - ./server.key:/etc/mosquitto/certs/server.key
-      - ./facadeConfig.json:/root/facadeConfig.json
-    command: ["sh", "-c", "stunnel /etc/stunnel/stunnel.conf && java -jar ./wisFacade-0.0.1-SNAPSHOT.jar"]
+      - ./ca.crt:/etc/stunnel/certs/ca.crt
+      - ./client.crt:/etc/stunnel/certs/client.crt
+      - ./client.key:/etc/stunnel/certs/client.key
+      - ./stunnel_wisfacade.conf:/etc/stunnel/stunnel_wisfacade.conf
+      - ./facadeConfig.json:/facadeConfig.json
+    command: ["sh", "-c", "sleep 5 && stunnel /etc/stunnel/stunnel_wisfacade.conf && java -jar ./wisFacade-0.0.1-SNAPSHOT.jar"]
+
   wis_broker:
     image: mqtt_broker:1.0
     ports:
@@ -59,6 +62,7 @@ services:
       - ./server.key:/etc/mosquitto/certs/server.key
       - ./mosquitto.conf:/etc/mosquitto/mosquitto.conf
     command: ["mosquitto", "-c", "/etc/mosquitto/mosquitto.conf"]
+
   wenv:
     image: docker.io/natbodocker/virtualrobotdisi23:1.0
     ports:

@@ -33,6 +33,7 @@ WORKDIR /scale-1.0/bin
 COPY ./*.pl ./
 COPY ./*.txt ./
 COPY ./resources/*.py ./
+COPY ./*.json ./
 
 RUN apk update
 RUN set -xe \

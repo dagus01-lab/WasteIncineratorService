@@ -7,7 +7,7 @@ object ScaleConfigReader {
     private val mapper = ObjectMapper().registerKotlinModule()
     private lateinit var config : ScaleConfig
 
-    fun loadSCaleConfig(filePath: String): ScaleConfig {
+    fun loadScaleConfig(filePath: String): ScaleConfig {
         if(!::config.isInitialized)
             config = mapper.readValue(File(filePath))
         return config

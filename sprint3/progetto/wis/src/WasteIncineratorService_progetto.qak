@@ -137,6 +137,7 @@ QActor raspberryinfocontroller context ctx_waste_incinerator_service{
 	[#
 		var RPs = 0;
 		var AshesLevel = 0;
+		var previousAshesLevel = 0;
 		var wisReady = 0;
 		var monitoringDeviceRunning = 0;
 	#]
@@ -153,8 +154,9 @@ QActor raspberryinfocontroller context ctx_waste_incinerator_service{
 			[#wisReady = 0#]
 		}
 		else{
-			if[#wisReady == 1#]{
+			if[#wisReady == 1 && previousAshesLevel != AshesLevel#]{
 				forward wis -m ashesLevel:ashesLevel($AshesLevel)
+				[#previousAshesLevel = AshesLevel#]
 			}
 		}
 	}
@@ -319,7 +321,7 @@ QActor oprobot context ctx_waste_incinerator_service withobj config using "WISCo
 	State takeRP{
 		publish "wisinfo" -m opRobotJob:opRobotJob(Going_to_WASTEIN)
 		println("OpRobot is going to take an RP..") color yellow
-		request basicrobot -m moverobot:moverobot($WASTEIN,$WASTEINy)
+		request basicrobot -m moverobot:moverobot($WASTEINx,$WASTEINy)
 	}
 	Transition t0 whenReply moverobotdone -> bringRPtoBURNIN
 				  whenReply moverobotfailed -> exit

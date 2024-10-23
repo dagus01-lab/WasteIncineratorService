@@ -11,6 +11,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
 
@@ -24,8 +30,7 @@ class Sonardevice ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 		 
 			lateinit var reader : java.io.BufferedReader
 		    lateinit var p : Process	
-		    var Distance = 0;
-		    var Data = "";
+		    var Distance = 0
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -43,22 +48,23 @@ class Sonardevice ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 				state("readSonarData") { //this:State
 					action { //it:State
 						 
-								Data = reader.readLine()
-								//CommUtils.outyellow("$name with python: data = $Data"   )
-								if( Data != null ){
+								var data = reader.readLine()
+								CommUtils.outyellow("$name with python: data = $data"   ) 
+								if( data != null ){
 								try{ 
-									val vd = Data.toFloat()
+									val vd = data.toFloat()
 									val v  = vd.toInt()
-									if( v <= 500 ){	//A first filter ...
+									if( v <= 100 ){	//A first filter ...
 										Distance = v				
-									}else Distance = 500
+									}else Distance = 0
 								}catch(e: Exception){
 										CommUtils.outred("$name readSonarDataERROR: $e "   )
 								}
 								}
 								
 						if(  Distance > 0  
-						 ){emitLocalStreamEvent("sonardata", "distance($Distance)" ) 
+						 ){CommUtils.outyellow("$name with python: data = $data")
+						emitLocalStreamEvent("sonardata", "distance($Distance)" ) 
 						}
 						//genTimer( actor, state )
 					}
