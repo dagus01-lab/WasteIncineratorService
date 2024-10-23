@@ -9,8 +9,8 @@ services:
       - ./ca.crt:/etc/stunnel/certs/ca.crt
       - ./client.crt:/etc/stunnel/certs/client.crt
       - ./client.key:/etc/stunnel/certs/client.key
-      - ./stunnel:raspberry.conf:/etc/stunnel/stunnel.conf
-      - ./monitoringdevice_conf.json:/root/monitoringdevice_conf.json
+      - ./stunnel_raspberry.conf:/etc/stunnel/stunnel.conf
+      - ./scale_conf.json:/scale-1.0/bin/scale_conf.json
     command: ["sh", "-c", "sleep 10 && stunnel && ./scale"]
    
   monitoringdevice:
@@ -23,5 +23,5 @@ services:
       - ./client.crt:/etc/stunnel/certs/client.crt
       - ./client.key:/etc/stunnel/certs/client.key
       - ./stunnel_raspberry.conf:/etc/stunnel/stunnel.conf
-      - ./scale_conf.json:/root/scale_conf.json
+      - ./monitoringdevice_conf.json:/monitoringdevice-1.0/bin/monitoringdevice_conf.json
     command: ["sh", "-c", "sleep 10 && stunnel && ./monitoringdevice"]

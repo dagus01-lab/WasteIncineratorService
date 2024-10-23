@@ -15,12 +15,13 @@ services:
       - ./client.key:/etc/stunnel/certs/client.key
       - ./stunnel_wis.conf:/etc/stunnel/stunnel_wis.conf
       - ./wis_conf.json:/wis_conf.json
-    command: ["sh", "-c", "sleep 10 && stunnel /etc/stunnel/stunnel_wis.conf && ./waste_incinerator_service"]
+    command: ["sh", "-c", "sleep 15 && stunnel /etc/stunnel/stunnel_wis.conf && ./waste_incinerator_service"]
 
   basicrobot:
     image: basicrobot24:1.0
     ports:
       - "8020:8020" 
+      - "8020:8020/udp"
       - "8085:8085"
     networks:
       - wis_LAN 
