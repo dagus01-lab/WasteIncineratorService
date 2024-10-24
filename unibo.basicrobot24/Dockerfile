@@ -1,16 +1,19 @@
 ## ----------------------------------------------------------
 ## Dockerfile for unibo.basicrobot24
 ## ----------------------------------------------------------
+FROM natbodocker/basicrobot24:1.0 as builder
 
 FROM alpine:latest
 ## EXPOSE 8020
 ## ADD extracts the tar
-ADD ./build/distributions/basicrobot24-1.0.tar /
+#ADD ./build/distributions/basicrobot24-1.0.tar /
 WORKDIR /basicrobot24-1.0/bin
-COPY ./*.pl ./
-COPY ./*.json ./
-COPY ./*.bin ./
-COPY ./*.txt ./
+#COPY ./*.pl ./
+#COPY ./*.json ./
+#COPY ./*.bin ./
+#COPY ./*.txt ./
+COPY --from=builder /basicrobot24-1.0/ /basicrobot24-1.0/
+
 RUN apk update 
 RUN apk add --no-cache openjdk11-jdk stunnel openssl
 
