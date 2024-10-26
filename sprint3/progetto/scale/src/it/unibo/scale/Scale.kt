@@ -11,6 +11,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
 import main.resources.ScaleConfigReader
@@ -24,50 +30,59 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		 val config = ScaleConfigReader.loadScaleConfig("scale_conf.json")
-		 
-				var RPs = 0;
-				var previous_RPs = 0; 
-				val WRP = config.WRP;
-				var timeLastUpdate = System.currentTimeMillis();
-				var timeout = config.timeout;
+		
+				var RPs = 0
 				var broker_url = config.broker_url
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						delay(1000) 
-						subscribeToLocalActor("scaledevice") 
-						CommUtils.outblue("$name subscribed to scaledevice")
+						CommUtils.outyellow("$name | STARTS")
 						connectToMqttBroker( "$broker_url", "scalenat" )
-						CommUtils.outblue("$name | CREATED  (and connected to mosquitto) ... ")
-						subscribe(  "wisinfo" ) //mqtt.subscribe(this,topic)
-						//val m = MsgUtil.buildEvent(name, "num_RP", "num_RP(0)" ) 
-						publish(MsgUtil.buildEvent(name,"num_RP","num_RP(0)").toString(), "wisinfo" )   
+						//val m = MsgUtil.buildEvent(name, "num_RP", "num_RP($RPs)" ) 
+						publish(MsgUtil.buildEvent(name,"num_RP","num_RP($RPs)").toString(), "wisinfo" )   
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t00",targetState="filter",cond=whenEvent("scaledata"))
+					 transition( edgeName="goto",targetState="wait", cond=doswitch() )
 				}	 
-				state("filter") { //this:State
+				state("wait") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("weight(W)"), Term.createTerm("weight(W)"), 
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+				 	 		stateTimer = TimerActor("timer_wait", 
+				 	 					  scope, context!!, "local_tout_"+name+"_wait", 10000.toLong() )  //OCT2023
+					}	 	 
+					 transition(edgeName="t01",targetState="keepConnectionAlive",cond=whenTimeout("local_tout_"+name+"_wait"))   
+					transition(edgeName="t02",targetState="notifyNewRP",cond=whenEvent("num_RP"))
+				}	 
+				state("notifyNewRP") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("num_RP(N)"), Term.createTerm("num_RP(N)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								  
-									      		var W = payloadArg(0).toInt() 
-									      		RPs = (W/WRP).toInt()
-								if( previous_RPs != RPs 
-								 ){//val m = MsgUtil.buildEvent(name, "num_RP", "num_RP($RPs)" ) 
+								RPs = payloadArg(0).toInt() 
+								//val m = MsgUtil.buildEvent(name, "num_RP", "num_RP($RPs)" ) 
 								publish(MsgUtil.buildEvent(name,"num_RP","num_RP($RPs)").toString(), "wisinfo" )   
-								}
-								 previous_RPs = RPs;  
 						}
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t01",targetState="filter",cond=whenEvent("scaledata"))
+					 transition( edgeName="goto",targetState="wait", cond=doswitch() )
+				}	 
+				state("keepConnectionAlive") { //this:State
+					action { //it:State
+						//val m = MsgUtil.buildEvent(name, "num_RP", "num_RP($RPs)" ) 
+						publish(MsgUtil.buildEvent(name,"num_RP","num_RP($RPs)").toString(), "wisinfo" )   
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 				}	 
 			}
 		}

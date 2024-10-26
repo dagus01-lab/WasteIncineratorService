@@ -31,20 +31,15 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		 val config = MonitoringDeviceConfigReader.loadMDConfig("monitoringdevice_conf.json")
 		
-				var levelAshStorage = -1;
-				var previousLevelAshStorage = -1;
-				var D = -1;
-				var IncineratorStatus = 0;
+				var Level=0
 				var broker_url = config.broker_url
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						delay(2000) 
-						CommUtils.outblue("$name STARTS")
+						CommUtils.outyellow("$name | STARTS")
 						connectToMqttBroker( "$broker_url", "monitoringdevicenat" )
-						CommUtils.outblue("$name | CREATED  (and connected to mosquitto) ... ")
-						subscribe(  "wisinfo" ) //mqtt.subscribe(this,topic)
-						subscribeToLocalActor("datacleaner") 
+						//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(0)" ) 
+						publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(0)").toString(), "wisinfo" )   
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -54,34 +49,23 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 				}	 
 				state("wait") { //this:State
 					action { //it:State
-						CommUtils.outblue("$name Waiting data from sonar or updates from Incinerator...")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
+				 	 		stateTimer = TimerActor("timer_wait", 
+				 	 					  scope, context!!, "local_tout_"+name+"_wait", 10000.toLong() )  //OCT2023
 					}	 	 
-					 transition(edgeName="t04",targetState="handleUpdateIncineratorState",cond=whenDispatch("incineratorState"))
-					transition(edgeName="t05",targetState="handleAshStorageLevel",cond=whenEvent("ashStorageLevel"))
+					 transition(edgeName="t01",targetState="keepConnectionAlive",cond=whenTimeout("local_tout_"+name+"_wait"))   
+					transition(edgeName="t02",targetState="handleNewStatoAshStorage",cond=whenEvent("statoAshStorage"))
 				}	 
-				state("handleUpdateIncineratorState") { //this:State
+				state("handleNewStatoAshStorage") { //this:State
 					action { //it:State
-						CommUtils.outgreen("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
-						 	   
-						if( checkMsgContent( Term.createTerm("incineratorState(N)"), Term.createTerm("incineratorState(N)"), 
+						if( checkMsgContent( Term.createTerm("statoAshStorage(N)"), Term.createTerm("statoAshStorage(N)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								IncineratorStatus = payloadArg(0).toInt() 
-								CommUtils.outblue("$name Current incinerator state: $IncineratorStatus")
-								if( IncineratorStatus==1 
-								 ){forward("led_on", "led_on(1)" ,"led" ) 
-								}
-								else
-								 {if( levelAshStorage==1 
-								  ){forward("led_off", "led_off(1)" ,"led" ) 
-								 }
-								 else
-								  {forward("led_blink", "led_blink(1)" ,"led" ) 
-								  }
-								 }
+								Level = payloadArg(0).toInt() 
+								//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage($Level)" ) 
+								publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage($Level)").toString(), "wisinfo" )   
 						}
 						//genTimer( actor, state )
 					}
@@ -90,38 +74,15 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 					}	 	 
 					 transition( edgeName="goto",targetState="wait", cond=doswitch() )
 				}	 
-				state("handleAshStorageLevel") { //this:State
+				state("keepConnectionAlive") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("ashStorageLevel(L,D)"), Term.createTerm("ashStorageLevel(L,D)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								
-												levelAshStorage = payloadArg(0).toInt()
-												D = payloadArg(1).toInt()
-								if( IncineratorStatus==0 && levelAshStorage != previousLevelAshStorage 
-								 ){CommUtils.outblue("$name current AshStorageLevel=$levelAshStorage")
-								if( levelAshStorage==1 
-								 ){forward("led_off", "led_off(1)" ,"led" ) 
-								}
-								else
-								 {forward("led_blink", "led_blink(1)" ,"led" ) 
-								 }
-								previousLevelAshStorage = levelAshStorage 
-								}
-								if( levelAshStorage==2 
-								 ){//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(1,$D)" ) 
-								publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(1,$D)").toString(), "wisinfo" )   
-								}
-								else
-								 {//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(0,$D)" ) 
-								 publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(0,$D)").toString(), "wisinfo" )   
-								 }
-						}
+						//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage($Level)" ) 
+						publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage($Level)").toString(), "wisinfo" )   
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="wait", cond=doswitch() )
 				}	 
 			}
 		}

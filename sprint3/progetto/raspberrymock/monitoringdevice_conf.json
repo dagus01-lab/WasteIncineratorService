@@ -1,0 +1,6 @@
+{
+	"broker_url":"tcp://127.0.0.1:8081",
+	"DLIMIT" : 10,
+	"DMIN" : 100,
+	"timeout" : 10000
+}

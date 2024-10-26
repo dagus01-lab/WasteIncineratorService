@@ -148,6 +148,11 @@ eclipse {
 application {
     //Define the main class for the application.
     mainClassName    = 'it.unibo.ctxscale.MainCtxscaleKt'
+    //added only for docker deployment to work fine with mocks
+    applicationDefaultJvmArgs = [
+        '-Dprism.order=sw',  // Use software rendering
+        '-Dprism.verbose=true' // Verbose output for debugging
+    ]
 }
  
  jar {

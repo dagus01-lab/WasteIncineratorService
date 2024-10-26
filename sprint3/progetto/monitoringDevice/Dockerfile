@@ -27,9 +27,18 @@
 ##
 ## docker run -it --rm --name monitoringdevice -p 8100:8100/tcp  --privileged monitoringdevice:1.0  sh
 FROM arm64v8/alpine
-## EXPOSE 8100
+
+ARG PUID=1000
+ARG PGID=1000
+
+RUN addgroup -g $PGID usergrp \
+    && adduser -D -u $PUID -G usergrp user
 ## ADD extracts the tar
-ADD ./build/distributions/monitoringdevice-1.0.tar /
+ADD --chown=user:usergrp ./build/distributions/monitoringdevice-1.0.tar /
+RUN chown -R user:usergrp /monitoringdevice-1.0
+
+## EXPOSE 8100
+
 WORKDIR /monitoringdevice-1.0/bin
 COPY ./*.pl ./
 COPY ./*.txt ./
@@ -43,6 +52,7 @@ RUN set -xe \
     && apk add --no-cache --purge curl ca-certificates musl wiringpi stunnel openssl \
     && pip3 install --no-cache --upgrade pyserial RPi.GPIO --break-system-packages \
     && apk del --purge .build-dependencies \
-    && rm -rf /var/cache/apk/* /tmp/*
+    && rm -rf /var/cache/apk/* /tmp/* \
 COPY ./stunnel.conf /etc/stunnel/stunnel.conf
+
 CMD ["sh", "-c", "stunnel /etc/stunnel/stunnel.conf && monitoringdevice"]

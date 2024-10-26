@@ -172,9 +172,9 @@ task dovesiamo {
 
 distributions {
     main {
-        distributionBaseName = 'monitoringdevice'
+        distributionBaseName = 'monitoringdevicemock'
         contents { 
-             from './monitoringdevice.pl'
+             from './monitoringdevicemock.pl'
              from './sysRules.pl'
              from './facadeConfig.json'
         }

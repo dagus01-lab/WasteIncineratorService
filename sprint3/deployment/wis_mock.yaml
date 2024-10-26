@@ -1,0 +1,130 @@
+version: '3.8'
+services:
+  wis:
+    image: dagus01/wis:1.0 
+    ports:
+      - "8125:8125"  
+    depends_on:
+      - basicrobot
+      - wis_broker
+    networks:
+      - wis_LAN  
+    secrets:
+      - source: client_crt
+        target: /etc/stunnel/certs/client.crt
+      - source: client_key
+        target: /etc/stunnel/certs/client.key
+      - source: ca_crt
+        target: /etc/stunnel/certs/ca.crt
+    volumes:
+      - ./stunnel_wis.conf:/etc/stunnel/stunnel_wis.conf
+      - ./wis_conf.json:/waste_incinerator_service-1.0/bin/wis_conf.json
+    command: ["sh", "-c", "sleep 10 && stunnel /etc/stunnel/stunnel_wis.conf && ./waste_incinerator_service"]
+
+  raspberrymock:
+    image: dagus01/raspberrymock:1.0
+    ports:
+      - "8095:8095"  
+      - "8100:8100"
+    networks:
+      - wis_LAN  
+    secrets:
+      - source: client_crt
+        target: /etc/stunnel/certs/client.crt
+      - source: client_key
+        target: /etc/stunnel/certs/client.key
+      - source: ca_crt
+        target: /etc/stunnel/certs/ca.crt
+    volumes:
+      - ./stunnel_raspberry.conf:/etc/stunnel/stunnel_raspberry.conf
+      - ./scale_conf.json:/raspberrymock-1.0/bin/scale_conf.json
+      - ./monitoringdevice_conf.json:/raspberrymock-1.0/bin/monitoringdevice_conf.json
+      - ./raspberryMockFacadeConfig.json:/raspberrymock-1.0/bin/facadeConfig.json
+    command: ["sh", "-c", "sleep 15 && stunnel /etc/stunnel/stunnel_raspberry.conf && ./raspberrymock"]
+
+  basicrobot:
+    image: dagus01/basicrobot24:1.0
+    ports:
+      - "8025:8025" 
+      - "8025:8025/udp"
+      - "8085:8085"
+    networks:
+      - wis_LAN 
+    depends_on:
+      - wenv
+    secrets:
+      - source: basicrobot_key
+        target: /etc/stunnel/certs/basicrobot.key
+      - source: basicrobot_crt
+        target: /etc/stunnel/certs/basicrobot.crt
+      - source: ca_crt
+        target: /etc/stunnel/certs/ca.crt
+    volumes:
+      - ./basicrobotConfig.json:/basicrobot24-1.0/bin/basicrobotConfig.json
+      - ./stunnel_basicrobot.conf:/etc/stunnel/stunnel_basicrobot.conf       
+    command: ["sh", "-c", "sleep 5 && stunnel /etc/stunnel/stunnel_basicrobot.conf && ./basicrobot24"]
+
+  wis_facade:
+    image: dagus01/wisfacade:1.0
+    ports:
+      - "8080:8080"
+    depends_on:
+      - wis_broker
+    networks:
+      - wis_LAN
+    secrets:
+      - source: client_key
+        target: /etc/stunnel/certs/client.key
+      - source: client_crt
+        target: /etc/stunnel/certs/client.crt
+      - source: ca_crt
+        target: /etc/stunnel/certs/ca.crt
+    volumes:
+      - ./stunnel_wisfacade.conf:/etc/stunnel/stunnel_wisfacade.conf
+      - ./facadeConfig.json:/facadeConfig.json
+    command: ["sh", "-c", "sleep 5 && stunnel /etc/stunnel/stunnel_wisfacade.conf && java -jar ./wisFacade-0.0.1-SNAPSHOT.jar"]
+
+  wis_broker:
+    image: dagus01/mqtt_broker:1.0
+    ports:
+      - "8081:8081"
+    networks:
+      - wis_LAN
+    secrets:
+      - source: server_crt
+        target: /etc/mosquitto/certs/server.crt
+      - source: server_key
+        target: /etc/mosquitto/certs/server.key
+      - source: ca_crt
+        target: /etc/mosquitto/certs/ca.crt
+    volumes:
+      - ./mosquitto.conf:/etc/mosquitto/mosquitto.conf
+    command: ["mosquitto", "-c", "/etc/mosquitto/mosquitto.conf"]
+
+  wenv:
+    image: docker.io/natbodocker/virtualrobotdisi23:1.0
+    ports:
+      - 8090:8090
+      - 8091:8091
+    networks:
+      - wis_LAN
+
+secrets:
+  server_crt:
+    file: ./server.crt
+  server_key:
+    file: ./server.key
+  ca_crt:
+    file: ./ca.crt
+  client_crt:
+    file: ./client.crt
+  client_key:
+    file: ./client.key
+  basicrobot_key:
+    file: ./basicrobot.key
+  basicrobot_crt:
+    file: ./basicrobot.crt
+    
+networks:
+  wis_LAN:
+    driver: bridge

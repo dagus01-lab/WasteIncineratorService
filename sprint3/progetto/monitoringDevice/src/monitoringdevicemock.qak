@@ -1,0 +1,65 @@
+System monitoringdevicemock
+
+Event statoAshStorage:statoAshStorage(N) "Event that simulate the status of the ash Storage (0=normal, 1=full)"
+Dispatch guicmd:guicmd(N)
+
+//Definizione dei contesti
+Context ctxmonitoringdevice ip [ host= "localhost"      port= 8200 ]
+QActor monitoringdevicedisplay context ctxmonitoringdevice withobj display using "main.java.MonitoringDeviceGui()"{
+	State s0 initial{
+		println("$name | STARTS") color green
+		[# kotlin.concurrent.thread(start = true) { 
+			 display.initialize(myself) 
+		   }
+		#]
+	}
+	Goto wait
+	State wait{
+		
+	}
+	Transition t0 whenMsg guicmd -> handleGuiCmd
+	State handleGuiCmd{
+		onMsg(guicmd:guicmd(CMD)){
+			[#
+				var cmd = payloadArg(0)
+				when(cmd){
+					"FULL" -> #]emit statoAshStorage:statoAshStorage(1) [#
+					"NORMAL" -> #]emit statoAshStorage:statoAshStorage(0)[#
+					"EMPTY"  -> #]emit statoAshStorage:statoAshStorage(0)[#
+					else -> #]println("Invalid input!") color green[#
+				}
+			#]
+			
+		}
+	}
+	Goto wait
+}
+QActor monitoringdevice context ctxmonitoringdevice withobj config using "MonitoringDeviceConfigReader.loadMDConfig(\"monitoringdevice_conf.json\")"{
+	import "main.resources.MonitoringDeviceConfigReader"
+	import "main.resources.MonitoringDeviceConfig" 
+	[#
+		var Level=0
+		var broker_url = config.broker_url
+	#]
+	State s0 initial{
+		println("$name | STARTS") color yellow
+		connectToMqttBroker "$broker_url" clientid "monitoringdevicenat"
+		publish "wisinfo" -m statoAshStorage:statoAshStorage(0)
+	}
+	Goto wait
+	State wait{
+		
+	}
+	Transition t0 	whenTime 10000->keepConnectionAlive
+					whenEvent statoAshStorage->handleNewStatoAshStorage
+	State handleNewStatoAshStorage{
+		onMsg(statoAshStorage:statoAshStorage(N)){
+			[#Level = payloadArg(0).toInt()#]
+			publish "wisinfo" -m statoAshStorage:statoAshStorage($Level)
+		}
+	}
+	Goto wait
+	State keepConnectionAlive{
+		publish "wisinfo" -m statoAshStorage:statoAshStorage($Level)
+	}
+}

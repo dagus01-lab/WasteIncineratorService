@@ -25,9 +25,9 @@ with Diagram('monitoringdevicemockArch', show=False, outformat='png', graph_attr
   with Cluster('env'):
      sys = Custom('','./qakicons/system.png')
 ### see https://renenyffenegger.ch/notes/tools/Graphviz/attributes/label/HTML-like/index
-     with Cluster('ctxscale', graph_attr=nodeattr):
-          inputreader=Custom('inputreader','./qakicons/symActorSmall.png')
-          scale=Custom('scale','./qakicons/symActorSmall.png')
-     inputreader >> Edge( label='statoAshStorage', **eventedgeattr, decorate='true', fontcolor='red') >> sys
-     sys >> Edge( label='statoAshStorage', **evattr, decorate='true', fontcolor='darkgreen') >> scale
+     with Cluster('ctxmonitoringdevice', graph_attr=nodeattr):
+          monitoringdevicedisplay=Custom('monitoringdevicedisplay','./qakicons/symActorWithobjSmall.png')
+          monitoringdevice=Custom('monitoringdevice','./qakicons/symActorWithobjSmall.png')
+     monitoringdevicedisplay >> Edge( label='statoAshStorage', **eventedgeattr, decorate='true', fontcolor='red') >> sys
+     sys >> Edge( label='statoAshStorage', **evattr, decorate='true', fontcolor='darkgreen') >> monitoringdevice
 diag
