@@ -427,18 +427,14 @@ opposta ai pattern più classici di istanziazione di componenti o Service Locato
 
 <h2>Piano di test</h2>
 <p>
-Dovendo avere a che fare con dispositivi di input che devono comunicare tra di loro su contesti diversi, si è pensato che il test automatizzato
-dovesse prevedere di verificare che arrivino effettivamente messaggi di ogni dispositivo sul broker MQTT. In particolare, per ogni attore coinvolto,
-si è deciso di effettuare un test che verifichi che entro un lasso di tempo di 20 secondi dall'avvio del WIS, non vengano ricevuti aggiornamenti.
-Gli attori in questione sono:
+Avendo a che fare con un'applicazione Spring, questa tecnologia ci da la possibilità di effettuare dei test automatizzati tramite l'annotazione @SpringBootTest; a tal proposito il test prevede di effettuare una richiesta GET verso il server che dovrà restituire la pagina html relativa alla RobotFacade.<br>
 <ul>
-<li><b>MonitoringDevice</b>: emette già eventi periodici al massimo ogni 10 secondi</li>
-<li><b>Scale</b>: emette un evento soltanto quando arrivano nuovi pacchetti. Si è deciso di modificarlo in modo tale che, se entro un intervallo di
-10 secondi non vi sono aggiornamenti, si invia un evento new_RP con payload 0 (che verrà scartato dal proxy dal lato del WIS)</li>
+<li><b>TestRobotFacade</b>: posizionarsi sulla directory /sprint3/progetto/wisFacade ed eseguire <b>./gradlew test</b><br/>
+	Per visualizzare l'output del test aprire la pagina al seguente <a href="../progetto/wisFacade/build/reports/tests/test/classes/unibo.wisFacade.FacadeApplicationTests.html">link</a>.</li>
 </ul>
 </p>
 <p>
-Il test automatizzato può essere trovato <a href="../progetto/wis/src/main/java/test/Test_Scale_MonitoringDevice.java">qui</a>.
+Il test automatizzato può essere trovato <a href="../progetto/wisFacade/src/test/java/unibo/wisFacade/FacadeApplicationTests.java">qui</a>.
 </p>
 
 <h2>Deployment</h2>
