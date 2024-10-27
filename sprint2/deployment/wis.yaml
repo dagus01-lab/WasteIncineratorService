@@ -19,7 +19,7 @@ services:
   basicrobot:
     image: basicrobot24:1.0
     ports:
-      - "8020:8020" 
+      - "8025:8025" 
       - "8085:8085"
     networks:
       - wis_LAN 

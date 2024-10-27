@@ -488,7 +488,9 @@ Chiaramente dopo aver trasferito il file raspberry.yaml e il file stunnel.conf.<
 Per far partire la versione del wis con i mock al posto del raspberry eseguire:<br/>
 <b>docker-compose -f wis_mock.yaml up</b><br>
 Alternativamente, in modo tale da poter effettuare il deployment direttamente sui nodi del sistema in maniera automatica, 
-si è deciso di usare docker swarm. Sull'host su cui girerà il wis eseguire:<br/>
+si potrebbe optare per uno strumento come docker swarm. Tra le altre cose, consentirebbe anche una cifratura del traffico 
+tra i container senza che questa venga gestita all'esterno come viene fatta ora. 
+Sull'host su cui girerà il wis eseguire:<br/>
 <b>docker swarm init</b><br/>
 e sul nodo del monitoring device e della scale eseguire:<br/>
 <b>docker swarm join --token <token> <wis_ip>:2377</b><br/>
