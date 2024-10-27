@@ -409,6 +409,8 @@ QActor oprobot context ctx_waste_incinerator_service withobj config using "WISCo
 	
 	State exit{
 		println("$name has been terminated") color yellow
+		publish "wisinfo" -m opRobotState:opRobotState(FAILURE)
+		publish "wisinfo" -m opRobotJob:opRobotJob(Failed_to_complete_path)
 	}
 }
 //-----------------------------------------------------------------------------------------------------------
@@ -427,6 +429,7 @@ QActor incinerator context ctx_waste_incinerator_service withobj config using "W
 		connectToMqttBroker "$broker_url" clientid "incineratornat"
 		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "incineratornat" 
  		println("$name | CREATED  (and connected to mosquitto) ... ") color green
+ 		publish "wisinfo" -m statoIncinerator:statoIncinerator(OFF)
 	}
 	Transition t0 whenMsg activationCommand -> turnOn
 	
@@ -438,14 +441,14 @@ QActor incinerator context ctx_waste_incinerator_service withobj config using "W
 	//Stato per gestire l'inizio di burning
 	State handleStartBurning{
 		println("Incinerator is burning...") color red
-		publish "wisinfo" -m statoIncinerator:statoIncinerator(1)
+		publish "wisinfo" -m statoIncinerator:statoIncinerator(BURNING)
 	}
 	Transition t0 whenTimeVar BTIME -> handleEndBurning
 	
 	//Stato per gestire la fine di burning
 	State handleEndBurning{
 		emit endBurning : endBurning(1) //emette il segnale di fine burning
-		publish "wisinfo" -m statoIncinerator:statoIncinerator(0)
+		publish "wisinfo" -m statoIncinerator:statoIncinerator(OFF)
 	}
 	Transition t0 whenMsg startBurning -> handleStartBurning   
 }

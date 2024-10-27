@@ -242,6 +242,10 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 				state("exit") { //this:State
 					action { //it:State
 						CommUtils.outyellow("$name has been terminated")
+						//val m = MsgUtil.buildEvent(name, "opRobotState", "opRobotState(FAILURE)" ) 
+						publish(MsgUtil.buildEvent(name,"opRobotState","opRobotState(FAILURE)").toString(), "wisinfo" )   
+						//val m = MsgUtil.buildEvent(name, "opRobotJob", "opRobotJob(Failed_to_complete_path)" ) 
+						publish(MsgUtil.buildEvent(name,"opRobotJob","opRobotJob(Failed_to_complete_path)").toString(), "wisinfo" )   
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

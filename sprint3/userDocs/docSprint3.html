@@ -298,6 +298,22 @@ ma essa viene fornita in automatico dal container.<br>
 Dunque, il container si occupa di risolvere (injection) le dipendenze dei componenti attraverso l’opportuna configurazione dell’implementazione dell’oggetto (push);
 opposta ai pattern più classici di istanziazione di componenti o Service Locator, dove è il componente che deve determinare l’implementazione della risorsa desiderata.
 </p>
+<p>
+	<h3>Struttura della wisFacade</h3>
+	L'applicazione spring in questione è composta da una parte di backend e da una di frontend (per la quale si è deciso di adottare come 
+	protocollo di comunicazione le websocket, in quanto permettono di, tramite una sola connessione tcp, ricevere aggiornamenti in tempo reale 
+	dal backend dell'applicazione senza bisogno di ricaricare l'intera pagina). <br>
+	La wisFacade è stata strutturata su diversi componenti:
+	<ul>
+		<li><b>FacadeBuilder</b>: crea i componenti dell'applicazione</li>
+		<li><b>FacadeController</b>: funge da entrypoint dell'applicazione</li>
+		<li><b>ApplGuiCore</b>: a questo componente viene demandato lo smistamento dei messaggi dal broker ai client websocket</li>
+		<li><b>WSHandler</b>: designato per l'interazione con i client web tramite websocket</li>
+		<li><b>MqttFacadeClient</b>: pensato per l'interazione con il broker MQTT</li>
+	</ul>
+	Di seguito viene riportata un'illustrazione della GUI:<br>
+	<img src="img/wisfacadegui.png" alt="GUI" />
+</p>
 
 <p>
 	<h3>Interazione WIS-WISFacade</h3>
@@ -374,6 +390,40 @@ opposta ai pattern più classici di istanziazione di componenti o Service Locato
 	loro di manomettere le informazioni che provengono dall'applicazione spring verso i client.<br>
 	Riguardo questo specifico requisito di sicurezza si è deciso di demandare la questione al committente.
 </p>
+<p>
+	<h3>RaspberryMockFacade</h3>
+	Si è deciso di fornire anche un'alternativa per far partire l'applicazione senza necessariamente essere in possesso di un raspberry pi.
+	Di conseguenza si è pensato ad un'applicazione grafica per poter mandare messaggi al broker MQTT sostituendo di fatto il monitoring device 
+	e la scale.<br>
+	L'interfaccia grafica fornita è la seguente:<br>
+	<img src="img/raspberrymockgui.png" alt="GUI" /><br>
+	Si noti come, per quanto riguarda lo stato dell'AshStorage, si è deciso di permettere agli utenti di specificare soltanto lo stato di riempimento, e non il livello 
+	di cenere effettivo. Questa decisione è dovuta principalmente ad una maggiore facilità di utilizzo da parte dell'utente. Inoltre, facendo un parallelismo con la controparte 
+	fisica, un osservatore in ogni istante riesce a percepire tangibilmente se l'AshStorage è pieno, vuoto oppure ad un livello intermedio, ma non l'esatta distanza percepita dal sonar.<br>
+	Per realizzare l'applicazione si è deciso di usare spring, come del resto si è fatto per la wisfacade, per gli stessi motivi.<br>
+	Si è deciso di integrare l'applicazione spring con un modello QAK. In questo modo si permette di avere un maggiore 
+	disaccoppiamento tra la parte dell'interazione con l'utente (tramite spring) e la parte di interazione tra il nodo del mock 
+	e il broker MQTT. <br>
+	<h4>Il modello QAK</h4>
+	Per quanto concerne il modello QAK le entità in gioco sono monitoringdevice e scale. Al fine di liberare questi due componenti dall'onere di dover comunicare con l'applicazione spring, 
+	si è deciso di introdurre un apposito attore ausiliario raspberrymockproxy, al quale viene delegato questo compito.<br>
+	Del resto, monitoringdevice e scale sono stati presi uguali ai loro corrispondenti fisici, ad eccezion fatta per il modo in cui il monitoringdevice aggiorna il livello dell'ashStorage.
+	L'interfaccia grafica deve poter permettere all'utente di stabilire il livello di riempimento, ma non permette di specificare una stima del livello dell'ashStorage.
+	Di conseguenza, il monitoringdevice invia lo stato di riempimento, e insieme il valore massimo corrispondente a quel determinato stato (se lo stato è "EMPTY" o "NORMAL" manda il livello corrispondente
+	al contenitore vuoto. Se invece è "FULL" manda il livello corrispondente al contenitore pieno ).<br>
+	Di seguito si trova il <a href="../progetto/raspberrymock/src/raspberrymock.qak">modello QAK</a>
+	<h4>L'applicazione spring</h4>
+	L'applicazione spring si struttura in modo simile al caso della wisfacade, ed è composta da:
+	<ul>		
+		<li><b>FacadeBuilder</b>: crea i componenti dell'applicazione</li>
+		<li><b>FacadeController</b>: funge da entrypoint dell'applicazione</li>
+		<li><b>ApplGuiCore</b>: a questo componente viene demandato l'aggiornamento agli altri client websocket e dell'attore raspberrymockproxy</li>
+		<li><b>WSHandler</b>: designato per l'interazione con i client web tramite websocket</li>
+	</ul>
+	Riguardo l'applicazione spring stessa (anche se per il momento non lo si ritiene necessario, in quanto è stata pensata per essere utilizzata 
+	a scopo di testing del sistema) andrebbe valutato in futuro un'opportuna politica di controllo degli accessi (in quanto l'accesso all'interfaccia 
+	grafica consente di modificare lo stato del sistema).
+</p>
 
 <h2>Piano di test</h2>
 <p>
@@ -435,6 +485,8 @@ Per avviare il monitoring device e la scale sul raspberry, scaricare le immagini
 monitoringdevice e scale ed eseguire:<br/>
 <b>docker-compose -f raspberry.yaml up</b><br/>
 Chiaramente dopo aver trasferito il file raspberry.yaml e il file stunnel.conf.<br/>
+Per far partire la versione del wis con i mock al posto del raspberry eseguire:<br/>
+<b>docker-compose -f wis_mock.yaml up</b><br>
 Alternativamente, in modo tale da poter effettuare il deployment direttamente sui nodi del sistema in maniera automatica, 
 si è deciso di usare docker swarm. Sull'host su cui girerà il wis eseguire:<br/>
 <b>docker swarm init</b><br/>
@@ -445,7 +497,7 @@ ip del nodo su cui gira il wis.
 Per poter permettere la comunicazione tra i vari nodi eseguire:<br/>
 <b>docker network create --driver overlay wis_LAN</b><br/>
 Successivamente, si può procedere con l'orchestrazione dei container su uno stack apposito:<br/>
-<b>sudo docker stack deploy --detach=false -c wis.yaml my_stack</b><br/>
+<b>docker stack deploy --detach=false -c wis.yaml my_stack</b><br/>
 Per terminare l'operazione eseguire ctrl+C e poi:<br/>
 <b>sudo docker stack rm my_stack</b><br/>
 Per poter vedere in tempo reale i log dei container: <br/>
@@ -461,6 +513,7 @@ Per poter vedere in tempo reale i log dei container: <br/>
 			<li>Tutti: discusso assieme i vantaggi/svantaggi dell'uso di un metodo publish/subscribe anziché updateResource.</li>
 			<li>Bryan: ragionato su vantaggi/svantaggi di gui sviluppata come applicazione mobile/web e implementazione della pagina della GUI.</li>
 			<li>Gabriele ed Emanuele: creazione/modifica dei componenti lato Facade e lato qak.</li>
+			<li>Gabriele: creazione raspberrymockfacade e deployment</li>
 		</ul>
 	</li>
 	<li><b>Testing:</b> piano dei test deciso assieme. L'effettiva realizzazione è stata affidata a Gabriele. </li>

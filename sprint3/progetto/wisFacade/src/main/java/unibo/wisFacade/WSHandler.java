@@ -24,7 +24,11 @@ public class WSHandler extends AbstractWebSocketHandler {
     private final List<WebSocketSession> sessions               = new ArrayList<>();
     private final Map<String, WebSocketSession> pendingRequests = new HashMap<>();
     private final Map<String, WebSocketSession> curSessions     = new HashMap<>();
-
+    private int statoAshStorage = 0;
+    private int statoWasteStorage = 0;
+    private String statoIncinerator = "-";
+    private String statoOpRobot = "-";
+    private String opRobotJob = "-";
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -32,6 +36,11 @@ public class WSHandler extends AbstractWebSocketHandler {
         CommUtils.outyellow("WSH | Added client session id=" + session.getId() + " " + session.getRemoteAddress());
         //curSessions.put(session.getId(),session);
         super.afterConnectionEstablished(session);
+        session.sendMessage(new TextMessage("statoAshStorage(0,"+statoAshStorage+")"));
+        session.sendMessage(new TextMessage("num_RP("+statoWasteStorage+")"));
+        session.sendMessage(new TextMessage("opRobotState("+statoOpRobot+")"));
+        session.sendMessage(new TextMessage("statoIncinerator("+statoIncinerator+")"));
+        session.sendMessage(new TextMessage("opRobotJob("+opRobotJob+")"));
     }
 
     @Override
@@ -74,24 +83,51 @@ public class WSHandler extends AbstractWebSocketHandler {
         }
 
     }
+    
+    protected synchronized void updateStoredValues(String message) {
+    	try {
+    		if(message.contains("statoAshStorage")){
+        		int stato = Integer.parseInt(message.split(",")[1].split(")")[0]);
+        		if(stato>=0) {
+        			statoAshStorage = stato;
+        		}
+        	}
+        	else if(message.contains("statoIncinerator")){
+        		statoIncinerator = message.split("(")[1].split(")")[0];
 
+        	}
+        	else if(message.contains("opRobotState")){
+        		statoOpRobot  = message.split("(")[1].split(")")[0];
+        	}
+        	else if(message.contains("opRobotJob")){
+        		opRobotJob = message.split("(")[1].split(")")[0];
+        	}
+        	else if(message.contains("num_RP")){
+        		int state = Integer.parseInt(message.split("(")[1].split(")")[0]);
+        		if(state>=0) {
+        			statoWasteStorage = state;
+        		}
+        	}
+    	} catch(Exception e) {
+    	}
+    	
+    }
 
-    protected synchronized  void sendToAll(String message) { //synchronized JAN24
-        //Appena si collega alla appl remota, il CoAP observer riceve dati vecchi
-        //e chiama  sendToAll prima amcora che un utente
-        //abbia aperto la pagina con il browser e che quindi ci sia una WS
+    protected synchronized  void sendToAll(String message) { 
+        
+        updateStoredValues(message);
         CommUtils.outcyan("WSH | Sending to all " + message);
         try {
-            if( sessions.size() > 0 ){
-                for (WebSocketSession session : sessions) {
-                    session.sendMessage(new TextMessage("WSH> "+message));
-                    //CommUtils.outcyan("WSH | sent on current session " + session.getRemoteAddress());
-                }
-            }
+	        if( sessions.size() > 0 ){
+	            for (WebSocketSession session : sessions) {
+	                session.sendMessage(new TextMessage(message));
+	                //CommUtils.outcyan("WSH | sent on current session " + session.getRemoteAddress());
+	            }
+	        }
             else{
-                //CommUtils.outred("WSH | Sorry: no session yet ...");
+                    //CommUtils.outred("WSH | Sorry: no session yet ...");
             }
- 
+     
         } catch (Exception e) {
                 CommUtils.outred("WSH | sendToAll " + message + " ERROR " + e.getMessage() );
         }
