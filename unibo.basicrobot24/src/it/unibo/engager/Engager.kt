@@ -11,6 +11,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
 
@@ -44,10 +50,11 @@ class Engager ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 				}	 
 				state("handleEngage") { //this:State
 					action { //it:State
-						CommUtils.outcyan("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
+						CommUtils.outmagenta("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
 						 	   
 						if( checkMsgContent( Term.createTerm("engage(OWNER,STEPTIME)"), Term.createTerm("engage(OWNER,STEPTIME)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
+								CommUtils.outblue("engager | owner=${payloadArg(0)}")
 								 if( currentMsg.conn != null ) curConn = currentMsg.conn					
 												   EngageCaller  = currentMsg.msgSender() //payloadArg(0)
 												   if( curConn != null )
@@ -57,6 +64,7 @@ class Engager ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 												   EngageDone = OwnerMngr.engage(EngageCaller)
 												   if( EngageDone ) OwnerMngr.setStepTime(payloadArg(1))
 												   //MAY24
+								CommUtils.outblue("$name | engage caller=$EngageCaller - engage done=$EngageDone")
 						}
 						//genTimer( actor, state )
 					}

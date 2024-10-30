@@ -79,8 +79,9 @@ QActor engager context ctxbasicrobot{
 		          whenRequest checkowner ->  checkTheOwner
      			   
     State handleEngage{
-    	printCurrentMessage 
+    	printCurrentMessage color magenta
 			onMsg( engage : engage(OWNER, STEPTIME) ) {
+				println("engager | owner=${payloadArg(0)}" ) color blue
 				[# if( currentMsg.conn != null ) curConn = currentMsg.conn					
 				   EngageCaller  = currentMsg.msgSender() //payloadArg(0)
 				   if( curConn != null )
@@ -91,6 +92,7 @@ QActor engager context ctxbasicrobot{
 				   if( EngageDone ) OwnerMngr.setStepTime(payloadArg(1))
 				   //MAY24
 				#]
+				println("$name | engage caller=$EngageCaller - engage done=$EngageDone") color blue
 			}
      }  
      //Goto engageAccept if [# Owner == "unkknown" || Owner == EngageCaller || EngageCaller == "gui23xyz9526" #] else engageRefuse
@@ -205,10 +207,13 @@ QActor basicrobot context ctxbasicrobot withobj robot using "uniborobots.robotSu
   	    #]
    		//delay 2000 //per inserzione in docker
   		*/
-        run robot.move( "h" )    //reset
-        delay 300
-	  	run robot.move( "a" )    //synch 
- 		run robot.move( "d" )	 //synch
+  		
+  		println("basicrobot | STARTING Sept 2024 no moves ... ") color magenta
+  		
+//        run robot.move( "h" )    //reset
+//        delay 300
+//	  	run robot.move( "a" )    //synch 
+// 		run robot.move( "d" )	 //synch
  
 
  	}
@@ -218,15 +223,15 @@ QActor basicrobot context ctxbasicrobot withobj robot using "uniborobots.robotSu
     State waitForRobot{
  		delay 5000 //per inserzione in docker: attesa per wenv  
  		//NO SUBSCRIPTION TO SONAR FOR THE VIRTUAL ROBOT
- 		println("basicrobot | STARTING ... ") color magenta
+ 		println("basicrobot | waitForRobot ... ") color magenta
  		
  		//ELIMINO LA INTERAZIONE SINCRONA perch� richiede la presenza dell'immagine
    		//run robot.move( "a" )    //synch 
  		//run robot.move( "d" )	//synch   	
-    }
+    } 
     Goto work
     
-  	
+  	 
 	State work{ 
 		//printCurrentMessage   
         //updateResource [# "basicrobot(started)" #]
@@ -701,9 +706,9 @@ QActor robotpos context ctxbasicrobot{
 //                   appl "main.java.facade24.Facade24Application" 
 //                   UserLibs -f "Facade24Start-1.0-plain"  -f "Facade24Start-1.0"
 
-//Facade robotfacade port 8085 usingactor basicrobot inctx ctxbasicrobot  
-//                   appl "main.java.robotfacade24.Robotfacade24Application" 
-//                   UserLibs -f "robotfacade24-1.0-plain"  -f "robotfacade24-1.0"
+Facade robotfacade port 8085 usingactor basicrobot inctx ctxbasicrobot  
+                   appl "main.java.robotfacade24.Robotfacade24Application" 
+                   UserLibs -f "robotfacade24-1.0-plain"  -f "robotfacade24-1.0"
 
   
 /*
@@ -786,7 +791,7 @@ QActor basicrobotusage context ctxbasicrobot{
 	State handleStepDone{
 		printCurrentMessage color black
 	}
-	Goto dowork
+	Goto dowork 
 	
 	State handleStepFail{
 		printCurrentMessage color black

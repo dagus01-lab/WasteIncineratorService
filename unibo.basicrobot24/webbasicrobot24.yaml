@@ -7,12 +7,12 @@ services:
       - 8091:8091/tcp
       - 8091:8091/udp
   basicrobot24:
-    image: basicrobot24:1.0
-    #image: docker.io/natbodocker/basicrobot24:1.0
+    #image: basicrobot24:1.0
+    image: docker.io/natbodocker/basicrobot24:1.0 
     ports:
       - 8020:8020/tcp
       - 8020:8020/udp
- ##     - 8085:8085
+      - 8085:8085
     depends_on:
       - wenv
  
