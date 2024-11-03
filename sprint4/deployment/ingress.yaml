@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: wis-facade-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    traefik.ingress.kubernetes.io/rule-type: PathPrefixStrip
 spec:
   rules:
   - host: wisfacade
@@ -22,7 +22,7 @@ kind: Ingress
 metadata:
   name: virtualrobot-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    traefik.ingress.kubernetes.io/rule-type: PathPrefixStrip
 spec:
   rules:
   - host: virtualrobot

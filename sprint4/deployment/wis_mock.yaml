@@ -50,6 +50,9 @@ spec:
           ]
         volumeMounts:
         - name: config-volume
+          subPath: stunnel_wis.conf
+          mountPath: /etc/stunnel/stunnel_wis.conf
+        - name: config-volume
           subPath: wis_conf.json
           mountPath: /waste_incinerator_service-1.0/bin/wis_conf.json
         resources:
@@ -82,23 +85,21 @@ spec:
     targetPort: 8125
   type: ClusterIP
 ---
-# Scale Deployment and Service
+# Raspberry Mock Deployment and Service
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: scale
+  name: raspberrymock
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: scale
+      app: raspberrymock
   template:
     metadata:
       labels:
-        app: scale
+        app: raspberrymock
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: raspberrypi
       initContainers:
       - name: wait-for-wis-broker
         image: busybox
@@ -110,108 +111,55 @@ spec:
               wis-broker..."; sleep 5; done'
           ]
       containers:
-      - name: scale-container
-        image: dagus01/scale:arm
+      - name: wis-facade-container
+        image: dagus01/raspberrymock:1.0
         ports:
-        - containerPort: 8200
-        command: [ "sh", "-c", "./scale" ]
+        - containerPort: 8095
+        - containerPort: 8100
+        command: [ "sh", "-c", "./raspberrymock" ]
         volumeMounts:
         - name: configs-volume
           subPath: scale_conf.json
-          mountPath: /scale-1.0/bin/scale_conf.json
-        securityContext:
-          privileged: true
-        resources:
-          requests:
-            memory: "48Mi"
-            cpu: "150m"
-          limits:
-            memory: "256Mi"
-            cpu: "1"
-      volumes:
-      - name: configs-volume
-        configMap:
-          name: config-files
-          items:
-          - key: scale_conf.json
-            path: scale_conf.json
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: scale-service
-spec:
-  selector:
-    app: scale
-  ports:
-  - protocol: TCP
-    port: 8200
-    targetPort: 8200
-  type: ClusterIP
----
-# Monitoring Device Deployment and Service
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: monitoringdevice
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: monitoringdevice
-  template:
-    metadata:
-      labels:
-        app: monitoringdevice
-    spec:
-      nodeSelector:
-        kubernetes.io/hostname: raspberrypi
-      initContainers:
-      - name: wait-for-wis-broker
-        image: busybox
-        command:
-          [
-            'sh',
-            '-c',
-            'until nc -nz wis-broker-service 8081; do echo "Waiting for
-              wis-broker..."; sleep 5; done'
-          ]
-      containers:
-      - name: monitoringdevice-container
-        image: dagus01/monitoringdevice:arm
-        ports:
-        - containerPort: 8100
-        command: [ "sh", "-c", "./monitoringdevice" ]
-        volumeMounts:
+          mountPath: /raspberrymock-1.0/bin/scale_conf.json
         - name: configs-volume
           subPath: monitoringdevice_conf.json
-          mountPath: /monitoringdevice-1.0/bin/monitoringdevice_conf.json
-        securityContext:
-          privileged: true
+          mountPath: /raspberrymock-1.0/bin/monitoringdevice_conf.json
+        - name: configs-volume
+          subPath: raspberryMockFacadeConfig.json
+          mountPath: /raspberrymock-1.0/bin/facadeConfig.json
         resources:
           requests:
-            memory: "32Mi"
-            cpu: "250m"
-          limits:
             memory: "256Mi"
+            cpu: "500m"
+          limits:
+            memory: "1024Mi"
             cpu: "1"
       volumes:
       - name: configs-volume
         configMap:
           name: config-files
           items:
+          - key: raspberryMockFacadeConfig.json
+            path: raspberryMockFacadeConfig.json
+          - key: scale_conf.json
+            path: scale_conf.json
           - key: monitoringdevice_conf.json
             path: monitoringdevice_conf.json
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: monitoringdevice-service
+  name: raspberrymock-service
 spec:
   selector:
-    app: monitoringdevice
+    app: raspberrymock
   ports:
-  - protocol: TCP
+  - name: facadeport
+    protocol: TCP
+    port: 8095
+    targetPort: 8095
+  - name: raspberrymockport
+    protocol: TCP
     port: 8100
     targetPort: 8100
   type: ClusterIP
