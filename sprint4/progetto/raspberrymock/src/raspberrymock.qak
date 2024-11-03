@@ -1,0 +1,128 @@
+System raspberrymock
+
+Event statoAshStorage:statoAshStorage(N, L) "Event that simulate the status of the ash Storage (0=normal, 1=full)"
+Event num_RP : num_RP(N) "command that simulates an update in the number of RPs"
+Dispatch ashStorageState:ashStorageState(N) "messaggio dalla GUI per notificare l'aggiornamento dello stato dell'ash storage"
+Dispatch wasteStorageState:wasteStorageState(N) "messaggio dalla GUI per notificare l'aggiornamento del numero di RP presenti nel waste storage"
+
+//Definizione dei contesti
+Context ctxraspberrymock ip [ host= "localhost"      port= 8100 ]
+
+QActor raspberrymockproxy context ctxraspberrymock{
+	State s0 initial{
+		delay 500
+		println("$name | STARTS") color red
+	}
+	Goto wait
+	State wait{
+		
+	}
+	Transition t0 whenMsg ashStorageState -> handleUpdateStatoAshStorage
+				  whenMsg wasteStorageState -> handleUpdateStatoWasteStorage
+	State handleUpdateStatoAshStorage{
+		
+		onMsg(ashStorageState:ashStorageState(S)){
+			[#
+				var State = payloadArg(0)
+				when(State){
+					"FULL" -> #]emit statoAshStorage:statoAshStorage(1,2) [#
+					"NORMAL" -> #]emit statoAshStorage:statoAshStorage(0,1)[#
+					"EMPTY" -> #]emit statoAshStorage:statoAshStorage(0,0)[#
+					else -> #]println("Invalid input!") color green[#
+				}
+			#]
+			
+		}
+	}
+	Goto wait
+	State handleUpdateStatoWasteStorage{
+		onMsg(wasteStorageState:wasteStorageState(N)){
+			[#var RPs = payloadArg(0)#]
+			emit num_RP:num_RP($RPs)
+		}
+	}
+	Goto wait
+	
+}
+
+QActor monitoringdevice context ctxraspberrymock withobj config using "MonitoringDeviceConfigReader.loadMDConfig(\"monitoringdevice_conf.json\")"{
+	import "main.resources.MonitoringDeviceConfigReader"
+	import "main.resources.MonitoringDeviceConfig" 
+	[#
+		var State = 0
+		var broker_url = config.broker_url
+		var DLIMIT = config.DLIMIT;
+		var DMIN = config.DMIN;
+	#]
+	State s0 initial{
+		println("$name | STARTS") color yellow
+		connectToMqttBroker "$broker_url" clientid "monitoringdevicenat"
+		println("$name | connected to MQTT broker $broker_url") color cyan
+		publish "wisinfo" -m statoAshStorage:statoAshStorage(0)
+	}
+	Goto wait
+	State wait{
+		
+	}
+	Transition t0 	whenTime 10000->keepConnectionAlive
+					whenEvent statoAshStorage->handleNewStatoAshStorage
+	State handleNewStatoAshStorage{
+		onMsg(statoAshStorage:statoAshStorage(N,L)){
+			[#
+				State = payloadArg(0).toInt()
+				when(State){
+					0 -> #]publish "wisinfo" -m statoAshStorage:statoAshStorage(0,$DMIN) [#
+					1 -> #]publish "wisinfo" -m statoAshStorage:statoAshStorage(1,$DLIMIT)[#
+					else -> #]println("Invalid input!") color green[#
+				}
+			#]
+		}
+	}
+	Goto wait
+	State keepConnectionAlive{
+		[#
+			when(State){
+					0 -> #]publish "wisinfo" -m statoAshStorage:statoAshStorage(0, $DMIN) [#
+					1 -> #]publish "wisinfo" -m statoAshStorage:statoAshStorage(1, $DLIMIT)[#
+				}
+		#]
+	}
+	Goto wait
+}
+
+QActor scale context ctxraspberrymock withobj config using "ScaleConfigReader.loadScaleConfig(\"scale_conf.json\")"{
+	import "main.resources.ScaleConfigReader"
+	import "main.resources.ScaleConfig" 
+	
+	[#
+		var RPs = 0
+		var broker_url = config.broker_url
+	#]
+	State s0 initial{
+		println("$name | STARTS") color yellow
+		connectToMqttBroker "$broker_url" clientid "scalenat"
+		println("$name | connected to MQTT broker $broker_url") color cyan
+		publish "wisinfo" -m num_RP:num_RP($RPs)
+	}
+	Goto wait
+	State wait{
+		
+	}
+	Transition t0 	whenTime 10000->keepConnectionAlive
+					whenEvent num_RP->notifyNewRP
+	State notifyNewRP{
+		onMsg(num_RP:num_RP(N)){
+			[#RPs = payloadArg(0).toInt()#]
+			publish "wisinfo" -m num_RP:num_RP($RPs)
+		}
+	}
+	Goto wait
+	State keepConnectionAlive{
+		publish "wisinfo" -m num_RP:num_RP($RPs)
+	}
+	Goto wait
+}
+
+Facade raspberryMockFacade port 8085 usingactor raspberrymockproxy inctx ctxraspberrymock 
+                   appl "unibo.raspberrymock.RaspberrymockApplication" 
+                   UserLibs -f "raspberrymockfacade-0.0.1-SNAPSHOT"  -f "raspberrymockfacade-0.0.1-SNAPSHOT-plain"

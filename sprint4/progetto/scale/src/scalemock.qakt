@@ -1,0 +1,59 @@
+System scalemock
+
+Event num_RP : num_RP(N) "command that simulates an update in the number of RPs"
+Dispatch guicmd:guicmd(N) "message sent by the GUI containing the number of RPs"
+
+//Definizione dei contesti
+Context ctxscale ip [ host= "localhost"      port= 8200 ]
+QActor scaledisplay context ctxscale withobj display using "main.java.ScaleGui()"{
+	State s0 initial{
+		println("$name | STARTS") color green
+		[# kotlin.concurrent.thread(start = true) { 
+			 display.initialize(myself)
+		   }
+		#]
+	}
+	Goto wait
+	State wait{ 
+		
+	}
+	Transition t0 whenMsg guicmd -> handleGuiCmd
+	State handleGuiCmd{
+		onMsg(guicmd:guicmd(N)){
+			[#var RPs = payloadArg(0)#]
+			emit num_RP:num_RP($RPs)
+		}
+		
+	}
+	Goto wait
+}
+QActor scale context ctxscale withobj config using "ScaleConfigReader.loadScaleConfig(\"scale_conf.json\")"{
+	import "main.resources.ScaleConfigReader"
+	import "main.resources.ScaleConfig" 
+	
+	[#
+		var RPs = 0
+		var broker_url = config.broker_url
+	#]
+	State s0 initial{
+		println("$name | STARTS") color yellow
+		connectToMqttBroker "$broker_url" clientid "scalenat"
+		publish "wisinfo" -m num_RP:num_RP($RPs)
+	}
+	Goto wait
+	State wait{
+		
+	}
+	Transition t0 	whenTime 10000->keepConnectionAlive
+					whenEvent num_RP->notifyNewRP
+	State notifyNewRP{
+		onMsg(num_RP:num_RP(N)){
+			[#RPs = payloadArg(0).toInt()#]
+			publish "wisinfo" -m num_RP:num_RP($RPs)
+		}
+	}
+	Goto wait
+	State keepConnectionAlive{
+		publish "wisinfo" -m num_RP:num_RP($RPs)
+	}
+}

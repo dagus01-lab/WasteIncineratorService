@@ -1,0 +1,1 @@
+{"host":"localhost", "port":"8100", "context":"ctxraspberrymock", "facade": "raspberrymockproxy", "facadeport":"8095", "sysdescr":"raspberrymock" } 

@@ -1,0 +1,129 @@
+ <!DOCTYPE html>
+<html>
+	<head>
+		<style>
+		        /* General Styling */
+		        * {
+		            box-sizing: border-box;
+		            margin: 0;
+		            padding: 0;
+		            font-family: Arial, sans-serif;
+		        }
+		        body, html {
+		            height: 100%;
+		        }
+		        .container {
+		            display: flex;
+		            height: 100vh;
+		        }
+
+		        /* Left Section Styling */
+		        .left-section, .right-section {
+		            width: 50%;
+		            padding: 20px;
+		            display: flex;
+		            flex-direction: column;
+		            align-items: center;
+		            justify-content: center;
+		        }
+
+		        .left-section {
+		            background-color: #f0f0f0;
+		            border-right: 2px solid #ccc;
+		        }
+
+		        .right-section {
+		            background-color: #e0e0e0;
+		        }
+
+		        /* Title Styling */
+		        h1 {
+		            font-size: 24px;
+		            margin-bottom: 20px;
+		            color: #333;
+		        }
+
+		        /* Textbox Styling */
+		        .textbox {
+		            width: 100%;
+		            max-width: 200px;
+		            height: 40px;
+		            border: 1px solid #ccc;
+		            border-radius: 5px;
+		            margin-bottom: 20px;
+		            display: flex;
+		            align-items: center;
+		            justify-content: center;
+		            background-color: white;
+		            font-size: 16px;
+		            color: #333;
+		        }
+
+		        /* Button Styling */
+		        .button-container {
+		            display: flex;
+		            flex-direction: column;
+		            gap: 10px;
+		            width: 100%;
+		            max-width: 200px;
+		        }
+
+		        button {
+		            padding: 10px;
+		            font-size: 16px;
+		            cursor: pointer;
+		            border: none;
+		            border-radius: 5px;
+		            transition: background-color 0.3s ease;
+		        }
+
+		        /* Left Section Buttons */
+		        .left-section button {
+		            background-color: #007bff;
+		            color: white;
+		        }
+
+		        .left-section button:hover {
+		            background-color: #0056b3;
+		        }
+
+		        /* Right Section Buttons */
+		        .right-section button {
+		            background-color: #28a745;
+		            color: white;
+		        }
+
+		        .right-section button:hover {
+		            background-color: #1e7e34;
+		        }
+		    </style>
+	</head>
+<meta charset = "utf-8" />
+<title>RaspberryMockGui</title>
+<body>
+<script src="https://cdn.jsdelivr.net/webjars/org.webjars/jquery/2.1.0/jquery.js"></script>
+<script language="javascript" type="text/javascript" src="wsminimal.js"></script>
+
+
+<div class="container">
+    <div class="left-section">
+        <h1>Monitoring Device</h1>
+		<div class="textbox" id="md-textbox">-</div>
+        <div class="button-container">
+            <button id="statoASFull">FULL</button>
+            <button id="statoASNormal">NORMAL</button>
+            <button id="statoASEmpty">EMPTY</button>
+        </div>
+    </div>
+
+    <div class="right-section">
+        <h1>Scale</h1>
+		<div class="textbox" id="scale-textbox">-</div>
+        <div class="button-container">
+            <button id="newRP">+</button>
+            <button id="lessRP">-</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>

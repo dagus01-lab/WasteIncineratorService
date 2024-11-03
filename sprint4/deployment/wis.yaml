@@ -1,4 +1,3 @@
-# WIS Deployment and Service
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,35 +15,62 @@ spec:
       initContainers:
       - name: wait-for-wis-broker
         image: busybox
-        command: ['sh', '-c', 'until mosquitto_sub -h wis-broker -t test -C 1 -W 5; do echo "Waiting for wis-broker..."; sleep 5; done']
-      - name: delay-for-basicrobot
-        image: busybox
-        command: ['sh', '-c', 'echo "Waiting 10 seconds for basicrobot to start..."; sleep 10']
+        command:
+          [
+            'sh',
+            '-c',
+            'until nc -nz wis-broker-service 8081; do echo "Waiting for
+              wis-broker..."; sleep 5; done'
+          ]
+      # - name: delay-for-basicrobot
+      #   image: busybox
+      #   command:
+      #     [
+      #       'sh',
+      #       '-c',
+      #       # 'until nc -zvu basicrobot-service 8020 ; do echo "Waiting for
+      #     #   basicrobot..."; sleep 10; done && sleep 5'
+      #       'until coap-client -m get coap://basicrobot-service:8020; do echo
+      #         "Waiting for basicrobot..."; sleep 10; done && sleep 5'
+      #     ]
       containers:
       - name: wis-container
         image: dagus01/wis:1.0
+        imagePullPolicy: Always
         ports:
         - containerPort: 8125
-        command: ["sh", "-c", "sleep 10 && stunnel /etc/stunnel/stunnel.conf && ./waste_incinerator_service"]
+        command:
+          [
+            "sh",
+            "-c",
+            "until coap-client -m get
+              coap://basicrobot-service:8020/ctxbasicrobot/basicrobot; do echo
+              'Waiting for basicrobot...'; sleep 10; done
+              &&  ./waste_incinerator_service"
+          ]
         volumeMounts:
-        - name: secrets-volume
-          mountPath: /etc/stunnel/certs
-        - name: configs-volume
-          mountPath: /waste_incinerator_service-1.0/bin
+        - name: config-volume
+          subPath: stunnel_wis.conf
+          mountPath: /etc/stunnel/stunnel_wis.conf
+        - name: config-volume
+          subPath: wis_conf.json
+          mountPath: /waste_incinerator_service-1.0/bin/wis_conf.json
         resources:
           requests:
             memory: "256Mi"
             cpu: "500m"
           limits:
-            memory: "512Mi"
+            memory: "1024Mi"
             cpu: "1"
       volumes:
-      - name: secrets-volume
-        secret:
-          secretName: stunnel-secrets
-      - name: configs-volume
+      - name: config-volume
         configMap:
-          name: stunnel-config
+          name: config-files
+          items:
+          - key: stunnel_wis.conf
+            path: stunnel_wis.conf
+          - key: wis_conf.json
+            path: wis_conf.json
 ---
 apiVersion: v1
 kind: Service
@@ -58,128 +84,200 @@ spec:
     port: 8125
     targetPort: 8125
   type: ClusterIP
----
-# Scale Deployment and Service
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: scale
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: scale
-  template:
-    metadata:
-      labels:
-        app: scale
 
-    spec:
-      initContainers:
-      - name: wait-for-wis-broker
-        image: busybox
-        command: ['sh', '-c', 'until mosquitto_sub -h wis-broker -t test -C 1 -W 5; do echo "Waiting for wis-broker..."; sleep 5; done']
-      containers:
-      - name: scale-container
-        image: dagus01/scale:arm
-        ports:
-        - containerPort: 8200
-        command: ["sh", "-c", "sleep 10 && stunnel /etc/stunnel/stunnel.conf && ./scale"]
-        volumeMounts:
-        - name: secrets-volume
-          mountPath: /etc/stunnel/certs
-        - name: configs-volume
-          mountPath: /scale-1.0/bin
-        securityContext:
-          privileged: true
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "500m"
-          limits:
-            memory: "512Mi"
-            cpu: "1"
-      volumes:
-      - name: secrets-volume
-        secret:
-          secretName: stunnel-secrets
-      - name: configs-volume
-        configMap:
-          name: stunnel-config
-  nodeSelector:
-    kubernetes.io/hostname: raspberrypi
+# ---
+# # Scale Deployment and Service
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: scale
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: scale
+#   template:
+#     metadata:
+#       labels:
+#         app: scale
+#     spec:
+#       initContainers:
+#       - name: wait-for-wis-broker
+#         image: busybox
+#         command: ['sh', '-c', 'until mosquitto_sub -h wis-broker -t test -C 1 -W 5; do echo "Waiting for wis-broker..."; sleep 5; done']
+#       containers:
+#       - name: scale-container
+#         image: dagus01/scale:arm
+#         ports:
+#         - containerPort: 8200
+#         command: ["sh", "-c", "./scale"]
+#         volumeMounts:
+#         - name: configs-volume
+#           mountPath: /scale-1.0/bin
+#         securityContext:
+#           privileged: true
+#         resources:
+#           requests:
+#             memory: "256Mi"
+#             cpu: "500m"
+#           limits:
+#             memory: "1024Mi"
+#             cpu: "1"
+#       volumes:
+#       - name: configs-volume
+#         configMap:
+#           name: stunnel-config
+#   nodeSelector:
+#     kubernetes.io/hostname: raspberrypi
+
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: scale-service
+# spec:
+#   selector:
+#     app: scale
+#   ports:
+#   - protocol: TCP
+#     port: 8200
+#     targetPort: 8200
+#   type: ClusterIP
+
+# ---
+# # Monitoring Device Deployment and Service
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: monitoringdevice
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: monitoringdevice
+#   template:
+#     metadata:
+#       labels:
+#         app: monitoringdevice
+#     spec:
+#       initContainers:
+#       - name: wait-for-wis-broker
+#         image: busybox
+#         command: ['sh', '-c', 'until mosquitto_sub -h wis-broker -t test -C 1 -W 5; do echo "Waiting for wis-broker..."; sleep 5; done']
+#       containers:
+#       - name: monitoringdevice-container
+#         image: dagus01/monitoringdevice:arm
+#         ports:
+#         - containerPort: 8100
+#         command: ["sh", "-c", "./monitoringdevice"]
+#         volumeMounts:
+#         - name: configs-volume
+#           mountPath: /monitoringdevice-1.0/bin
+#         securityContext:
+#           privileged: true
+#         resources:
+#           requests:
+#             memory: "256Mi"
+#             cpu: "500m"
+#           limits:
+#             memory: "1024Mi"
+#             cpu: "1"
+#       volumes:
+#       - name: configs-volume
+#         configMap:
+#           name: stunnel-config
+#   nodeSelector:
+#     kubernetes.io/hostname: raspberrypi
+
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: monitoringdevice-service
+# spec:
+#   selector:
+#     app: monitoringdevice
+#   ports:
+#   - protocol: TCP
+#     port: 8100
+#     targetPort: 8100
+#   type: ClusterIP
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: scale-service
-spec:
-  selector:
-    app: scale
-  ports:
-  - protocol: TCP
-    port: 8200
-    targetPort: 8200
-  type: ClusterIP
----
-# Monitoring Device Deployment and Service
+# Raspberry Mock Deployment and Service
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: monitoringdevice
+  name: raspberrymock
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: monitoringdevice
+      app: raspberrymock
   template:
     metadata:
       labels:
-        app: monitoringdevice
+        app: raspberrymock
+    spec:
       initContainers:
       - name: wait-for-wis-broker
         image: busybox
-        command: ['sh', '-c', 'until mosquitto_sub -h wis-broker -t test -C 1 -W 5; do echo "Waiting for wis-broker..."; sleep 5; done']
-    spec:
+        command:
+          [
+            'sh',
+            '-c',
+            'until nc -nz wis-broker-service 8081; do echo "Waiting for
+              wis-broker..."; sleep 5; done'
+          ]
       containers:
-      - name: monitoringdevice-container
-        image: dagus01/monitoringdevice:arm
+      - name: wis-facade-container
+        image: dagus01/raspberrymock:1.0
         ports:
+        - containerPort: 8095
         - containerPort: 8100
-        command: ["sh", "-c", "sleep 15 && stunnel /etc/stunnel/stunnel.conf && ./monitoringdevice"]
+        command: [ "sh", "-c", "./raspberrymock" ]
         volumeMounts:
-        - name: secrets-volume
-          mountPath: /etc/stunnel/certs
         - name: configs-volume
-          mountPath: /monitoringdevice-1.0/bin
-        securityContext:
-          privileged: true
+          subPath: scale_conf.json
+          mountPath: /raspberrymock-1.0/bin/scale_conf.json
+        - name: configs-volume
+          subPath: monitoringdevice_conf.json
+          mountPath: /raspberrymock-1.0/bin/monitoringdevice_conf.json
+        - name: configs-volume
+          subPath: raspberryMockFacadeConfig.json
+          mountPath: /raspberrymock-1.0/bin/facadeConfig.json
         resources:
           requests:
             memory: "256Mi"
             cpu: "500m"
           limits:
-            memory: "512Mi"
+            memory: "1024Mi"
             cpu: "1"
       volumes:
-      - name: secrets-volume
-        secret:
-          secretName: stunnel-secrets
       - name: configs-volume
         configMap:
-          name: stunnel-config
-  nodeSelector:
-    kubernetes.io/hostname: raspberrypi
+          name: config-files
+          items:
+          - key: raspberryMockFacadeConfig.json
+            path: raspberryMockFacadeConfig.json
+          - key: scale_conf.json
+            path: scale_conf.json
+          - key: monitoringdevice_conf.json
+            path: monitoringdevice_conf.json
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: monitoringdevice-service
+  name: raspberrymock-service
 spec:
   selector:
-    app: monitoringdevice
+    app: raspberrymock
   ports:
-  - protocol: TCP
+  - name: facadeport
+    protocol: TCP
+    port: 8095
+    targetPort: 8095
+  - name: raspberrymockport
+    protocol: TCP
     port: 8100
     targetPort: 8100
   type: ClusterIP
@@ -199,32 +297,41 @@ spec:
       labels:
         app: basicrobot
     spec:
+      initContainers:
+      - name: wait-for-virtualrobot
+        image: busybox
+        command:
+          [
+            'sh',
+            '-c',
+            ' until nc -z virtualrobot-service 8090; do echo "Waiting for
+              virtualrobot..."; sleep 5; done'
+          ]
       containers:
       - name: basicrobot-container
-        image: dagus01/basicrobot24:1.0
+        image: natbodocker/basicrobot24:1.0
         ports:
         - containerPort: 8020
         - containerPort: 8085
-        command: ["sh", "-c", "./basicrobot24"]
         volumeMounts:
-        - name: secrets-volume
-          mountPath: /etc/stunnel/certs
         - name: configs-volume
-          mountPath: /root
+          subPath: basicrobotConfig.json
+          mountPath: /basicrobot24-1.0/bin/basicrobotConfig.json
+        command: [ "sh", "-c", "./basicrobot24" ]
         resources:
           requests:
             memory: "256Mi"
             cpu: "500m"
           limits:
-            memory: "512Mi"
+            memory: "1024Mi"
             cpu: "1"
       volumes:
-      - name: secrets-volume
-        secret:
-          secretName: stunnel-secrets
       - name: configs-volume
         configMap:
-          name: stunnel-config
+          name: config-files
+          items:
+          - key: basicrobotConfig.json
+            path: basicrobotConfig.json
 ---
 apiVersion: v1
 kind: Service
@@ -234,13 +341,19 @@ spec:
   selector:
     app: basicrobot
   ports:
-  - protocol: TCP
+  - name: coaptcp
+    protocol: TCP
     port: 8020
     targetPort: 8020
-  - protocol: TCP
+  - name: coapudp
+    protocol: UDP
+    port: 8020
+    targetPort: 8020
+  - name: tcp
+    protocol: TCP
     port: 8085
     targetPort: 8085
-  type: NodePort
+  type: ClusterIP
 ---
 # WIS Facade Deployment and Service
 apiVersion: apps/v1
@@ -260,33 +373,38 @@ spec:
       initContainers:
       - name: wait-for-wis-broker
         image: busybox
-        command: ['sh', '-c', 'until mosquitto_sub -h wis-broker -t test -C 1 -W 5; do echo "Waiting for wis-broker..."; sleep 5; done']
-
+        command:
+          [
+            'sh',
+            '-c',
+            'until nc -nz wis-broker-service 8081; do echo "Waiting for
+              wis-broker..."; sleep 5; done'
+          ]
       containers:
       - name: wis-facade-container
         image: dagus01/wisfacade:1.0
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
-        command: ["sh", "-c", "stunnel /etc/stunnel/stunnel.conf && java -jar ./wisFacade-0.0.1-SNAPSHOT.jar"]
+        command: [ "sh", "-c", "java -jar ./wisFacade-0.0.1-SNAPSHOT.jar" ]
         volumeMounts:
-        - name: secrets-volume
-          mountPath: /etc/stunnel/certs
         - name: configs-volume
-          mountPath: /root
+          subPath: facadeConfig.json
+          mountPath: /facadeConfig.json
         resources:
           requests:
             memory: "256Mi"
             cpu: "500m"
           limits:
-            memory: "512Mi"
+            memory: "1024Mi"
             cpu: "1"
       volumes:
-      - name: secrets-volume
-        secret:
-          secretName: stunnel-secrets
       - name: configs-volume
         configMap:
-          name: stunnel-config
+          name: config-files
+          items:
+          - key: facadeConfig.json
+            path: facadeConfig.json
 ---
 apiVersion: v1
 kind: Service
@@ -299,7 +417,7 @@ spec:
   - protocol: TCP
     port: 8080
     targetPort: 8080
-  type: NodePort
+  type: ClusterIP
 ---
 # WIS Broker Deployment and Service
 apiVersion: apps/v1
@@ -323,29 +441,38 @@ spec:
         - containerPort: 8081
         readinessProbe:
           exec:
-            command: ["mosquitto_sub", "-h", "localhost", "-t", "test", "-C", "1", "-W", "5"]
+            command:
+              [
+                "sh",
+                "-c",
+                "mosquitto_pub -h localhost -p 8081 -t test -m
+                  'readiness_check' -r &&  mosquitto_sub -h localhost -p 8081 -t
+                  test -C 1 -W 5 | grep 'readiness_check'"
+              ]
           initialDelaySeconds: 5
-          periodSeconds: 10
-        command: ["mosquitto", "-c", "/etc/mosquitto/mosquitto.conf"]
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
+        command: [ "mosquitto", "-c", "/etc/mosquitto/mosquitto.conf" ]
         volumeMounts:
-        - name: secrets-volume
-          mountPath: /etc/mosquitto/certs
         - name: configs-volume
-          mountPath: /etc/mosquitto
+          subPath: mosquitto.conf
+          mountPath: /etc/mosquitto/mosquitto.conf
         resources:
           requests:
             memory: "256Mi"
             cpu: "500m"
           limits:
-            memory: "512Mi"
+            memory: "1024Mi"
             cpu: "1"
       volumes:
-      - name: secrets-volume
-        secret:
-          secretName: stunnel-secrets
       - name: configs-volume
         configMap:
-          name: stunnel-config
+          name: config-files
+          items:
+          - key: mosquitto.conf
+            path: mosquitto.conf
 ---
 apiVersion: v1
 kind: Service
@@ -358,4 +485,61 @@ spec:
   - protocol: TCP
     port: 8081
     targetPort: 8081
+  type: ClusterIP
+---
+# WIS Broker Deployment and Service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: virtualrobot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: virtualrobot
+  template:
+    metadata:
+      labels:
+        app: virtualrobot
+    spec:
+      containers:
+      - name: virtualrobot-container
+        image: natbodocker/virtualrobotdisi23:1.0
+        ports:
+        - containerPort: 8090
+        - containerPort: 8091
+        # readinessProbe:
+        #   httpGet:
+        #     path: /
+        #     port: 8090
+        #   initialDelaySeconds: 5
+        #   periodSeconds: 10
+        #   timeoutSeconds: 5
+        #   failureThreshold: 3
+        #   successThreshold: 1
+        command: [ "node", "WebpageServer" ]
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+          limits:
+            memory: "1024Mi"
+            cpu: "1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: virtualrobot-service
+spec:
+  selector:
+    app: virtualrobot
+  ports:
+  - name: websocket
+    protocol: TCP
+    port: 8091
+    targetPort: 8091
+  - name: http
+    protocol: TCP
+    port: 8090
+    targetPort: 8090
   type: ClusterIP

@@ -1,0 +1,112 @@
+/** Modello per l'architettura logica dello SPRINT2 della scale */
+
+System scale
+
+//Messaggi inerenti lo stato del WasteStorage
+Event scaledata : weight(W)   "emitted  by scale"
+Event num_RP : num_RP(N) "command for communicating the number of new RP"
+
+//Definizione dei contesti
+Context ctxscale ip [ host= "localhost"      port= 8200 ] 
+
+//--------------------------------Attore scaledevice------------------------------------------------------
+QActor scaledevice context ctxscale{
+[# 
+	lateinit var reader : java.io.BufferedReader 
+    lateinit var p : Process	
+    var Weight = 0
+    var WeightMAX = 500
+#]	
+	
+	State s0 initial{ 
+		println("$name | scalestart") 
+	 	[#
+			p       = Runtime.getRuntime().exec("python scaleDevice.py")
+			reader  = java.io.BufferedReader(  java.io.InputStreamReader(p.getInputStream() ))	
+		#]		
+	}
+	Goto readscaleData
+	
+	//Stato per la lettura dei dati dalla scale fisica
+	State readscaleData{
+	[# 
+		var data = reader.readLine()
+		//CommUtils.outyellow("$name with python: data = $data"   ) 
+		if( data != null ){
+			try{ 
+				val vd = data.toFloat()
+				val v  = vd.toInt()
+				if( v <= WeightMAX ){	
+					Weight = v				
+				}else Weight = WeightMAX
+			}catch(e: Exception){
+					CommUtils.outred("$name readscaleDataERROR: $e "   )
+			}
+		}
+		
+	#]	
+		if [# Weight >= 0 #] { 
+		    //println("$name with python: data = $Weight"   ) color yellow
+			emitlocalstream scaledata : weight($Weight)			 
+		}
+		//autodispatch doread : doread(1)
+	}
+	Goto readscaleData
+}
+//--------------------------------------------------------------------------------------------------------
+
+//--------------------------------Attore scale------------------------------------------------------------
+QActor scale context ctxscale withobj config using "ScaleConfigReader.loadScaleConfig(\"scale_conf.json\")"{
+	import "main.resources.ScaleConfigReader"
+	import "main.resources.ScaleConfig" 
+	[# 
+		var RPs = 0;
+		var previous_RPs = 0; 
+		val WRP = config.WRP;
+		var timeLastUpdate = System.currentTimeMillis();
+		var timeout = config.timeout;
+		var broker_url = config.broker_url
+	#]
+	
+	State s0 initial {
+		delay 1000
+		subscribeTo scaledevice for scaledata		
+		println("$name subscribed to scaledevice") color blue
+		connectToMqttBroker "$broker_url" clientid "scalenat"
+		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "scalenat"
+ 		println("$name | CREATED  (and connected to mosquitto) ... ") color blue
+ 		subscribe "wisinfo"
+ 		publish "wisinfo" -m num_RP:num_RP(0)
+	}
+	Transition t0 whenEvent scaledata -> filter
+	
+	
+	//Stato per gestire i dati emessi dalla scaledata
+	State filter {
+     	onMsg(scaledata : weight(W)) {
+	      	[#  
+	      		var W = payloadArg(0).toInt() 
+	      		RPs = (W/WRP).toInt()
+	      	#]	     
+			/* 		      	
+	      	//Se il numero di RPs è aumentato, notifico tale info al WIS
+	      	if [#RPs > previous_RPs#]{ //verificare il margine della misura
+	      		println("$name emit number of RPs=$RPs in Waste Storage") color magenta
+	      		[#
+	      			for (i in previous_RPs..RPs-1) {
+	      				#]
+	      				publish "wisinfo" -m new_RP:new_RP(1)
+	      				[#
+	      			}
+	      			timeLastUpdate = System.currentTimeMillis()
+	      		#]
+	     	} */
+			if[#previous_RPs != RPs#]{
+				publish "wisinfo" -m num_RP:num_RP($RPs)
+			}
+	      	[# previous_RPs = RPs; #]
+     	}
+	}	
+	Transition t0 whenEvent scaledata -> filter
+}
+//--------------------------------------------------------------------------------------------------------
