@@ -1,0 +1,194 @@
+ersion: '3.8'
+services:
+  wis:
+    image: dagus01/wis:1.0 
+    ports:
+      - "8125:8125"  
+    depends_on:
+      - basicrobot
+      - broker
+    networks:
+      - wisLAN  
+    configs:
+      - source: wis_conf.json
+        target: /waste_incinerator_service-1.0/bin/wis_conf.json
+    command: [
+      "sh", 
+      "-c", 
+      "until nc -nz wis-broker 8081; do echo 'Waiting for wis-broker...''; sleep 5; done",
+      "until coap-client -m get coap://basicrobot:8020/ctxbasicrobot/basicrobot; do echo 'Waiting for basicrobot...'; sleep 10; done",
+      "./waste_incinerator_service"]
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  scale:
+    image: dagus01/scale:arm 
+    ports:
+      - "8200:8200"  
+    depends_on:
+      - basicrobot
+      - broker
+    networks:
+      - wisLAN 
+    command: [
+      "sh", 
+      "-c", 
+      "until nc -nz wis-broker 8081; do echo 'Waiting for wis-broker...''; sleep 5; done",
+    , "./scale"]
+    configs:
+      - source: scale_conf.json
+        target: /scale-1.0/bin/scale_conf.json
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == raspberrypi
+
+  monitoringdevice:
+    image: dagus01/monitoringdevice:arm 
+    ports:
+      - "8100:8100"  
+    depends_on:
+      - basicrobot
+      - broker
+    networks:
+      - wisLAN 
+    command: [
+      "sh", 
+      "-c", 
+      "until nc -nz wis-broker 8081; do echo 'Waiting for wis-broker...''; sleep 5; done",
+      "./monitoringdevice"]
+    configs:
+      - source: monitoringdevice_conf.json
+        target: /monitoringdevice-1.0/bin/monitoringdevice_conf.json
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == raspberrypi
+
+  basicrobot-service:
+    image: natbodocker/basicrobot24:1.0
+    ports:
+      - "8020:8020" 
+      - "8085:8085"
+    networks:
+      - wisLAN 
+    depends_on:
+      - wenv
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    configs:
+      - source: basicrobotConfig.json
+        target: ./basicrobotConfig.json
+    healthcheck:
+      test: ["CMD", "nc -nz localhost 8020"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    command: [
+      "sh", 
+      "-c", 
+      "sleep 10",
+      "until nc -nz wis-broker-service 8081; do echo 'Waiting for wis-broker...''; sleep 5; done",
+     "./basicrobot24"]
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  wis_facade:
+    image: dagus01/wisfacade:1.0
+    depends_on:
+      - wis_broker
+    ports:
+      - "8080:8080"
+    networks:
+      - wisLAN
+    healthcheck:
+      test: ["CMD", "nc -nz wis-broker 8081"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    configs:
+      - source: facadeConfig.json
+        target: /facadeConfig.json
+    command: [
+      "sh", 
+      "-c", 
+      "sleep 10",
+      "until nc -nz wis-broker 8081; do echo 'Waiting for wis-broker...''; sleep 5; done",
+      " java -jar ./wisFacade-0.0.1-SNAPSHOT.jar"]
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  wis_broker:
+    image: dagus01/mqtt_broker:1.0
+    ports:
+      - "8081:8081"
+    networks:
+      - wisLAN
+    configs:
+      - source: mosquitto.conf
+        target: /etc/mosquitto/mosquitto.conf
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: 
+      [
+        "CMD", 
+        "mosquitto_pub -h localhost -p 8081 -t test -m
+        'readiness_check' -r &&  mosquitto_sub -h localhost -p 8081 -t
+        test -C 1 -W 5 | grep 'readiness_check'"
+      ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    command: ["mosquitto", "-c", "/etc/mosquitto/mosquitto.conf"]
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  wenv:
+    image: docker.io/natbodocker/virtualrobotdisi23:1.0
+    ports:
+      - 8090:8090
+      - 8091:8091
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - wisLAN 
+    healthcheck:
+      test: ["CMD", "nc -nz localhost 8090"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+
+configs:
+  mosquitto.conf:
+    file: ./configs/mosquitto.conf
+  basicrobotConfig.json:
+    file: ./configs/basicrobotConfig.json
+  facadeConfig.json:
+    file: ./configs/facadeConfig.json
+  scale_conf.json:
+    file: ./configs/scale_conf.json
+  wis_conf.json:
+    file: ./configs/wis_conf.json
+  monitoringdevice_conf.json:
+    file: ./configs/monitoringdevice_conf.json
+
+networks:
+  secure-overlay-network:
+    driver: overlay
+    driver_opts:
+      encrypted: "true"
