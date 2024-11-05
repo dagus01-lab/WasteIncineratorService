@@ -35,7 +35,7 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					action { //it:State
 						CommUtils.outmagenta("$name started")
 						
-									p       = Runtime.getRuntime().exec("python ledDevice.py")
+									p       = Runtime.getRuntime().exec("./ledDevice")
 									writer = java.io.BufferedWriter( java.io.OutputStreamWriter(p.getOutputStream()));
 						//genTimer( actor, state )
 					}

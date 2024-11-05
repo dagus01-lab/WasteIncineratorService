@@ -41,7 +41,7 @@ Reply moverobotfailed:  moverobotfailed(PLANDONE, PLANTODO) for moverobot
 
 //Definizione dei contesti
 Context ctx_waste_incinerator_service ip [host="localhost" port=8125]
-Context ctxbasicrobot ip [host="basicrobot-service" port=8020] 
+Context ctxbasicrobot ip [host="basicrobot" port=8020] 
 
 //Attori esterni al WIS
 ExternalQActor basicrobot context ctxbasicrobot

@@ -25,34 +25,24 @@
 ##    e infine fare push:
 ##      docker push <username>/monitoringdevice:arm
 ##
-## docker run -it --rm --name monitoringdevice -p 8100:8100/tcp  --privileged monitoringdevice:1.0  sh
-FROM arm64v8/alpine
+## docker run -it --rm --name monitoringdevice -p 8100:8100/tcp  -monitoringdevice:1.0  sh
+FROM devdotnetorg/libgpiod:2.1.2-alpine-3.20
 
-ARG PUID=1000
-ARG PGID=1000
-
-RUN addgroup -g $PGID usergrp \
-    && adduser -D -u $PUID -G usergrp user
 ## ADD extracts the tar
-ADD --chown=user:usergrp ./build/distributions/monitoringdevice-1.0.tar /
-RUN chown -R user:usergrp /monitoringdevice-1.0
-
+ADD ./build/distributions/monitoringdevice-1.0.tar /
 ## EXPOSE 8100
+RUN apk update
+RUN set -xe \
+    && apk add --no-cache gcc build-base linux-headers gcc musl-dev libgpiod-dev \
+    && apk add --no-cache openjdk11-jdk 
 
 WORKDIR /monitoringdevice-1.0/bin
 COPY ./*.pl ./
 COPY ./*.txt ./
-COPY ./resources/*.py ./
+COPY ./resources/* ./
 COPY ./*.json ./
 
-RUN apk update
-RUN set -xe \
-    && apk add --no-cache -Uu --virtual .build-dependencies python3-dev py3-pip libffi-dev openssl-dev build-base musl \
-    && apk add --no-cache python3 openjdk11-jdk \
-    && apk add --no-cache --purge curl ca-certificates musl wiringpi stunnel openssl \
-    && pip3 install --no-cache --upgrade pyserial RPi.GPIO --break-system-packages \
-    && apk del --purge .build-dependencies \
-    && rm -rf /var/cache/apk/* /tmp/* \
-COPY ./stunnel.conf /etc/stunnel/stunnel.conf
+RUN gcc sonar.c -o sonar -lgpiod
+RUN gcc ledDevice.c -o ledDevice -lgpiod
 
-CMD ["sh", "-c", "stunnel /etc/stunnel/stunnel.conf && monitoringdevice"]
+CMD ["sh", "-c", "./monitoringdevice"]

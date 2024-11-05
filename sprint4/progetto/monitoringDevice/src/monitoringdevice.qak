@@ -63,7 +63,7 @@ QActor sonardevice context ctxmonitoringdevice{
 	State s0 initial{
 		println("$name | sonarstart") 
 	 	[#
-			p       = Runtime.getRuntime().exec("python sonar.py")
+			p       = Runtime.getRuntime().exec("./sonar")
 			reader  = java.io.BufferedReader(  java.io.InputStreamReader(p.getInputStream() ))	
 		#]		
 	}
@@ -246,7 +246,7 @@ QActor led context ctxmonitoringdevice{
 	State s0 initial{
 		println("$name started") color magenta
 		[#
-			p       = Runtime.getRuntime().exec("python ledDevice.py")
+			p       = Runtime.getRuntime().exec("./ledDevice")
 			writer = java.io.BufferedWriter( java.io.OutputStreamWriter(p.getOutputStream()));
 		#]	
 	}

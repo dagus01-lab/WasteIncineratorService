@@ -37,7 +37,7 @@ class Scaledevice ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					action { //it:State
 						CommUtils.outblack("$name | scalestart")
 						
-									p       = Runtime.getRuntime().exec("python scaleDevice.py")
+									p       = Runtime.getRuntime().exec("./scaleDevice")
 									reader  = java.io.BufferedReader(  java.io.InputStreamReader(p.getInputStream() ))	
 						//genTimer( actor, state )
 					}

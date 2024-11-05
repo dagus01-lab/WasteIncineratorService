@@ -21,6 +21,8 @@ public class FacadeBuilder {
 			MqttFacadeClient mqttClient = new MqttFacadeClient(guiCore, ApplSystemInfo.brokerURL, ApplSystemInfo.clientID, ApplSystemInfo.topic);
 		} catch (MqttException e) {
 			System.out.println("MqttClient: Connection to server failed: "+ e.getMessage());
+		} catch(Exception e) {
+			System.out.println("Other exception occurred: "+ e.getMessage());
 		}
         
     }
