@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<head>
+    <!--
+<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+<script type="text/javascript" src="../css/issStyle.js"></script>
+-->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.4/dist/css/foundation.min.css" crossorigin="anonymous">
+		<script src="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.4/dist/js/foundation.min.js"crossorigin="anonymous"></script> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/templateISS.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/main.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/navbar.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/table.css">
+        <link rel="stylesheet" type="text/css" href="./commons/resources/styles/code.css">
+        <!-- <script type="text/javascript" src="./commons/resources/scripts/myScripts.js"></script> -->
+<style type="text/css">
+body
+{
+    margin-left:  30px;
+    margin-right: 30px;
+};
+
+P
+{
+    font-family: Tahoma;
+    font-size: 10pt;
+};
+
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+	font-size: 93%;
+}
+
+a:hover {
+    background-color: #cccccc;
+}
+
+
+hr {
+    clear: both;
+    height: 1px;
+    color: #242424;
+    background-color: transparent;
+}
+
+h1, h2, h3 {
+    color: #242424;
+    clear: left;
+    font: 100% Tahoma, Helvetica, Arial, sans-serif;
+    margin-bottom: 0.5em;
+    padding-top: 0.5em;
+	border-radius: 10px;
+	padding: 5px;
+}
+
+top {
+	width: 100%;
+}
+
+
+#i {
+    color: #ff1010;
+}
+tt{
+	font-family: "Arial";
+    font-size: 90%;
+	color: #006600;
+}
+em{
+	font-family: "Arial";
+    font-size: 80%;
+	font-weight: bold;
+	border-style:solid;
+	border-color: #abe876;
+    color: #1632cc;
+}
+bc{
+	font-family: "Arial";
+	font-size: 90%;
+	font-weight: bold;
+    color: #990000;
+	background-color: #fcf8c7;
+}
+ks{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #0000CD	;
+	font-size: 90%;
+}
+kc{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #008000	;
+	font-size: 90%;
+}
+pre{
+	font-family: "Consolas";
+	font-size: 85%;
+	background-color: #f5f5f5;
+	border: 1.5px solid silver;
+	padding: 5px;
+}
+m{
+	font-family: "Helvetica";
+	line-height: 100%;
+ 	font-size: 75%;
+}
+div.body{
+	 
+    font-size: 18px;
+}
+k{
+    color: #990000;
+	font-weight: bold;
+	font-size: 90%;
+}
+h1 {
+    font-size: 150%;
+    background-color: #b2c0ff;
+	padding: 10px;
+}
+
+h2 {
+    background-color: #9ed8ff;
+    font-size: 130%;
+}
+
+h3 {
+	background-color: #e6ccff;
+    font-size: 100%;
+}
+h4 {
+    background-color: #ccffcc;
+    font-size: 100%;
+	width: 95%;
+	border-radius: 5px;
+	padding: 2px;
+}
+h5 {
+    background-color: #d5ffb0;
+    font-size: 100%;
+
+}
+div.req{
+	background-color: #d9ffb3;
+    font-size: 18px;
+	width: 700px;
+    border: 3px solid green;
+    padding: 15px;
+    margin: 10px;
+}
+div.remark{
+	background-color: #E3F2FD;
+    border: 1.5px solid #d5f2ed;
+    padding: 15px;
+    margin: 10px;
+	border-radius: 25px;
+}
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+ol, ul, li {
+  margin: 0;
+  margin-left: 10px;
+  padding: 0;
+  padding-bottom: 5px;
+}
+
+table, th, td {
+	border: 1px solid black;
+}
+
+img {
+	border: 1.5px solid #d5f2ed
+
+}
+
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+}
+
+div.wrapdesc{
+	width: 90%;
+	margin: auto;
+}
+
+div.imagedesc{
+	width: 85%;
+	margin: auto;
+}
+
+.slidekp{
+    background-color: hsl(332, 77%, 86%);
+    border-radius: 10px;
+    border: 1px solid blue;
+    font-size: 18px; 
+    font-weight: bold;
+    line-height: 1.5;
+    padding: 3px
+  } 
+</style>
+
+<title>Documento Sprint3</title>
+</head>
+
+<body>
+<div id="top">
+	<h1> WASTE INCINERATOR SERVICE - Sprint 3 </h1>
+</div>
+
+<div class="body"> 
+<h2>Introduzione</h2>
+<p>
+Un'azienda intende realizzare un <b>WasteIncineratorService</b> per trattare i rifiuti bruciandoli 
+e necessita di un servizio di sistema software (WIS) che controlli un robot (chiamato OpRobot) per spostare i rifiuti.
+</p>
+
+<h2>Requisiti</h2>
+<p>Il seguente link porta al documento dei requisiti fornito dal
+cliente. <br/>
+<a href="TemaFinale24.html">Documento requisiti</a> 
+</p>
+
+<h2>Sprint precedente</h2>
+<p>Il seguente link porta al documento dello SPRINT precedente, nel
+quale si sono sviluppati il MonitoringDevice e la Scale.<br/>
+<a href="../../sprint2/userDocs/docSprint2.html">SPRINT 2</a> 
+</p>
+
+<h4>Architettura iniziale di riferimento</h4>
+<p>Di seguito viene mostrata un'immagine che rappresenta l'architettura finale dello sprint precedente, che sarà quindi l'architettura iniziale di questo sprint.<br/>
+<a href="img/architetturaIniziale.png">
+	<img src="img/architetturaIniziale.png" name="Image1" align="bottom" width="1000" height="800" border="1"/>
+</a>
+<a href="img/architetturaIniziale.png">
+</a>
+</p>
+
+<h2>GOAL</h2>
+<p>In questo SPRINT verranno affrontati i seguenti requisiti:
+<ul>
+
+</ul> 
+</p>
+
+<h2>Analisi del problema</h2>
+
+
+<h2>Progetto</h2>
+mapping dei pin con il ponte h: 
+<ul>
+	<li>in1 -> pin fisico 21</li>
+	<li>in2 -> pin fisico 19</li>
+	<li>in3 -> pin fisico 5</li>
+	<li>in4 -> pin fisico 3</li>
+</ul>
+mapping dei pin con il raspberry:
+<ul>
+	<li>vcc -> pin fisico 2</li>
+	<li>trig -> pin fisico 11</li>
+	<li>echo -> pin fisico 13</li>
+	<li>gnd -> pin fisico 9</li>
+</ul> 
+
+<h2>Piano di test</h2>
+
+
+<h2>Deployment</h2>
+
+<h3>Deployment con docker</h3>
+Viste le limitazioni esposte nello sprint precedente, relativamente a docker-compose, si è
+deciso di usare un orchestratore di container per effettuare il deployment su tutti i nodi
+della rete in tempo reale. Questo consente anche una cifratura del traffico 
+tra i container senza che questa venga gestita all'esterno come viene fatta ora e permette
+ci avere un meccanismo di rotazione delle chiavi per diminuire la possibilità di effettuare
+attacchi brute-force. 
+Per poter far questo però (come è stato accennato precedentemente) si è reso necessario cambiare
+la modalità di interazione con i pin GPIO, passando dalla libreria RPi.GPIO alla libreria 
+lgpiod. Infatti, docker swarm pone delle limitazioni sulla modalità di esecuzione dei container, 
+non permettendo la modalità privilegiata, il che non è compatibile con la libreria python utilizzata
+fino ad ora, in quanto <a href="https://github.com/sarnold/RPi.GPIO/blob/master/source/py_gpio.c#L1006">
+richiede accesso a file dentro /proc/ per verificare il dispositivo su cui si 
+sta effettuando l'accesso</a>, che non vengono esposte dall'esterno in maniera diretta da docker.
+Contestualmente, docker swarm non dovrebbe neanche supportare nativamente il binding di devices 
+dall'host sul container, ma comunque è possibile usare dei metodi per inserire i devices come volumi
+e avere un container sul raspberry che intercetti le richieste di montaggio di volumi da parte dei 
+container e che modifichi i cgroups in maniera tale da consentire al processo che lo ha richiesto
+di accedere effettivamente al device. <a href="https://github.com/allfro/device-mapping-manager/issues/12#issuecomment-2019301115">Qui</a> s
+i può trovare un esempio di come questo può essere fatto.<br>
+Al momento occorre, prima di procedere con il deployment, eseguire docker compose del file riportato nel commento.
+Si pensa di integrare presto questa parte direttamente nel deployment con swarm.
+
+
+Sull'host su cui girerà il wis eseguire:<br/>
+<b>docker swarm init</b><br/>
+e sul nodo del monitoring device e della scale eseguire:<br/>
+<b>docker swarm join --token <token> <wis_ip>:2377</b><br/>
+dove per token si intende il token generato dopo il primo comando e per wis_ip l'indirizzo
+ip del nodo su cui gira il wis.
+Per poter permettere la comunicazione tra i vari nodi eseguire:<br/>
+<b>docker network create --driver overlay wis_LAN</b><br/>
+Successivamente, si può procedere con l'orchestrazione dei container su uno stack apposito:<br/>
+<b>docker stack deploy --detach=false -c wis.yaml my_stack</b><br/>
+Per terminare l'operazione eseguire ctrl+C e poi:<br/>
+<b>sudo docker stack rm my_stack</b><br/>
+Per poter vedere in tempo reale i log dei container: <br/>
+<b>for service in $(sudo docker stack services --format {{.Name}} my_stack); do   sudo docker service logs -f $service & done</b>
+
+<h2>Suddivisione dei compiti</h2>
+<p>
+<ol>
+	<li><b>Analisi del problema:</b> tutti i membri hanno contribuito, in particolare per discutere i vantaggi/svantaggi delle soluzioni proposte.  
+	</li>
+	<li><b>Progettazione:</b> tutti i membri hanno contribuito, in particolare:
+		<ul>
+			<li>Tutti: discusso assieme i vantaggi/svantaggi dell'uso di un metodo publish/subscribe anziché updateResource.</li>
+			<li>Bryan: ragionato su vantaggi/svantaggi di gui sviluppata come applicazione mobile/web e implementazione della pagina della GUI.</li>
+			<li>Gabriele ed Emanuele: creazione/modifica dei componenti lato Facade e lato qak.</li>
+			<li>Gabriele: creazione raspberrymockfacade e deployment</li>
+		</ul>
+	</li>
+	<li><b>Testing:</b> piano dei test deciso assieme. L'effettiva realizzazione è stata affidata a Gabriele. </li>
+</ol>
+</p>
+
+<h2>Sprint futuri</h2>
+<p>Nel prossimo sprint si prevede di implementare il robot fisico. 
+</p>
+</div>
+
+<div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
+Bryan Bertoni : bryan.bertoni@studio.unibo.it <br>
+Gabriele Daga : gabriele.daga@studio.unibo.it <br>
+Emanuele D'Arsié : emanuele.darsie@studio.unibo.it <br><br>
+
+GIT repo: https://github.com/bryanber102/TemaFinale24
+</div>
+
+</body>
+</html>

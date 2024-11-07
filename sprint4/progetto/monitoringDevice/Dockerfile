@@ -26,16 +26,15 @@
 ##      docker push <username>/monitoringdevice:arm
 ##
 ## docker run -it --rm --name monitoringdevice -p 8100:8100/tcp  -monitoringdevice:1.0  sh
-FROM devdotnetorg/libgpiod:2.1.2-alpine-3.20
+FROM arm64v8/alpine
+
+## EXPOSE 8100
+RUN apk update
+RUN set -xe && apk add --no-cache libgpiod gcc build-base linux-headers musl-dev libgpiod-dev stunnel
+RUN apk add --no-cache openjdk11-jdk 
 
 ## ADD extracts the tar
 ADD ./build/distributions/monitoringdevice-1.0.tar /
-## EXPOSE 8100
-RUN apk update
-RUN set -xe \
-    && apk add --no-cache gcc build-base linux-headers gcc musl-dev libgpiod-dev \
-    && apk add --no-cache openjdk11-jdk 
-
 WORKDIR /monitoringdevice-1.0/bin
 COPY ./*.pl ./
 COPY ./*.txt ./

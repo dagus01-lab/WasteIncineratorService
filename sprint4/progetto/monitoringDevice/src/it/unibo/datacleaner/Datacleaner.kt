@@ -38,10 +38,11 @@ class Datacleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 				val DMIN = config.DMIN; //rappresenta l'altezza del contenitore
 				var timeLastUpdate = System.currentTimeMillis();
 				var timeout = config.timeout;
+				var range = 3;
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						delay(1000) 
+						delay(1100) 
 						subscribeToLocalActor("sonardevice") 
 						CommUtils.outblue("$name subscribed to sonardevice")
 						//genTimer( actor, state )
@@ -64,7 +65,7 @@ class Datacleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 													} else {
 													    1
 													}
-								if( D != previous_D 
+								if( D - range > previous_D || D+range < previous_D 
 								 ){CommUtils.outmagenta("$name emit newLevel of Ash")
 								emitLocalStreamEvent("ashStorageLevel", "ashStorageLevel($Level,$D)" ) 
 								previous_D = D 

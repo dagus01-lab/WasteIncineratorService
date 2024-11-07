@@ -1,11 +1,19 @@
 package unibo.wisFacade;
 
 import org.springframework.stereotype.Component;
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
+
+import unibo.basicomm23.utils.CommUtils;
+
+import org.eclipse.paho.mqttv5.client.IMqttDeliveryToken;
+import org.eclipse.paho.mqttv5.client.IMqttToken;
+import org.eclipse.paho.mqttv5.client.MqttCallback;
+import org.eclipse.paho.mqttv5.client.MqttClient;
+import org.eclipse.paho.mqttv5.client.MqttClientException;
+import org.eclipse.paho.mqttv5.client.MqttConnectionOptions;
+import org.eclipse.paho.mqttv5.client.MqttDisconnectResponse;
+import org.eclipse.paho.mqttv5.common.MqttException;
+import org.eclipse.paho.mqttv5.common.MqttMessage;
+import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class MqttFacadeClient {
@@ -17,39 +25,43 @@ public class MqttFacadeClient {
     public MqttFacadeClient(ApplguiCore guiCore, String brokerURL, String clientID, String topic) throws MqttException {
     	for(int i = 0; i<MAX_RETRIES; i++) {
     		try {
-                System.out.println("ApplConfig: {url:"+brokerURL+", clientID:"+clientID+", topic:"+topic+"}");
+    			MqttClient client = new MqttClient(brokerURL, clientID);
+                MqttConnectionOptions options = new MqttConnectionOptions();
 
-    			client = new MqttClient(brokerURL, clientID);
-                this.mytopic = topic;
-                // Set a callback handler, similar to CoapHandler in CoAP
                 client.setCallback(new MqttCallback() {
-                    @Override
-                    public void connectionLost(Throwable cause) {
-                        System.out.println("Connection lost: " + cause.getMessage());
-                        //guiCore.updateMsg("MqttObserver ERROR");
+                    public void connectComplete(boolean reconnect, String serverURI) {
+                        CommUtils.outgreen("connected to: " + serverURI);
                     }
 
-                    @Override
+                    public void disconnected(MqttDisconnectResponse disconnectResponse) {
+                        CommUtils.outred("disconnected: " + disconnectResponse.getReasonString());
+                    }
+
+                    public void deliveryComplete(IMqttToken token) {
+                        CommUtils.outgreen("deliveryComplete: " + token.isComplete());
+                    }
+
                     public void messageArrived(String topic, MqttMessage message) throws Exception {
-                        System.out.println("Message arrived. Topic: " + topic + " Message: " + new String(message.getPayload()));
+                    	CommUtils.outcyan("Message arrived. Topic: " + topic + " Message: " + new String(message.getPayload()));
                         guiCore.handleMsgFromMqttBroker(message);
-
                     }
 
-                    @Override
-                    public void deliveryComplete(IMqttDeliveryToken token) {
-                        System.out.println("Message delivery complete for token: " + token.isComplete());
+                    public void mqttErrorOccurred(MqttException exception) {
+                        CommUtils.outred("mqttErrorOccurred: " + exception.getMessage());
                     }
+                    public void authPacketArrived(int reasonCode, MqttProperties properties) {
+                        CommUtils.outcyan("authPacketArrived");
+                    }
+
                 });
-                client.connect();
-                client.subscribe(topic);
-                break;
-    		}
-    		catch(MqttException e) {
+
+                client.connect(options);
+
+                client.subscribe(topic, 1);
+    		} catch(MqttException e) {
     			continue;
     		}
     	}
-        
     }
     public void sendMessage(String messageContent) throws MqttException {
         MqttMessage message = new MqttMessage(messageContent.getBytes());

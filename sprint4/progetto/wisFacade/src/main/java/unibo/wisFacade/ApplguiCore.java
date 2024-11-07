@@ -1,7 +1,7 @@
 package unibo.wisFacade;
 import java.util.List;
 
-import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.mqttv5.common.MqttMessage;
 
 import unibo.basicomm23.interfaces.IApplMessage;
 import unibo.basicomm23.utils.CommUtils;
@@ -17,8 +17,8 @@ public class ApplguiCore {
         this.wsHandler = wsHandler;
     }
 
-    public void handleMsgFromMqttBroker(MqttMessage msg) {
-    	String message = new String(msg.getPayload());
+    public void handleMsgFromMqttBroker(MqttMessage message2) {
+    	String message = new String(message2.getPayload());
     	String payload = CommUtils.getContent(message);
     	wsHandler.sendToAll(payload);
     }

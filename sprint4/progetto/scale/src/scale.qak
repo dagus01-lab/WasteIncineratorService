@@ -19,6 +19,7 @@ QActor scaledevice context ctxscale{
 #]	
 	
 	State s0 initial{ 
+		delay 1200
 		println("$name | scalestart") 
 	 	[#
 			p       = Runtime.getRuntime().exec("./scaleDevice")
@@ -69,8 +70,8 @@ QActor scale context ctxscale withobj config using "ScaleConfigReader.loadScaleC
 	#]
 	
 	State s0 initial {
-		delay 1000
-		subscribeTo scaledevice for scaledata		
+		subscribeTo scaledevice for scaledata
+		delay 1000		
 		println("$name subscribed to scaledevice") color blue
 		connectToMqttBroker "$broker_url" clientid "scalenat"
 		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "scalenat"

@@ -53,7 +53,7 @@ float take_average(struct gpiod_line *trig_line, struct gpiod_line *echo_line, i
     float total = 0;
     for (int i = 0; i < num_samples; i++) {
         total += take_sample(trig_line, echo_line);
-        usleep_custom(10000);  // Wait 10 milliseconds between samples
+        usleep_custom(150000);  // Wait 150 milliseconds between samples
     }
     return total / num_samples;
 }
@@ -93,7 +93,7 @@ int main() {
         //printf("Distance: %.1f cm\n", distance);
 	    printf("%.1f\n", distance);
         fflush(stdout);
-        usleep_custom(250000);  // Wait 250 milliseconds before the next reading
+        usleep_custom(1000000);  // Wait 1 second before the next reading
     }
 
     // Clean up and close the chip

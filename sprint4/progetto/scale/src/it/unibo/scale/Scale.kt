@@ -40,8 +40,8 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						delay(1000) 
 						subscribeToLocalActor("scaledevice") 
+						delay(1000) 
 						CommUtils.outblue("$name subscribed to scaledevice")
 						connectToMqttBroker( "$broker_url", "scalenat" )
 						CommUtils.outblue("$name | CREATED  (and connected to mosquitto) ... ")

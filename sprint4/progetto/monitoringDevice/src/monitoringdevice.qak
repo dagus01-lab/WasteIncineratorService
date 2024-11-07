@@ -61,6 +61,7 @@ QActor sonardevice context ctxmonitoringdevice{
 #]	
 
 	State s0 initial{
+		delay 1200
 		println("$name | sonarstart") 
 	 	[#
 			p       = Runtime.getRuntime().exec("./sonar")
@@ -109,10 +110,11 @@ QActor datacleaner context ctxmonitoringdevice withobj config using "MonitoringD
 		val DMIN = config.DMIN; //rappresenta l'altezza del contenitore
 		var timeLastUpdate = System.currentTimeMillis();
 		var timeout = config.timeout;
+		var range = 3;
 	#]
 	
 	State s0 initial {
-		delay 1000
+		delay 1100
 		subscribeTo sonardevice for sonardata		
 		println("$name subscribed to sonardevice") color blue
 	}
@@ -133,7 +135,7 @@ QActor datacleaner context ctxmonitoringdevice withobj config using "MonitoringD
 	      	#]	      	
 	      	//println("$name D=$D, level=$Level") color red
 	      		
-	      	if [#D != previous_D#]{ //verificare il margine della misura
+	      	if [#D - range > previous_D || D+range < previous_D#]{ //verificare il margine della misura
 	      		println("$name emit newLevel of Ash") color magenta
 	 			emitlocalstream ashStorageLevel:ashStorageLevel($Level, $D)
 	 			[#previous_D = D#]
@@ -161,7 +163,7 @@ QActor monitoringdevice context ctxmonitoringdevice withobj config using "Monito
 	#]
 	
 	State s0 initial{
-		delay 2000
+		delay 1000
 		println("$name STARTS") color blue
 		connectToMqttBroker "$broker_url" clientid "monitoringdevicenat"
 		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "monitoringdevicenat"

@@ -1,5 +1,5 @@
 package unibo.wisFacade;
-import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.mqttv5.common.MqttException;
 
 import unibo.basicomm23.coap.CoapConnection;
 import unibo.basicomm23.utils.CommUtils;

@@ -26,11 +26,13 @@
 ##      docker push <username>/scale:arm
 ## docker run -it --rm --name scale -p 8200:8200/tcp  --privileged scale:arm  /bin/bash
 
-FROM devdotnetorg/libgpiod:2.1.2-alpine-3.20
+FROM arm64v8/alpine
+
+## EXPOSE 8200
 RUN apk update
-RUN set -xe \
-    && apk add --no-cache gcc build-base linux-headers gcc musl-dev libgpiod-dev \
-    && apk add --no-cache openjdk11-jdk 
+RUN set -xe && apk add --no-cache libgpiod gcc build-base linux-headers musl-dev libgpiod-dev stunnel
+RUN apk add --no-cache openjdk11-jdk 
+
 ## ADD extracts the tar
 ADD ./build/distributions/scale-1.0.tar /
 ## EXPOSE 8200

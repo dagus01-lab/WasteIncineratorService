@@ -39,7 +39,7 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						delay(2000) 
+						delay(1000) 
 						CommUtils.outblue("$name STARTS")
 						connectToMqttBroker( "$broker_url", "monitoringdevicenat" )
 						CommUtils.outblue("$name | CREATED  (and connected to mosquitto) ... ")

@@ -35,6 +35,7 @@ class Sonardevice ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
+						delay(1200) 
 						CommUtils.outblack("$name | sonarstart")
 						
 									p       = Runtime.getRuntime().exec("./sonar")

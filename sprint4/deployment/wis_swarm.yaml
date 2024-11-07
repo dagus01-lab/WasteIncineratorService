@@ -1,29 +1,93 @@
 version: '3.8'
 services:
+  # volumes:
+  #   image: docker:dind
+  #   stop_grace_period: 60s
+  #   command:
+  #     - ash
+  #     - -c
+  #     - |
+  #       term_signal_handler() {
+  #         echo "############  Caught SIGTERM #############"
+  #         docker stop devices_volume_priv >/dev/null 2>&1
+  #         exit
+  #       }
+
+  #       trap 'term_signal_handler' SIGTERM
+        
+  #       echo "Starting event listener container"
+  #       docker run \
+  #         --rm \
+  #         --privileged \
+  #         --tty=false -i \
+  #         --name devices_volume_priv \
+  #         -v /var/run/docker.sock:/var/run/docker.sock \
+  #         -v /sys/fs/cgroup/devices/docker/:/docker/:Z \
+  #         -v /dev/:/real/dev/ \
+  #         docker sh -s <<"EOF" &
+  #           add_perm() {
+  #             read DEVICE CID
+  #             if [[ -z $$DEVICE ]]; then
+  #               echo "we did a startup I think"
+  #               return
+  #             fi
+              
+  #             USBDEV=`readlink -f /real$${DEVICE}`
+  #             major=`stat -c '%t' $$USBDEV`
+  #             minor=`stat -c '%T' $$USBDEV`
+  #             if [[ -z $$minor || -z $$major ]]; then
+  #               echo 'Device not found'
+  #               return
+  #             fi
+  #             dminor=$$((0x$${minor}))
+  #             dmajor=$$((0x$${major}))
+  #             echo "Setting permissions (c $$dmajor:$$dminor rwm) for $${CID} to device ($${DEVICE})"
+  #             echo "c $$dmajor:$$dminor rwm" > /docker/$${CID}/devices.allow
+  #           }
+
+  #           echo "Listening for startup events that have a label of 'volume.device'"
+  #           while true; do
+  #             docker events \
+  #               --filter 'label=volume.device' \
+  #               --filter 'event=start' \
+  #               --format '{{index .Actor.Attributes "volume.device"}} {{.Actor.ID}}' | \
+  #               add_perm
+  #             echo "Restarting events listener"
+  #           done
+  #       EOF
+  #       while true ; do 
+  #         sleep 5
+  #       done
+  #   volumes:
+  #     - "/var/run/docker.sock:/var/run/docker.sock"
+  #   deploy:
+  #     placement:
+  #       constraints:
+  #         - node.hostname == raspberry
   wis:
-    image: dagus01/wis:1.0 
+    image: dagus01/wis:1.0
     ports:
-      - "8125:8125"  
+    - "8125:8125"
     depends_on:
-      - basicrobot
-      - broker
+    - basicrobot
+    - broker
     networks:
-      - wisLAN  
+    - wisLAN
     configs:
-      - source: wis_conf.json
-        target: /waste_incinerator_service-1.0/bin/wis_conf.json
-    command: [
-      "sh", 
-      "-c", 
-      "until nc -nz wis-broker 8081; do echo 'Waiting for wis-broker...''; sleep 5; done",
-      "until coap-client -m get coap://basicrobot:8020/ctxbasicrobot/basicrobot; do echo 'Waiting for basicrobot...'; sleep 10; done",
-      "./waste_incinerator_service"]
+    - source: wis_conf.json
+      target: /waste_incinerator_service-1.0/bin/wis_conf.json
+    command:
+      [
+        "sh",
+        "-c",
+        "until nc -nz wis_broker 8081; do echo 'Waiting for wis_broker...'; sleep 5; done && until coap-client -m get coap://basicrobot:8020/ctxbasicrobot/basicrobot; do echo 'Waiting for  basicrobot...'; sleep 10; done && ./waste_incinerator_service"
+      ]
     deploy:
       placement:
-        constraints: [node.role == manager]
+        constraints: [ node.role == manager ]
 
   scale:
-    image: dagus01/scale:arm 
+    image: dagus01/scale
     ports:
       - "8200:8200"  
     depends_on:
@@ -34,17 +98,21 @@ services:
     command: [
       "sh", 
       "-c", 
-      "until nc -nz wis-broker 8081; do echo 'Waiting for wis-broker...''; sleep 5; done", "./scale"]
+      "until nc -nz wis_broker 8081; do echo 'Waiting for wis_broker...'; sleep 5; done && ./scale"]
     configs:
       - source: scale_conf.json
         target: /scale-1.0/bin/scale_conf.json
     deploy:
       placement:
         constraints:
-          - node.hostname == raspberrypi
+          - node.hostname == raspberry
+    # labels:
+    #   - "volume.device=/dev/gpiochip0"
+    volumes:
+      - /dev/gpiochip0:/dev/gpiochip0
 
   monitoringdevice:
-    image: dagus01/monitoringdevice:arm 
+    image: dagus01/monitoringdevice
     ports:
       - "8100:8100"  
     depends_on:
@@ -55,118 +123,131 @@ services:
     command: [
       "sh", 
       "-c", 
-      "until nc -nz wis-broker 8081; do echo 'Waiting for wis-broker...''; sleep 5; done",
-      "./monitoringdevice"]
+      "until nc -nz wis_broker 8081; do echo 'Waiting for wis_broker...'; sleep 5; done && ./monitoringdevice"]
     configs:
       - source: monitoringdevice_conf.json
         target: /monitoringdevice-1.0/bin/monitoringdevice_conf.json
     deploy:
       placement:
         constraints:
-          - node.hostname == raspberrypi
+          - node.hostname == raspberry 
+    # labels:
+    #   - "volume.device=/dev/gpiochip0"
+    volumes:
+      - /dev/gpiochip0:/dev/gpiochip0
 
-  basicrobot-service:
-    image: natbodocker/basicrobot24:1.0
+  basicrobot:
+    hostname: basicrobot
+    image: dagus01/basicrobot24:1.0
     ports:
-      - "8020:8020" 
-      - "8085:8085"
+    - "8020:8020"
+    - "8085:8085"
     networks:
-      - wisLAN 
+      wisLAN:
+        aliases:
+          - basicrobot
     depends_on:
-      - wenv
+    - virtualrobot
     deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
+      # replicas: 1
+      # restart_policy:
+      #   condition: on-failure
       placement:
-        constraints: [node.role == manager]
+        constraints: [ node.role == manager ]
     configs:
-      - source: basicrobotConfig.json
-        target: ./basicrobotConfig.json
-    healthcheck:
-      test: ["CMD", "nc -nz localhost 8020"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    command: [
-      "sh", 
-      "-c", 
-      "sleep 10",
-      "until nc -nz wis-broker-service 8081; do echo 'Waiting for wis-broker...''; sleep 5; done",
-     "./basicrobot24"]
-
+    - source: basicrobotConfig.json
+      target: /basicrobot24-1.0/bin/basicrobotConfig.json
+    # healthcheck:
+    #   test: [ "CMD", "nc -nzu localhost 8020" ]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
+    command:
+      [
+        "sh",
+        "-c",
+        "until nc -zv virtualrobot 8090; do echo 'Waiting for virtualrobot...'; sleep 5; done && ./basicrobot24"
+      ]
 
   wis_facade:
+    hostname: wis_facade
     image: dagus01/wisfacade:1.0
     depends_on:
-      - wis_broker
+    - wis_broker
     ports:
-      - "8080:8080"
+    - "8080:8080"
     networks:
-      - wisLAN
-    healthcheck:
-      test: ["CMD", "nc -nz wis-broker 8081"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+    - wisLAN
+    # healthcheck:
+    #   test: [ "CMD", "nc -nz wis_broker 8081" ]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
     configs:
-      - source: facadeConfig.json
-        target: /facadeConfig.json
-    command: [
-      "sh", 
-      "-c", 
-      "sleep 10",
-      "until nc -nz wis-broker 8081; do echo 'Waiting for wis-broker...''; sleep 5; done",
-      " java -jar ./wisFacade-0.0.1-SNAPSHOT.jar"]
+    - source: facadeConfig.json
+      target: /facadeConfig.json
+    - source: stunnel_wisfacade.conf
+      target: /etc/stunnel/stunnel_wisfacade.conf
+    command:
+      [
+        "sh",
+        "-c",
+        "until nc -nz wis_broker 8081; do echo 'Waiting for wis_broker...';  sleep 5; done && stunnel /etc/stunnel/stunnel_wisfacade.conf && java -jar ./wisFacade-0.0.1-SNAPSHOT.jar"
+      ]
     deploy:
       placement:
-        constraints: [node.role == manager]
+        constraints: [ node.role == manager ]
 
   wis_broker:
+    hostname: wis_broker
     image: dagus01/mqtt_broker:1.0
     ports:
-      - "8081:8081"
+    - "8081:8081"
     networks:
-      - wisLAN
+      wisLAN:
+        aliases:
+          - wis_broker
     configs:
-      - source: mosquitto.conf
-        target: /etc/mosquitto/mosquitto.conf
+    - source: mosquitto.conf
+      target: /etc/mosquitto/mosquitto.conf
     deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-    healthcheck:
-      test: 
-      [
-        "CMD", 
-        "mosquitto_pub -h localhost -p 8081 -t test -m
-        'readiness_check' -r &&  mosquitto_sub -h localhost -p 8081 -t
-        test -C 1 -W 5 | grep 'readiness_check'"
-      ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    command: ["mosquitto", "-c", "/etc/mosquitto/mosquitto.conf"]
+      # replicas: 1
+      # restart_policy:
+      #   condition: on-failure
+    # placement:
+    #   constraints: [ node.role == manager ]
+    # healthcheck:
+    #   test:
+    #     [
+    #       "CMD",
+    #       "mosquitto_pub -h localhost -p 8081 -t test  -m  'readiness_check'  -r  &&  mosquitto_sub -h localhost -p 8081 -t test -C 1 -W 5 | grep 'readiness_check'"
+    #     ]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
+    command: [ "mosquitto", "-c", "/etc/mosquitto/mosquitto.conf" ]
 
-  wenv:
+  virtualrobot:
+    hostname: virtualrobot
     image: docker.io/natbodocker/virtualrobotdisi23:1.0
     ports:
-      - 8090:8090
-      - 8091:8091
+    - 8090:8090
+    - 8091:8091
     deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
+      # replicas: 1
+      # restart_policy:
+      #   condition: on-failure
       placement:
-        constraints: [node.role == manager]
+        constraints: [ node.role == manager ]
     networks:
-      - wisLAN 
-    healthcheck:
-      test: ["CMD", "nc -nz localhost 8090"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
+      wisLAN:
+        aliases:
+          - virtualrobot
+    # healthcheck:
+    #   test: [ "CMD", "nc -nz localhost 8090" ]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
 
 configs:
   mosquitto.conf:
@@ -181,9 +262,16 @@ configs:
     file: ./configs/wis_conf.json
   monitoringdevice_conf.json:
     file: ./configs/monitoringdevice_conf.json
+  raspberryMockFacadeConfig.json:
+    file: ./configs/raspberryMockFacadeConfig.json
+  stunnel_wisfacade.conf:
+    file: ./configs/stunnel_wisfacade.conf
+  raspberry_setup.sh:
+    file: ./configs/raspberry_setup.sh
 
 networks:
-  secure-overlay-network:
+  wisLAN:
     driver: overlay
-    driver_opts:
-      encrypted: "true"
+    # attachable: true
+    # driver_opts:
+    #   encrypted: "true"

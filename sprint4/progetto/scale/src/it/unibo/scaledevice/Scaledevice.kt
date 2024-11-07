@@ -35,6 +35,7 @@ class Scaledevice ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
+						delay(1200) 
 						CommUtils.outblack("$name | scalestart")
 						
 									p       = Runtime.getRuntime().exec("./scaleDevice")
