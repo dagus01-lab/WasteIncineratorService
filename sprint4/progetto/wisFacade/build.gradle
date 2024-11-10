@@ -46,7 +46,9 @@ dependencies {
     implementation group: 'javax.websocket', name: 'javax.websocket-api', version: '1.1'
 	// Spring Integration MQTT
     implementation 'org.springframework.integration:spring-integration-mqtt:5.5.16'
-
+    // WebSocket API for Java
+    implementation 'javax.websocket:javax.websocket-api:1.1'
+	implementation 'org.glassfish.tyrus.bundles:tyrus-standalone-client:1.17'
     // MQTT Client (Eclipse Paho)
     implementation 'org.eclipse.paho:org.eclipse.paho.mqttv5.client:1.2.5'
     //implementation "org.springframework.boot:spring-boot-starter-websocket:3.2.0-SNAPSHOT"

@@ -25,6 +25,7 @@ public class MQTTBrokerSetup extends AbstractTestExecutionListener {
     }
 
 	private static Process procBroker;
+
 	private static void showOutput(Process proc, String color){
 		new Thread(){
 			public void run(){

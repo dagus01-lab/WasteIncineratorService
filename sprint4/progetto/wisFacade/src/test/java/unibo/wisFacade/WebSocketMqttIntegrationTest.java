@@ -31,6 +31,7 @@ public class WebSocketMqttIntegrationTest{
 	private String websocketEndpoint = "accessgui"; // WebSocket endpoint
 	private Interaction websocketConnSupport=null;
 	private CountDownLatch latch = new CountDownLatch(1);
+	private static WebsocketObserver obs;
 	
 //	@BeforeClass
 //	public void setup() throws Exception {
@@ -47,14 +48,14 @@ public class WebSocketMqttIntegrationTest{
 	@Test
 	public void testWebSocketReceiveMessageFromMqtt() throws InterruptedException {
 
-		try {
+		
 			while (websocketConnSupport == null) {
 				websocketConnSupport = ConnectionFactory.createClientSupport(ProtocolType.ws, "localhost:8080", "accessgui");
 				CommUtils.outcyan("testWISFacade | another connect attempt ");
-				WebsocketObserver obs = new WebsocketObserver(latch, websocketConnSupport);
+				obs = new WebsocketObserver(latch, websocketConnSupport);
 				Thread.sleep(1000);
 			}
-			CommUtils.outgreen("testWISFacade | connected to facade");
+		try {	CommUtils.outgreen("testWISFacade | connected to facade");
 			Interaction connSupport = null;
 			Thread.sleep(2000);
 			CommUtils.outmagenta("test_WISFacade_MQTT ======================================= ");
@@ -70,7 +71,7 @@ public class WebSocketMqttIntegrationTest{
 			((MqttConnection) connSupport).subscribe("wisinfo");
 			IApplMessage new_RP = CommUtils.buildEvent("wistester", "num_RP", "num_RP(1)");
 			((MqttConnection) connSupport).publish("wisinfo", new_RP.toString());
-
+			
 			latch.await(5, TimeUnit.SECONDS);
 		} catch( InterruptedException ie) {
 			fail("websocket client did not receive message");
@@ -83,21 +84,6 @@ public class WebSocketMqttIntegrationTest{
 	@AfterEach
 	public void cleanup() throws Exception {
 		websocketConnSupport.close();
-	}
-
-	public class WebsocketObserver extends ApplAbstractObserver{
-		CountDownLatch latch;
-		public WebsocketObserver(CountDownLatch latch, Interaction clientConn) {
-	        ((WsConnection)clientConn ).addObserver(this);
-			this.latch = latch;
-		}
-		@Override
-		public void update(String value) {
-			CommUtils.outblue("WebsocketClientMock | received "+value);
-			if(value.contains("num_RP(1)")) {
-				latch.countDown();
-			}
-		}
 	}
 }
 
