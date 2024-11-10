@@ -39,6 +39,8 @@ class Wisscaleproxy ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 					action { //it:State
 						connectToMqttBroker( "$broker_url", "wisscaleproxynat" )
 						CommUtils.outmagenta("$name | CREATED  (and connected to mosquitto) ... ")
+						var basicrobot =  
+						CommUtils.outred("${System.getenv("BASICROBOT")}")
 						subscribe(  "wisinfo" ) //mqtt.subscribe(this,topic)
 						//genTimer( actor, state )
 					}

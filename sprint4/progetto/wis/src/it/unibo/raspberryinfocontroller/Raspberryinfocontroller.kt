@@ -48,8 +48,10 @@ class Raspberryinfocontroller ( name: String, scope: CoroutineScope, isconfined:
 				}	 
 				state("wait") { //this:State
 					action { //it:State
+						CommUtils.outblack("$name | mdrunning=$monitoringDeviceRunning, wisReady=$wisReady, RPs=$RPs, AshesLevel=$AshesLevel")
 						if( monitoringDeviceRunning == 1 && wisReady == 1 && RPs>0 && AshesLevel==0 
 						 ){forward("arrived_RP", "arrived_RP(1)" ,"wis" ) 
+						CommUtils.outred("$name | sent wis a new RP")
 						wisReady = 0 
 						}
 						else

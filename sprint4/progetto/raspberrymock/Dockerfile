@@ -18,7 +18,6 @@ RUN apk update
 RUN apk add --no-cache openjdk11-jdk stunnel openssl \
     && apk add --no-cache mosquitto mosquitto-clients  
 COPY ./stunnel.conf /etc/stunnel/stunnel_raspberry.conf
-##CMD ["sh", "-c", "nginx && ./waste_incinerator_service"]
 CMD ["sh", "-c", "./raspberrymock"]
 #type docker_password.txt | docker login --username natbodocker --password-stdin
 #docker login --username natbodocker --password xyz

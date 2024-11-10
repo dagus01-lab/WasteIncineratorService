@@ -5,6 +5,19 @@
 ## 1) gradlew distTar
 ## 2) docker build -t wis:1.0 .
 ## docker run -it --rm --name wis -v ./ca.crt:/etc/nginx/certs/ca.crt -v ./client.crt:/etc/nginx/certs/client.crt -v client.key:/etc/nginx/certs/client.key  -p 8125:8125/tcp 8125:8125/udp --privileged wis:1.0  sh
+
+
+
+    # FROM qakbase:1.0 AS build
+	# WORKDIR /wis
+	# COPY . .
+	# RUN ./gradlew build && ./gradlew distTar
+	
+	# FROM qakbase:1.0 AS test-stage
+	# WORKDIR /wis
+	# COPY --from=build / /
+	# RUN ./gradlew test
+
     FROM alpine:latest
     ## EXPOSE 8100
     ## ADD extracts the tar

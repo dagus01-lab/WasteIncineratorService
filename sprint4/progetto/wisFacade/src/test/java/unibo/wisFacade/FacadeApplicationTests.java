@@ -1,5 +1,7 @@
 package unibo.wisFacade;
 
+import static org.junit.Assert.assertThat;
+
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,14 +15,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class FacadeApplicationTests {
 
-	//con autowired fa sì che il parametro venga inizializzato nella fase iniziale
+	// con autowired fa sì che il parametro venga inizializzato nella fase iniziale
 	@Autowired
 	private TestRestTemplate template;
 
-	//Verifico che alla richiesta "/" ritorni la pagina html della Facade
-    @Test
-    public void getPage() throws Exception {
-        ResponseEntity<String> response = template.getForEntity("/", String.class);
-        assertThat(response.getBody()).contains("ServiceStatusGUI");
-    }
+	// Verifico che alla richiesta "/" ritorni la pagina html della Facade
+	@Test
+	public void getPage() throws Exception {
+		ResponseEntity<String> response = template.getForEntity("/", String.class);
+		assertThat(response.getBody()).contains("ServiceStatusGUI");
+	}
 }

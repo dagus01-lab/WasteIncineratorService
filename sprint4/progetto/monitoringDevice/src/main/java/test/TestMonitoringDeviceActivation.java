@@ -1,6 +1,5 @@
 package main.java.test;
-
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,16 +10,16 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import unibo.basicomm23.interfaces.Interaction;
+import unibo.basicomm23.mqtt.MqttConnection;
 import unibo.basicomm23.msg.ProtocolType;
 import unibo.basicomm23.utils.ColorsOut;
 import unibo.basicomm23.utils.CommUtils;
 import unibo.basicomm23.utils.ConnectionFactory;
-import unibo.basicomm23.mqtt.MqttConnection;
 
-public class Test_Scale_MonitoringDevice {
+public class TestMonitoringDeviceActivation {
 	private static Interaction connSupport;
-	private static Process procBasicRobot;
-	private static Process procWIS;
+	private static Process procMonitoringDevice;
+	private static Process procBroker;
 
 	//Metodo di supporto per mostrare l'output dei messaggi a colori
 	public static void showOutput(Process proc, String color){
@@ -41,34 +40,32 @@ public class Test_Scale_MonitoringDevice {
 		}.start();
 	}
 
-	//Metodo per attivare il BasicRobot
-	public static void activateBasicRobot() {
+	//Metodo per attivare la scale
+	public static void activateMonitoringDevice() {
 		Thread th = new Thread(){
 			public void run(){
-				CommUtils.outmagenta("TestWIS activateBasicRobot");
+				CommUtils.outmagenta("TestMonitoringDevice ActivateMonitoringDevice");
 				try {
-					//procBasicRobot = Runtime.getRuntime().exec("./src/main/java/test/basicRobotexec.bat");
-					procBasicRobot = Runtime.getRuntime().exec("../../unibo.basicrobot24/gradlew run");
-					showOutput(procBasicRobot,ColorsOut.BLUE);
+					//procWIS = Runtime.getRuntime().exec("./src/main/java/test/WISexec.bat");
+					procMonitoringDevice = Runtime.getRuntime().exec("./gradlew run");
+					showOutput(procMonitoringDevice,ColorsOut.GREEN);
 				} catch ( Exception e) {
-					CommUtils.outred("TestWIS activateBasicRobot ERROR " + e.getMessage());
+					CommUtils.outred("TestMonitoringDevice ActivateMonitoringDevice ERROR " + e.getMessage());
 				}
 			}
 		};
 		th.start();
 	}
-
-	//Metodo per attivare il WIS
-	public static void activateWIS() {
+	public static void activateBroker() {
 		Thread th = new Thread(){
 			public void run(){
-				CommUtils.outmagenta("TestWIS activateWIS");
+				CommUtils.outmagenta("TestScale ActivateBroker");
 				try {
-					//procWIS = Runtime.getRuntime().exec("./src/main/java/test/WISexec.bat");
-					procWIS = Runtime.getRuntime().exec("./gradlew run");
-					showOutput(procWIS,ColorsOut.GREEN);
+					//procBroker = Runtime.getRuntime().exec("mosquitto -p 8081");
+					procBroker = Runtime.getRuntime().exec("/usr/sbin/mosquitto -p 8081");
+					showOutput(procBroker,ColorsOut.GREEN);
 				} catch ( Exception e) {
-					CommUtils.outred("TestWIS activateWIS ERROR " + e.getMessage());
+					CommUtils.outred("TestMonitoringDevice ActivateBroker ERROR " + e.getMessage());
 				}
 			}
 		};
@@ -78,7 +75,7 @@ public class Test_Scale_MonitoringDevice {
 	@BeforeClass
 	//Metodo per attivare il sistema complessivo, prima di partire con i veri test
 	public static void activate() {
-		CommUtils.outmagenta("TestWIS activate ");
+		CommUtils.outmagenta("TestMonitoringDevice activate ");
 		/*activateBasicRobot();
 		try {
 			Thread.sleep(10000);
@@ -86,7 +83,8 @@ public class Test_Scale_MonitoringDevice {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
-		activateWIS();
+		activateBroker();
+		activateMonitoringDevice();
 	}
 	/*
 	 * After execution
@@ -96,7 +94,8 @@ public class Test_Scale_MonitoringDevice {
 	public static void down() {
 		CommUtils.outmagenta("end of test ");
 		//procBasicRobot.destroy();
-		procWIS.destroy();
+		procMonitoringDevice.destroy();
+		procBroker.destroy();
 		/*try {
 			CommUtils.outcyan("end of test - taskkill /F /IM java.exe");
 			Runtime.getRuntime().exec("taskkill /F /IM java.exe");
@@ -105,35 +104,6 @@ public class Test_Scale_MonitoringDevice {
 		}*/
 	}
 
-	/*
-	 */
-		@Test(timeout=20000)
-		public void testScaleActivation() {
-	 		try {
-	 			Thread.sleep(2000);
-	  			 CommUtils.outmagenta("testScaleActivation ======================================= ");
-				while( connSupport == null ) {
-	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:8081", "wistester");
-	 				CommUtils.outcyan("testWISSystem another connect attempt ");
-	 				Thread.sleep(1000);
-	 			}
-	 			CommUtils.outcyan("CONNECTED to mqtt broker " + connSupport);
-	 			((MqttConnection)connSupport).trace=true;
-	 			((MqttConnection)connSupport).setupConnectionForAnswer("wisinfo");
-	 			((MqttConnection)connSupport).subscribe("wisinfo");
-	 			
-	 			String message = "";
-	 			long startWait = System.currentTimeMillis();
-	 			long timeout = 10000;
-	 			while(!message.contains("new_RP")) {
-	 				message = connSupport.receiveMsg();
-	 			}
-	 			
-			} catch (Exception e) {
-				CommUtils.outred("testWIS ERROR " + e.getMessage());
-				fail("testRequest " + e.getMessage());
-			}
-		}
 		@Test(timeout=20000)
 		public void testMonitoringDeviceActivation() {
 			try {

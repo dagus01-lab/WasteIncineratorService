@@ -17,8 +17,8 @@ public class ApplguiCore {
         this.wsHandler = wsHandler;
     }
 
-    public void handleMsgFromMqttBroker(MqttMessage message2) {
-    	String message = new String(message2.getPayload());
+    public void handleMsgFromMqttBroker(MqttMessage messagemqtt) {
+    	String message = new String(messagemqtt.getPayload());
     	String payload = CommUtils.getContent(message);
     	wsHandler.sendToAll(payload);
     }

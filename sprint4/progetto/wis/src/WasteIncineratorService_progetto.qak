@@ -40,8 +40,9 @@ Reply moverobotdone  :  moverobotok(ARG)                    for moverobot
 Reply moverobotfailed:  moverobotfailed(PLANDONE, PLANTODO) for moverobot
 
 //Definizione dei contesti
+
 Context ctx_waste_incinerator_service ip [host="localhost" port=8125]
-Context ctxbasicrobot ip [host="basicrobot" port=8020] 
+Context ctxbasicrobot ip [host="127.0.0.1" port=8020] 
 
 //Attori esterni al WIS
 ExternalQActor basicrobot context ctxbasicrobot
@@ -59,6 +60,8 @@ QActor wisscaleproxy context ctx_waste_incinerator_service withobj config using 
 		connectToMqttBroker "$broker_url" clientid "wisscaleproxynat"
 		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "wisscaleproxynat"
  		println("$name | CREATED  (and connected to mosquitto) ... ") color magenta
+ 		[#var basicrobot = #]
+ 		println("${System.getenv(\"BASICROBOT\")}") color red
  		subscribe "wisinfo"
 		//si mette ad osservare lo stato del AshStorage fornito dal MonitoringDevice
 	}
@@ -120,7 +123,7 @@ QActor wismonitoringdeviceproxy context ctx_waste_incinerator_service withobj co
 				}catch(e:Exception){
 					#]println("$name received invalid payload:${payloadArg(0)}") color red[#
 				}
-			#]
+			#] 
 			
 		}
 	}
@@ -148,9 +151,10 @@ QActor raspberryinfocontroller context ctx_waste_incinerator_service{
 	}
 	Goto wait
 	State wait{
-		//println("$name | mdrunning=$monitoringDeviceRunning, wisReady=$wisReady, RPs=$RPs, AshesLevel=$AshesLevel")
+		println("$name | mdrunning=$monitoringDeviceRunning, wisReady=$wisReady, RPs=$RPs, AshesLevel=$AshesLevel")
 		if[#monitoringDeviceRunning == 1 && wisReady == 1 && RPs>0 && AshesLevel==0#]{
 			forward wis -m arrived_RP:arrived_RP(1)
+			println("$name | sent wis a new RP") color red
 			[#wisReady = 0#]
 		}
 		else{
