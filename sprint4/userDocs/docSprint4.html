@@ -206,12 +206,12 @@ div.imagedesc{
   } 
 </style>
 
-<title>Documento Sprint3</title>
+<title>Documento Sprint4</title>
 </head>
 
 <body>
 <div id="top">
-	<h1> WASTE INCINERATOR SERVICE - Sprint 3 </h1>
+	<h1> WASTE INCINERATOR SERVICE - Sprint 4 </h1>
 </div>
 
 <div class="body"> 
@@ -229,8 +229,8 @@ cliente. <br/>
 
 <h2>Sprint precedente</h2>
 <p>Il seguente link porta al documento dello SPRINT precedente, nel
-quale si sono sviluppati il MonitoringDevice e la Scale.<br/>
-<a href="../../sprint2/userDocs/docSprint2.html">SPRINT 2</a> 
+quale si è sviluppata la ServiceStatusGUI.<br/>
+<a href="../../sprint3/userDocs/docSprint3.html">SPRINT 3</a> 
 </p>
 
 <h4>Architettura iniziale di riferimento</h4>
@@ -243,16 +243,23 @@ quale si sono sviluppati il MonitoringDevice e la Scale.<br/>
 </p>
 
 <h2>GOAL</h2>
-<p>In questo SPRINT verranno affrontati i seguenti requisiti:
-<ul>
-
-</ul> 
+<p>In questo SPRINT conclusivo si vuole passare dal robot virtuale del WEnv a un robot fisico (DDR). 
 </p>
 
 <h2>Analisi del problema</h2>
+<p>
+L'unico problema da considerare è come passare dal robot virtuale al robot fisico, possibilmente senza troppo modificare l'architettura iniziale di riferimento,
+in quanto <mark>l'uso di un robot fisico rispetto ad uno virtuale non dovrebbe comportare la modifica della logica di interazione dei componenti del sistema.</mark><br>
+Per fortuna, con il <b><a href=./BasicRobot24.html>BasicRobot</a></b> ci è stato fornito con un <a href=../progetto/wis/basicrobotConfig.json>file di configurazione</a></b> che
+permette facilmente di passare da un tipo di robot all'altro.<br>
+Ricordiamo infatti che, sin dai primi sprint, l'OpRobot è stato pensato in modo che utilizzasse il basicRobot e che non fosse una sua specializzazione. (OpRobot non è un BasicRobot)<br>
+<mark>In questo modo al'OpRobot non interessa sapere con che tipologia di robot (virtuale, DDR, nano, etc...) si interfaccia il BasicRobot e ciò ci ha permesso di passare molto facilmente al prototipo fisico.</mark>
+</p>
 
 
 <h2>Progetto</h2>
+Non avendo dovuto modificare la parte di software in questo sprint (a parte la piccola modifica nel file di configurazione), nella fase di progettazione ci si è concentraci sull'assemblaggio dei componenti fisici del robot.
+In particolare: <br>
 mapping dei pin con il ponte h: 
 <ul>
 	<li>in1 -> pin fisico 21</li>
@@ -278,8 +285,8 @@ Viste le limitazioni esposte nello sprint precedente, relativamente a docker-com
 deciso di usare un orchestratore di container per effettuare il deployment su tutti i nodi
 della rete in tempo reale. Questo consente anche una cifratura del traffico 
 tra i container senza che questa venga gestita all'esterno come viene fatta ora e permette
-ci avere un meccanismo di rotazione delle chiavi per diminuire la possibilità di effettuare
-attacchi brute-force. 
+di avere un meccanismo di rotazione delle chiavi per diminuire la possibilità di effettuare
+attacchi brute-force. <br>
 Per poter far questo però (come è stato accennato precedentemente) si è reso necessario cambiare
 la modalità di interazione con i pin GPIO, passando dalla libreria RPi.GPIO alla libreria 
 lgpiod. Infatti, docker swarm pone delle limitazioni sulla modalità di esecuzione dei container, 
@@ -315,23 +322,16 @@ Per poter vedere in tempo reale i log dei container: <br/>
 <h2>Suddivisione dei compiti</h2>
 <p>
 <ol>
-	<li><b>Analisi del problema:</b> tutti i membri hanno contribuito, in particolare per discutere i vantaggi/svantaggi delle soluzioni proposte.  
+	<li><b>Analisi del problema:</b> tutti i membri hanno contribuito.  
 	</li>
-	<li><b>Progettazione:</b> tutti i membri hanno contribuito, in particolare:
-		<ul>
-			<li>Tutti: discusso assieme i vantaggi/svantaggi dell'uso di un metodo publish/subscribe anziché updateResource.</li>
-			<li>Bryan: ragionato su vantaggi/svantaggi di gui sviluppata come applicazione mobile/web e implementazione della pagina della GUI.</li>
-			<li>Gabriele ed Emanuele: creazione/modifica dei componenti lato Facade e lato qak.</li>
-			<li>Gabriele: creazione raspberrymockfacade e deployment</li>
-		</ul>
+	<li><b>Progettazione:</b> assemblaggio robot in carico a Gabriele.
 	</li>
 	<li><b>Testing:</b> piano dei test deciso assieme. L'effettiva realizzazione è stata affidata a Gabriele. </li>
 </ol>
 </p>
 
 <h2>Sprint futuri</h2>
-<p>Nel prossimo sprint si prevede di implementare il robot fisico. 
-</p>
+
 </div>
 
 <div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
