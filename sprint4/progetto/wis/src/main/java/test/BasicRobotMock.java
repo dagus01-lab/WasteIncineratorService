@@ -70,7 +70,8 @@ public class BasicRobotMock {
 	}
 	public void shutdown() {
 		try {
-			serverSocket.close();
+			if(serverSocket!= null)
+				serverSocket.close();
 		} catch (IOException e) {
 			CommUtils.outred("BasicRobotMock | Error closing server socket");
 		}

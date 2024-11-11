@@ -109,7 +109,7 @@ public class Test_WIS {
 	@BeforeClass
 	public static void activateSetup() {
 		CommUtils.outyellow("== SETTING UP TEST ENVIRONMENT ==============");
-//		activateBasicRobot();
+		activateBasicRobot();
 //		activateBroker();
 //		CommUtils.delay(1000);
 	}
@@ -124,7 +124,7 @@ public class Test_WIS {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
-		activateBasicRobot();
+		
 		activateBroker();
 		CommUtils.delay(1000);
 		CommUtils.outyellow("== SETTING UP WIS ==============");

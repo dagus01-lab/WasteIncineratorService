@@ -57,6 +57,21 @@ dependencies {
 //	implementation group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core-jvm', version: "$kotlinVersion"
 
 }
+test {
+    useJUnitPlatform()
+    
+    // Configure logging to show detailed output for test execution
+    testLogging {
+        // Show output for all test events (including passed and skipped)
+        events "passed", "skipped", "failed"
+        
+        // Display full stack traces on failure
+        exceptionFormat = 'full'
+        
+        // Show standard output (System.out) and standard error (System.err) for tests
+        showStandardStreams = true
+    }
+}
 
 tasks.named('test') {
 	useJUnitPlatform()

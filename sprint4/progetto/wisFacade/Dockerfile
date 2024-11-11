@@ -7,20 +7,16 @@
 ## docker run -it --rm --name wisfacade -v ./ca.crt:/etc/nginx/certs/ca.crt -v ./client.crt:/etc/nginx/certs/client.crt -v client.key:/etc/nginx/certs/client.key  -p 8050:8050/tcp 8050:8050/udp --privileged wisfacade:1.0  sh
 
 #MULTI-STAGE build to integrate tests with github actions
-# FROM openjdk:17 AS build
-# WORKDIR /wisfacade
-# COPY . .
-# RUN ./gradlew build && ./gradlew distTar
+FROM dagus01/qakimage:1.0 AS build
+WORKDIR /wisfacade
+COPY . .
+RUN ./gradlew build
+RUN ./gradlew test 
 
-# FROM openjdk:17 AS test-stage
-# WORKDIR /wis
-# COPY --from=build /wisfacade /wisfacade
-# RUN ./gradlew test 
-
-FROM openjdk:11-jdk-alpine
-COPY ./build/libs/wisFacade-0.0.1-SNAPSHOT.jar wisFacade-0.0.1-SNAPSHOT.jar
+FROM alpine:latest
+COPY --from=build /wisfacade/build/libs/wisFacade-0.0.1-SNAPSHOT.jar wisFacade-0.0.1-SNAPSHOT.jar
 COPY ./*.json ./
-RUN apk add --no-cache stunnel openssl
+RUN apk add --no-cache stunnel openssl openjdk11-jdk
 COPY ./stunnel.conf /etc/stunnel/stunnel.conf
 CMD ["sh", "-c", "java -jar ./wisFacade-0.0.1-SNAPSHOT.jar"]    
 

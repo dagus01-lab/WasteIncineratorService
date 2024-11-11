@@ -8,20 +8,18 @@
 
 
 
-    # FROM qakbase:1.0 AS build
-	# WORKDIR /wis
-	# COPY . .
-	# RUN ./gradlew build && ./gradlew distTar
-	
-	# FROM qakbase:1.0 AS test-stage
-	# WORKDIR /wis
-	# COPY --from=build / /
-	# RUN ./gradlew test
+    FROM dagus01/qakimage:1.0 AS build
+	WORKDIR /wis
+    COPY . .
+    RUN ./gradlew eclipse
+    RUN ./gradlew build && ./gradlew distTar
+	RUN ./gradlew test
 
     FROM alpine:latest
     ## EXPOSE 8100
     ## ADD extracts the tar
-    ADD ./build/distributions/waste_incinerator_service-1.0.tar /
+    COPY --from=build /wis/build/distributions/waste_incinerator_service-1.0.tar /
+    RUN tar -xf /waste_incinerator_service-1.0.tar -C /
     WORKDIR /waste_incinerator_service-1.0/bin
     COPY ./*.pl ./
     COPY ./*.bin ./

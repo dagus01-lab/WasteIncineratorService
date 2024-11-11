@@ -186,7 +186,21 @@ distributions {
         }
     }
 } 
-
+test {
+    useJUnit()
+    
+    // Configure logging to show detailed output for test execution
+    testLogging {
+        // Show output for all test events (including passed and skipped)
+        events "passed", "skipped", "failed"
+        
+        // Display full stack traces on failure
+        exceptionFormat = 'full'
+        
+        // Show standard output (System.out) and standard error (System.err) for tests
+        showStandardStreams = true
+    }
+}
 task run0(type: JavaExec) {
     group = "Execution"
     description = "Run the main class with JavaExecTask"

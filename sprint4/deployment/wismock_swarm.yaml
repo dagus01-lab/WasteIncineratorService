@@ -53,7 +53,7 @@ services:
 
   basicrobot:
     hostname: basicrobot
-    image: dagus01/basicrobot24:1.0
+    image: natbodocker/basicrobot24:1.0
     ports:
     - "8020:8020"
     - "8085:8085"
