@@ -15,7 +15,7 @@
     RUN ./gradlew build && ./gradlew distTar
 	RUN ./gradlew test
 
-    FROM alpine:latest
+    FROM nginx:alpine
     ## EXPOSE 8100
     ## ADD extracts the tar
     COPY --from=build /wis/build/distributions/waste_incinerator_service-1.0.tar /

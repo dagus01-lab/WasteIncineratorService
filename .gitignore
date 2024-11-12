@@ -1,3 +1,5 @@
-/.metadata/
+./.metadata/
 *.crt
 *.key
+./.settings/
+./vscode/

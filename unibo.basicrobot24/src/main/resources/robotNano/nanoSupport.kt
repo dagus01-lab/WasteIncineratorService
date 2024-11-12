@@ -13,8 +13,8 @@ object nanoSupport {
 	lateinit var writer : OutputStreamWriter
 
 	fun create( owner : ActorBasic ){		
-		//val p = Runtime.getRuntime().exec("sudo ./Motors")
-		val p = Runtime.getRuntime().exec("sudo python3 Motors.py")
+		val p = Runtime.getRuntime().exec("./Motors")
+		//val p = Runtime.getRuntime().exec("sudo python3 Motors.py")
 		writer = OutputStreamWriter(  p.getOutputStream()  )
 		println("nanoSupport  | CREATED with writer=$writer")
  	}

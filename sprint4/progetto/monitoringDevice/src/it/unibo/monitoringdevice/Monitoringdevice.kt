@@ -97,7 +97,7 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 								
 												levelAshStorage = payloadArg(0).toInt()
 												D = payloadArg(1).toInt()
-								if( IncineratorStatus==0 && levelAshStorage != previousLevelAshStorage 
+								if( IncineratorStatus==0  && levelAshStorage != previousLevelAshStorage  
 								 ){CommUtils.outblue("$name current AshStorageLevel=$levelAshStorage")
 								if( levelAshStorage==1 
 								 ){forward("led_off", "led_off(1)" ,"led" ) 

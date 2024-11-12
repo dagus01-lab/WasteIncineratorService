@@ -71,7 +71,7 @@ class Datacleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 								previous_D = D 
 								}
 								if( System.currentTimeMillis()-timeLastUpdate>=timeout 
-								 ){emitLocalStreamEvent("ashStorageLevel", "ashStorageLevel($Level)" ) 
+								 ){emitLocalStreamEvent("ashStorageLevel", "ashStorageLevel($Level,$D)" ) 
 								timeLastUpdate=System.currentTimeMillis() 
 								}
 						}

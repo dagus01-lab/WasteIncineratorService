@@ -29,8 +29,8 @@ class sonarHCSR04SupportActor ( name : String ) : ActorBasic( name ) {
 		if( msg.msgId() == "sonarstart"){
 			println("sonarHCSR04SupportActor CREATING")
 			try{
-				//val p = Runtime.getRuntime().exec("sudo ./SonarAlone")
-				val p  = Runtime.getRuntime().exec("sudo python3 sonar.py")
+				val p = Runtime.getRuntime().exec("./sonar")
+				//val p  = Runtime.getRuntime().exec("sudo python3 sonar.py")
 				reader = BufferedReader(  InputStreamReader(p.getInputStream() ))
 				startRead(   )
 			}catch( e : Exception){

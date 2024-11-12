@@ -141,7 +141,7 @@ QActor datacleaner context ctxmonitoringdevice withobj config using "MonitoringD
 	 			[#previous_D = D#]
 	     	}
 	     	if[#System.currentTimeMillis()-timeLastUpdate>=timeout#]{
-	     		emitlocalstream ashStorageLevel:ashStorageLevel($Level)
+	     		emitlocalstream ashStorageLevel:ashStorageLevel($Level, $D)
 	     		[#timeLastUpdate=System.currentTimeMillis()#]
 	     	}
      	}
@@ -214,7 +214,7 @@ QActor monitoringdevice context ctxmonitoringdevice withobj config using "Monito
 				D = payloadArg(1).toInt()
 			#]
 			
-			if [#IncineratorStatus==0 && levelAshStorage != previousLevelAshStorage#]{ 
+			if [#IncineratorStatus==0  && levelAshStorage != previousLevelAshStorage #]{ 
 				println("$name current AshStorageLevel=$levelAshStorage") color blue
 				if [#levelAshStorage==1#]{
 					//se Incinerator non sta bruciando e AshStorage non è né vuoto né pieno, allora spengo il led

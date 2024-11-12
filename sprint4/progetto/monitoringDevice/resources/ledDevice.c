@@ -38,6 +38,7 @@ void* blink_led(void* arg) {
 
 int main() {
     signal(SIGINT, signal_handler);
+    signal(SIGTERM, signal_handler);
 
     chip = gpiod_chip_open_by_name("gpiochip0"); // Use the appropriate GPIO chip
     if (!chip) {

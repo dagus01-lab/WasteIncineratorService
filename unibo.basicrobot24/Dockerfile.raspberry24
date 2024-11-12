@@ -1,5 +1,5 @@
 ## ----------------------------------------------------------
-## Dockerfile monitoringdevice
+## Dockerfile basicrobot
 ## ----------------------------------------------------------
 ## In order to build the container type the following commands:
 ## 1) gradlew distTar
@@ -14,34 +14,52 @@
 ##      docker run --privileged --rm tonistiigi/binfmt --install all
 ##    (se questi step per configurare buildx sono già stati effettuati non è necessario ripeterli)
 ##    Infine, l'immagine può essere costruita:
-##      docker buildx build --platform linux/arm64/v8 -t dagus01/monitoringdevice --load .
+##      docker buildx build --platform linux/arm64/v8 -t basicrobot:arm --load .
 ## 3) è possibile condividere l'immagine con un raspberry sulla stessa LAN:
-##      docker save monitoringdevice:arm | ssh user@<MD-ip> 'sudo docker load'
+##      docker save basicrobot:arm | ssh user@<MD-ip> 'sudo docker load'
 ##    oppure, facendo push su docker hub. In tal caso occorre fare tag dell'immagine locale:
-##      docker tag monitoringdevice <username>/monitoringdevice
+##      docker tag basicrobot:arm <username>/basicrobot:arm
 ##    dove <username> denota il nome utente del proprio repository dockerhub.
 ##    Occorre poi fare login:
 ##      docker login --username <username>
 ##    e infine fare push:
-##      docker push <username>/monitoringdevice:arm
+##      docker push <username>/basicrobot:arm
 ##
-## docker run -it --rm --name monitoringdevice -p 8100:8100/tcp  -monitoringdevice:1.0  sh
+## docker run -it --rm --name basicrobot -p 8020:8020/tcp -p 8020:8020/udp -p 8085:8085/tcp basicrobot:1.0  sh
 FROM arm64v8/alpine
 
-## EXPOSE 8100
+## EXPOSE 8200
 RUN apk update
 RUN set -xe && apk add --no-cache libgpiod gcc build-base linux-headers musl-dev libgpiod-dev stunnel
 RUN apk add --no-cache openjdk11-jdk 
 
 ## ADD extracts the tar
-ADD ./build/distributions/monitoringdevice-1.0.tar /
-WORKDIR /monitoringdevice-1.0/bin
+ADD ./build/distributions/basicrobot24-1.0.tar /
+## EXPOSE 8200
+WORKDIR /basicrobot24-1.0/bin
 COPY ./*.pl ./
-COPY ./*.txt ./
-COPY ./resources/* ./
 COPY ./*.json ./
+COPY ./*.bin ./
+COPY ./*.txt ./
+COPY ./MotorsUpdated.c ./
+COPY ./sonar.c ./
 
+RUN gcc MotorsUpdated.c -o Motors -lgpiod
 RUN gcc sonar.c -o sonar -lgpiod
-RUN gcc ledDevice.c -o ledDevice -lgpiod
+CMD ["sh", "-c", "./basicrobot24"]
 
-CMD ["sh", "-c", "./monitoringdevice"]
+## 1) gradlew distTar
+## 2) docker build -t basicrobot24:1.0 .
+## OCCORRE APRIRE UDP PER PERMETTERE COAP
+## docker run -it --rm --name basicrobot24 -p8020:8020/tcp -p8020:8020/udp  --privileged basicrobot24:1.0  /bin/bash
+## MODIFICA DEL FILE DI CONFIGURAZIONE
+# docker cp basicrobotConfig.json 89193dba02a2:/basicrobot24-1.0/bin/basicrobotConfig.json
+# docker cp stepTimeConfig.json cab3aa29f8eb:/basicrobot24-1.0/bin/stepTimeConfig.json
+# docker tag basicrobot24:1.0 natbodocker/basicrobot24:1.0
+
+#type docker_password.txt | docker login --username natbodocker --password-stdin
+#docker login --username natbodocker --password xyz
+#docker push natbodocker/basicrobot24:1.0
+
+
+# docker-compose -f basicrobot24.yaml  up
