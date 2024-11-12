@@ -276,7 +276,37 @@ mapping dei pin con il raspberry:
 </ul> 
 
 <h2>Piano di test</h2>
-
+Quanto al piano di testing si è deciso di automatizzarlo il più possibile in questo ultimo sprint.
+In particolare, si è deciso di effettuare test dal punto di vista applicativo, ma anche sulle immagini
+che vengono direttamente fornite alla parte distribuita.
+Riportiamo i test effettuati sui nodi dell'applicazione:
+<ul>
+	<li><b>WIS:</b>Sul wis sono stati effettuati due test:
+		<ol>
+			<li><b>test_newRP_MDfull</b>: testa la situazione in cui arriva un RP ma l'ashStorage è pieno. Comportamento atteso: il robot non si muove</li>
+			<li><b>test_newRP_MDok</b>: testa la situazione in cui arriva un RP ma l'ashStorage è ad un livello normale. Comportamento atteso: il robot va a prendere l'RP</li>
+		</ol>
+	</li>
+	<li><b>WISFacade:</b>Sulla wisfacade sono stati effettuati due test:
+		<ol>
+			<li><b>test_facade</b>: crea un client http mock e verifica che la facade permetta di collegarsi via HTTP</li>
+			<li><b>test_wisfacade_MQTTIntegration</b>: Crea un client websocket mock che si connette e contestualmente un altro client MQTT che notifica l'arrivo di un RP. Comportamento atteso: il client websocket viene notificato dell'arrivo di un RP</li>
+		</ol>
+	</li>
+	<li><b>RaspberryMock:</b>Sulla raspberrymock sono stati effettuati due test:
+		<ol>
+			<li><b>test_arrived_RP</b>: invia un messaggio new_RP da una facademock e verifica che venga fatta una publish su un broker MQTT di testing</li>
+			<li><b>test_updateStatoAshStorage</b>: invia un messaggio statoAshStorage da una facademock e verifica che venga fatta una publish su un broker MQTT di testing</li>
+		</ol>
+		Per ovvi motivi di praticità si è deciso di mantenere il test sul raspberrymock e non su scale e monitoringdevice fisici,
+		oltre al fatto che il test effettuato sul raspberrymock verifica il corretto comportamento degli attori
+		monitoringdevice e scale, che rimangono uguali sia nel caso fisico che nel mock.
+	</li>
+</ul>
+Nella fase di build dei container sono state sfruttate le multi-stage build in modo tale da creare un'immagine in cui viene fatto il build 
+dell'applicazione (e contestualmente, i test automatizzati relativi ad essa). 
+Si è deciso quindi di creare un workflow che permettesse, a fronte di ogni aggiornamento del repository del progetto, di effettuare i test
+in maniera automatica, creando le immagini docker di questi tre nodi e verificando la correttezza di questo processo.
 
 <h2>Deployment</h2>
 
