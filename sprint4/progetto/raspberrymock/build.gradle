@@ -186,6 +186,7 @@ distributions {
         }
     }
 } 
+
 test {
     useJUnit()
     
@@ -201,6 +202,7 @@ test {
         showStandardStreams = true
     }
 }
+
 task run0(type: JavaExec) {
     group = "Execution"
     description = "Run the main class with JavaExecTask"

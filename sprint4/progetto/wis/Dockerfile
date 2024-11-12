@@ -29,6 +29,8 @@
     RUN apk update 
     RUN apk add --no-cache libcoap openjdk11-jdk stunnel openssl \
         && apk add --no-cache mosquitto mosquitto-clients
+    RUN apk add --no-cache nginx && \
+        mkdir -p /run/nginx
     COPY ./stunnel.conf /etc/stunnel/stunnel_wis.conf 
     ##CMD ["sh", "-c", "nginx && ./waste_incinerator_service"]
     CMD ["sh", "-c", "./waste_incinerator_service"]
