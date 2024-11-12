@@ -17,7 +17,7 @@ You can find some useful documentation on this language  [here](sprint0/userDocs
 
 ## Roadmap
 1. **Sprint 0**: Requirements analysis. Latest Release: [sprint0.qak](sprint0/src/sprint0.qak).
-2. **Sprint 1**: Waste Incinerator Service. Latest Release: [sprint1.qak](sprint1/src/sprint1.qak).
+2. **Sprint 1**: Waste Incinerator Service. Latest Release: [sprint1.qak](sprint1/src/WasteIncineratorService_progetto.qak).
 3. **Sprint 2**: Scale and MonitoringDevice. Latest Release: [sprint2](sprint2).
 4. **Sprint 3**: WISFacade and RaspberryMock. Latest Release: [sprint3](sprint3).
 5. **Sprint 4**: Physical Robot. Latest Release: [sprint4](sprint4).
