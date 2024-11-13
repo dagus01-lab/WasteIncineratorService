@@ -1,97 +1,65 @@
 version: '3.8'
 services:
-  # volumes:
-  #   image: docker:dind
-  #   stop_grace_period: 60s
-  #   command:
-  #     - ash
-  #     - -c
-  #     - |
-  #       term_signal_handler() {
-  #         echo "############  Caught SIGTERM #############"
-  #         docker stop devices_volume_priv >/dev/null 2>&1
-  #         exit
-  #       }
+  dmm:
+    image: alpinelinux/docker-cli
+    entrypoint: docker
+    command: |
+        run 
+        --rm
+        -i
+        --name device-manager
+        --privileged
+        --cgroupns=host
+        --pid=host
+        --userns=host
+        -v /sys:/host/sys
+        -v /var/run/docker.sock:/var/run/docker.sock
+        ghcr.io/allfro/allfro/device-mapping-manager:nightly
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.labels.device == rpi 
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
 
-  #       trap 'term_signal_handler' SIGTERM
-        
-  #       echo "Starting event listener container"
-  #       docker run \
-  #         --rm \
-  #         --privileged \
-  #         --tty=false -i \
-  #         --name devices_volume_priv \
-  #         -v /var/run/docker.sock:/var/run/docker.sock \
-  #         -v /sys/fs/cgroup/devices/docker/:/docker/:Z \
-  #         -v /dev/:/real/dev/ \
-  #         docker sh -s <<"EOF" &
-  #           add_perm() {
-  #             read DEVICE CID
-  #             if [[ -z $$DEVICE ]]; then
-  #               echo "we did a startup I think"
-  #               return
-  #             fi
-              
-  #             USBDEV=`readlink -f /real$${DEVICE}`
-  #             major=`stat -c '%t' $$USBDEV`
-  #             minor=`stat -c '%T' $$USBDEV`
-  #             if [[ -z $$minor || -z $$major ]]; then
-  #               echo 'Device not found'
-  #               return
-  #             fi
-  #             dminor=$$((0x$${minor}))
-  #             dmajor=$$((0x$${major}))
-  #             echo "Setting permissions (c $$dmajor:$$dminor rwm) for $${CID} to device ($${DEVICE})"
-  #             echo "c $$dmajor:$$dminor rwm" > /docker/$${CID}/devices.allow
-  #           }
-
-  #           echo "Listening for startup events that have a label of 'volume.device'"
-  #           while true; do
-  #             docker events \
-  #               --filter 'label=volume.device' \
-  #               --filter 'event=start' \
-  #               --format '{{index .Actor.Attributes "volume.device"}} {{.Actor.ID}}' | \
-  #               add_perm
-  #             echo "Restarting events listener"
-  #           done
-  #       EOF
-  #       while true ; do 
-  #         sleep 5
-  #       done
-  #   volumes:
-  #     - "/var/run/docker.sock:/var/run/docker.sock"
-  #   deploy:
-  #     placement:
-  #       constraints:
-  #         - node.hostname == raspberry
   wis:
-    image: dagus01/wis:1.0
+    image: dagus01/wis:arm
     ports:
-    - "8125:8125"
-    depends_on:
-    - basicrobot
-    - broker
+    - "8085:8085"
     networks:
     - wisLAN
+    healthcheck:
+      test: [ "nslookup wis_broker && gpioget /dev/gpiochip0 18" ]
+      interval: 30s
+      timeout: 5s
+      retries: 2
     configs:
     - source: wis_conf.json
       target: /waste_incinerator_service-1.0/bin/wis_conf.json
-    - source: nginx_wis.conf
-      target: /etc/nginx/nginx.conf
+    - source: basicrobotConfig.json
+      target: /basicrobot24-1.0/bin/basicrobotConfig.json
+    - source: MotorsUpdated.c
+      target: /basicrobot24-1.0/bin/MotorsUpdated.c
     command:
       [
         "sh",
         "-c",
-        "until nc -nz wis_broker 8081; do echo 'Waiting for wis_broker...'; sleep 5; done && until coap-client -m get coap://basicrobot:8020/ctxbasicrobot/basicrobot; do echo 'Waiting for  basicrobot...'; sleep 10; done && nginx && ./waste_incinerator_service"
+        "until nc -nz wis_broker 8081; do echo 'Waiting for wis_broker...'; sleep 5; done && \
+        until gpioget /dev/gpiochip0 5; do echo 'Waiting for authorization to access GPIO pins..';  done && \
+        gcc -o /basicrobot24-1.0/bin/Motors /basicrobot24-1.0/bin/MotorsUpdated.c -lgpiod && \
+        cd /waste_incinerator_service-1.0/bin/ && pwd && ls && ./wis_start.sh"
       ]
     deploy:
       placement:
-        constraints: [ node.role == manager ]
+        constraints: [ node.hostname == robottino ]
+    volumes:
+      - /dev/gpiochip0:/dev/gpiochip0
 
   scale:
     image: dagus01/scale
-    ports:
-      - "8200:8200"  
+    # ports:
+    #   - "8200:8200"  
     depends_on:
       - basicrobot
       - broker
@@ -100,23 +68,26 @@ services:
     command: [
       "sh", 
       "-c", 
-      "until nc -nz wis_broker 8081; do echo 'Waiting for wis_broker...'; sleep 5; done && ./scale"]
+      " until nc -nz wis_broker 8081; do echo 'Waiting for wis_broker...'; sleep 5; done && gpioget /dev/gpiochip0 13 && ./scale"]
     configs:
       - source: scale_conf.json
         target: /scale-1.0/bin/scale_conf.json
+    healthcheck:
+      test: [ "nslookup wis_broker && gpioget /dev/gpiochip0 13" ]
+      interval: 30s
+      timeout: 5s
+      retries: 2
     deploy:
       placement:
         constraints:
           - node.hostname == raspberry
-    # labels:
-    #   - "volume.device=/dev/gpiochip0"
     volumes:
       - /dev/gpiochip0:/dev/gpiochip0
 
   monitoringdevice:
     image: dagus01/monitoringdevice
-    ports:
-      - "8100:8100"  
+    # ports:
+    #   - "8100:8100"  
     depends_on:
       - basicrobot
       - broker
@@ -125,52 +96,22 @@ services:
     command: [
       "sh", 
       "-c", 
-      "until nc -nz wis_broker 8081; do echo 'Waiting for wis_broker...'; sleep 5; done && ./monitoringdevice"]
+      "until nc -nz wis_broker 8081; do echo 'Waiting for wis_broker...'; sleep 5; done && gpioget /dev/gpiochip0 18 && ./monitoringdevice"]
     configs:
       - source: monitoringdevice_conf.json
         target: /monitoringdevice-1.0/bin/monitoringdevice_conf.json
+    healthcheck:
+      test: [ "nslookup wis_broker && gpioget /dev/gpiochip0 18" ]
+      interval: 30s
+      timeout: 5s
+      retries: 2
     deploy:
       placement:
         constraints:
           - node.hostname == raspberry 
-    # labels:
-    #   - "volume.device=/dev/gpiochip0"
     volumes:
       - /dev/gpiochip0:/dev/gpiochip0
 
-  basicrobot:
-    hostname: basicrobot
-    image: dagus01/basicrobot:arm
-    ports:
-    - "8020:8020"
-    - "8085:8085"
-    networks:
-      wisLAN:
-        aliases:
-          - basicrobot
-    depends_on:
-    - virtualrobot
-    deploy:
-      # replicas: 1
-      # restart_policy:
-      #   condition: on-failure
-      placement:
-        constraints:
-          - node.hostname == robottino 
-    configs:
-    - source: basicrobotConfig.json
-      target: /basicrobot24-1.0/bin/basicrobotConfig.json
-    # healthcheck:
-    #   test: [ "CMD", "nc -nzu localhost 8020" ]
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 5
-    command:
-      [
-        "sh",
-        "-c",
-        "until nc -zv virtualrobot 8090; do echo 'Waiting for virtualrobot...'; sleep 5; done && ./basicrobot24"
-      ]
 
   wis_facade:
     hostname: wis_facade
@@ -204,8 +145,8 @@ services:
   wis_broker:
     hostname: wis_broker
     image: dagus01/mqtt_broker:1.0
-    ports:
-    - "8081:8081"
+    # ports:
+    # - "8081:8081"
     networks:
       wisLAN:
         aliases:
@@ -252,10 +193,19 @@ configs:
     file: ./configs/raspberry_setup.sh
   nginx_wis.conf:
     file: ./configs/nginx_wis.conf
+  MotorsUpdated.c:
+    file: ./configs/MotorsUpdated.c
+  wis_start.sh:
+    file: ./configs/wis_start.sh
 
 networks:
   wisLAN:
     driver: overlay
-    # attachable: true
+    attachable: true
+    ipam:
+      driver: default       # Uses the default IP Address Management (IPAM) driver
+      config:
+        - subnet: "10.0.10.0/24"       # Specifies the subnet for the network
+    #       gateway: "10.0.10.1"         # Specifies the gateway IP
     # driver_opts:
     #   encrypted: "true"

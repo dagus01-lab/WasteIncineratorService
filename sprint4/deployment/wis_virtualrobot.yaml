@@ -25,8 +25,8 @@ services:
 
   wis:
     image: dagus01/wis:1.0
-    ports:
-    - "8125:8125"
+    # ports:
+    # - "8125:8125"
     depends_on:
     - basicrobot
     - broker
@@ -49,8 +49,8 @@ services:
 
   scale:
     image: dagus01/scale
-    ports:
-      - "8200:8200"  
+    # ports:
+    #   - "8200:8200"  
     depends_on:
       - basicrobot
       - broker
@@ -79,8 +79,8 @@ services:
 
   monitoringdevice:
     image: dagus01/monitoringdevice
-    ports:
-      - "8100:8100"  
+    # ports:
+    #   - "8100:8100"  
     depends_on:
       - basicrobot
       - broker
@@ -110,9 +110,9 @@ services:
   basicrobot:
     hostname: basicrobot
     image: dagus01/basicrobot24:1.0
-    ports:
-    - "8020:8020"
-    - "8085:8085"
+    # ports:
+    # - "8020:8020"
+    # - "8085:8085"
     networks:
       wisLAN:
         aliases:
@@ -172,8 +172,8 @@ services:
   wis_broker:
     hostname: wis_broker
     image: dagus01/mqtt_broker:1.0
-    ports:
-    - "8081:8081"
+    # ports:
+    # - "8081:8081"
     networks:
       wisLAN:
         aliases:
@@ -245,6 +245,10 @@ configs:
 networks:
   wisLAN:
     driver: overlay
-    # attachable: true
+    attachable: true
     # driver_opts:
     #   encrypted: "true"
+    # ipam:
+    #   config:
+    #     - subnet: "10.0.0.0/8"
+    #       gateway: "10.0.0.1"

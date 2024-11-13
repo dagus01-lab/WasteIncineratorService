@@ -67,7 +67,7 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 				 	 		stateTimer = TimerActor("timer_engage", 
-				 	 					  scope, context!!, "local_tout_"+name+"_engage", 1000.toLong() )  //OCT2023
+				 	 					  scope, context!!, "local_tout_"+name+"_engage", 5000.toLong() )  //OCT2023
 					}	 	 
 					 transition(edgeName="t014",targetState="noResponse",cond=whenTimeout("local_tout_"+name+"_engage"))   
 					transition(edgeName="t015",targetState="waitingWorking",cond=whenReply("engagedone"))

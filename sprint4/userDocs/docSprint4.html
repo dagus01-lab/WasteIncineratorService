@@ -258,6 +258,7 @@ Ricordiamo infatti che, sin dai primi sprint, l'OpRobot è stato pensato in modo
 
 
 <h2>Progetto</h2>
+<img src="./robot.jpg" alt="robot"></img>
 Non avendo dovuto modificare la parte di software in questo sprint (a parte la piccola modifica nel file di configurazione), nella fase di progettazione ci si è concentraci sull'assemblaggio dei componenti fisici del robot.
 In particolare: <br>
 mapping dei pin con il ponte h: 
@@ -330,16 +331,17 @@ e avere un container sul raspberry che intercetti le richieste di montaggio di v
 container e che modifichi i cgroups in maniera tale da consentire al processo che lo ha richiesto
 di accedere effettivamente al device. <a href="https://github.com/allfro/device-mapping-manager/issues/12#issuecomment-2019301115">Qui</a> s
 i può trovare un esempio di come questo può essere fatto.<br>
-Al momento occorre, prima di procedere con il deployment, eseguire docker compose del file riportato nel commento.
-Si pensa di integrare presto questa parte direttamente nel deployment con swarm.
+Si noti come nel deployment con i dispositivi fisici si è deciso di collocare wis e basicrobot sullo stesso nodo, in quanto fortemente accoppiati
+(per via della comunicazione via COAP tra essi).
 
 
 Sull'host su cui girerà il wis eseguire:<br/>
-<b>docker swarm init</b><br/>
+<b>docker swarm init --autolock</b><br/>
 e sul nodo del monitoring device e della scale eseguire:<br/>
 <b>docker swarm join --token <token> <wis_ip>:2377</b><br/>
 dove per token si intende il token generato dopo il primo comando e per wis_ip l'indirizzo
-ip del nodo su cui gira il wis.
+ip del nodo su cui gira il wis.<br>
+Si noti l'utilizzo di --autolock, che garantisce che container non autorizzati non riescano a sostituire il nodo manager nel caso in cui quest'ultimo venga riavviato. 
 Per poter permettere l'esecuzione del container che permette di accedere al device /dev/gpiochip0, eseguire sul nodo manager:
 <b>docker node update --label-add device=rpi node_name</b>
 per ogni raspberry della rete (dove node_name rappresenta il nome del raspberry).

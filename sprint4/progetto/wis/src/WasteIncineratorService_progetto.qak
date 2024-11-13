@@ -303,7 +303,7 @@ QActor oprobot context ctx_waste_incinerator_service withobj config using "WISCo
 		println("$name | $MyName engaging ... ") color yellow 
 		request basicrobot -m engage : engage($MyName,$StepTime) //pc Emanuele 112, fisso Gabriele 260, portatile Gabriele 330
 	}
-	Transition t0 whenTime 1000 -> noResponse
+	Transition t0 whenTime 5000 -> noResponse
 				  whenReply engagedone   -> waitingWorking
  	              whenReply engagerefused -> end
  	          
