@@ -41,11 +41,11 @@ with Diagram('waste_incinerator_serviceArch', show=False, outformat='png', graph
      oprobot >> Edge( label='alarm', **eventedgeattr, decorate='true', fontcolor='red') >> sys
      incinerator >> Edge( label='endBurning', **eventedgeattr, decorate='true', fontcolor='red') >> sys
      oprobot >> Edge(color='magenta', style='solid', decorate='true', label='<engage<font color="darkgreen"> engagedone engagerefused</font> &nbsp; moverobot<font color="darkgreen"> moverobotdone moverobotfailed</font> &nbsp; >',  fontcolor='magenta') >> basicrobot
-     raspberryinfocontroller >> Edge(color='blue', style='solid',  decorate='true', label='<arrived_RP &nbsp; ashesLevel &nbsp; >',  fontcolor='blue') >> wis
+     raspberryinfocontroller >> Edge(color='blue', style='solid',  decorate='true', label='<ashesLevel &nbsp; arrived_RP &nbsp; >',  fontcolor='blue') >> wis
      oprobot >> Edge(color='blue', style='solid',  decorate='true', label='<rpInBurnin &nbsp; newAshes &nbsp; >',  fontcolor='blue') >> wis
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<activationCommand &nbsp; startBurning &nbsp; >',  fontcolor='blue') >> incinerator
      wisscaleproxy >> Edge(color='blue', style='solid',  decorate='true', label='<arrived_RP &nbsp; >',  fontcolor='blue') >> raspberryinfocontroller
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<arrived_RP &nbsp; >',  fontcolor='blue') >> oprobot
-     wis >> Edge(color='blue', style='solid',  decorate='true', label='<waitingForNewRPs &nbsp; >',  fontcolor='blue') >> raspberryinfocontroller
+     wis >> Edge(color='blue', style='solid',  decorate='true', label='<waitingForUpdates &nbsp; >',  fontcolor='blue') >> raspberryinfocontroller
      wismonitoringdeviceproxy >> Edge(color='blue', style='solid',  decorate='true', label='<ashesLevel &nbsp; monitoringDeviceOff &nbsp; >',  fontcolor='blue') >> raspberryinfocontroller
 diag

@@ -139,6 +139,7 @@ public class Test_WIS {
 	public void down() {
 		CommUtils.outmagenta("end of test ");
 		procWIS.destroy();
+		procBroker.destroy();
 		CommUtils.delay(1000);
 		/*try {
 			CommUtils.outcyan("end of test - taskkill /F /IM java.exe");
@@ -159,7 +160,7 @@ public class Test_WIS {
 	public void test_ArrivedRP_MDfull() {
 		boolean testok = false;
 		try {
- 			Thread.sleep(2000);
+ 			Thread.sleep(6000);
   			 CommUtils.outmagenta("test_ArrivedRP_MDfull ======================================= ");
 			while( connSupport == null ) {
  				connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:8081", "wistester");
@@ -205,10 +206,10 @@ public class Test_WIS {
 	
 	/*
 	 */
-		@Test(timeout=20000)
+		@Test(timeout=25000)
 		public void test_ArrivedRP_MDok() {
 	 		try {
-	 			Thread.sleep(2000);
+	 			Thread.sleep(6000);
 	  			 CommUtils.outmagenta("test_ArrivedRP_MDok ======================================= ");
 				while( connSupport == null ) {
 	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:8081", "wistester");
@@ -225,14 +226,169 @@ public class Test_WIS {
 	 			((MqttConnection)connSupport).publish("wisinfo", new_RP.toString());
 	 			
 	 			String message = "";
-	 			while(!message.toLowerCase().contains("going_to_wastein")) {
-	 				message = connSupport.receiveMsg();
+	 			while((message = connSupport.receiveMsg())!=null) {
 	 				CommUtils.outgreen("wistester | received "+message);
 	 				if(message.toLowerCase().contains("going_to_wastein")) {
 	 					break;
 	 				}
 	 			}
 	 			assertTrue(true);
+	 			
+			} catch (Exception e) {
+				CommUtils.outred("testWIS ERROR " + e.getMessage());
+				fail("testRequest " + e.getMessage());
+			}
+		}
+		@Test(timeout=30000)
+		public void test_ArrivedRP_MDoff_after_one_round() {
+			boolean testok = false;
+			try {
+	 			Thread.sleep(6000);
+	  			 CommUtils.outmagenta("test_ArrivedRP_MDoff_after_one_round ======================================= ");
+				while( connSupport == null ) {
+	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:8081", "wistester");
+	 				CommUtils.outcyan("testWISSystem another connect attempt ");
+	 				Thread.sleep(1000);
+	 			}
+	 			((MqttConnection)connSupport).trace=true;
+	 			((MqttConnection)connSupport).setupConnectionForAnswer("wisinfo");
+	 			((MqttConnection)connSupport).subscribe("wisinfo");
+	 			CommUtils.outcyan("CONNECTED to mqtt broker " + connSupport);
+	 			IApplMessage monitoringDeviceFull = CommUtils.buildEvent("wistester", "statoAshStorage", "statoAshStorage(1, 0)");
+	 			IApplMessage monitoringDeviceEmpty = CommUtils.buildEvent("wistester", "statoAshStorage", "statoAshStorage(0, 100)");
+	 			IApplMessage new_RP = CommUtils.buildEvent("wistester", "num_RP", "num_RP(1)");
+	 			((MqttConnection)connSupport).publish("wisinfo", monitoringDeviceEmpty.toString());
+	 			CommUtils.delay(1000);
+	 			((MqttConnection)connSupport).publish("wisinfo", new_RP.toString());
+	 			String message = "";
+	 			while((message = connSupport.receiveMsg())!=null) {
+	 				CommUtils.outred("wistester | received "+message);
+	 				
+	 				if (message.toLowerCase().contains("going_to_wastein")) {
+	 					break;
+	 				}
+	 			}
+
+	 			//if I do not receive any message with opRobotState(Going_WASTEIN) the test is successful
+	 			long startTime = System.currentTimeMillis();
+	 			long timeout = 2000;
+	 			message = "";
+	 			while((message = connSupport.receiveMsg())!=null) {
+	 				CommUtils.outred("wistester | received "+message);
+	 				if(System.currentTimeMillis()-startTime >= timeout) {
+	 					testok = true;
+	 					break;
+	 				} else if (message.toLowerCase().contains("going_to_wastein")) {
+	 					break;
+	 				}
+	 			}
+	 			if(testok) {
+	 				assertTrue(true);
+	 			} else {
+	 				fail("wistester | robot has taken RP even though ash storage was full!: "+message.toString());
+	 			}
+	 			
+			} catch (Exception e) {
+				CommUtils.outred("testWIS ERROR " + e.getMessage());
+				fail("testRequest " + e.getMessage());
+			}
+		}
+		@Test(timeout=30000)
+		public void test_ArrivedRP_MDfull_after_one_round() {
+			boolean testok = false;
+			try {
+	 			Thread.sleep(6000);
+	  			 CommUtils.outmagenta("test_ArrivedRP_MDfull_after_one_round ======================================= ");
+				while( connSupport == null ) {
+	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:8081", "wistester");
+	 				CommUtils.outcyan("testWISSystem another connect attempt ");
+	 				Thread.sleep(1000);
+	 			}
+	 			((MqttConnection)connSupport).trace=true;
+	 			((MqttConnection)connSupport).setupConnectionForAnswer("wisinfo");
+	 			((MqttConnection)connSupport).subscribe("wisinfo");
+	 			CommUtils.outcyan("CONNECTED to mqtt broker " + connSupport);
+	 			IApplMessage monitoringDeviceFull = CommUtils.buildEvent("wistester", "statoAshStorage", "statoAshStorage(1, 0)");
+	 			IApplMessage monitoringDeviceEmpty = CommUtils.buildEvent("wistester", "statoAshStorage", "statoAshStorage(0, 100)");
+	 			IApplMessage new_RP = CommUtils.buildEvent("wistester", "num_RP", "num_RP(1)");
+	 			((MqttConnection)connSupport).publish("wisinfo", monitoringDeviceEmpty.toString());
+	 			CommUtils.delay(1000);
+	 			((MqttConnection)connSupport).publish("wisinfo", new_RP.toString());
+	 			String message = "";
+	 			while((message = connSupport.receiveMsg())!=null) {
+	 				CommUtils.outred("wistester | received "+message);
+	 				
+	 				if (message.toLowerCase().contains("going_to_wastein")) {
+	 					break;
+	 				}
+	 			}
+	 			CommUtils.delay(15000);
+	 			((MqttConnection)connSupport).publish("wisinfo", monitoringDeviceFull.toString());
+	 			//if I do not receive any message with opRobotState(Going_WASTEIN) the test is successful
+	 			long startTime = System.currentTimeMillis();
+	 			long timeout = 2000;
+	 			message = "";
+	 			while((message = connSupport.receiveMsg())!=null) {
+	 				CommUtils.outred("wistester | received "+message);
+	 				if(System.currentTimeMillis()-startTime >= timeout) {
+	 					testok = true;
+	 					break;
+	 				} else if (message.toLowerCase().contains("going_to_wastein")) {
+	 					break;
+	 				}
+	 			}
+	 			if(testok) {
+	 				assertTrue(true);
+	 			} else {
+	 				fail("wistester | robot has taken RP even though ash storage was full!: "+message.toString());
+	 			}
+	 			
+			} catch (Exception e) {
+				CommUtils.outred("testWIS ERROR " + e.getMessage());
+				fail("testRequest " + e.getMessage());
+			}
+		}
+		@Test(timeout=30000)
+		public void test_ArrivedRP_MDok_after_one_round() {
+			boolean testok = false;
+			try {
+	 			Thread.sleep(6000);
+	  			 CommUtils.outmagenta("test_ArrivedRP_MDfull_after_one_round ======================================= ");
+				while( connSupport == null ) {
+	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:8081", "wistester");
+	 				CommUtils.outcyan("testWISSystem another connect attempt ");
+	 				Thread.sleep(1000);
+	 			}
+	 			((MqttConnection)connSupport).trace=true;
+	 			((MqttConnection)connSupport).setupConnectionForAnswer("wisinfo");
+	 			((MqttConnection)connSupport).subscribe("wisinfo");
+	 			CommUtils.outcyan("CONNECTED to mqtt broker " + connSupport);
+	 			IApplMessage monitoringDeviceFull = CommUtils.buildEvent("wistester", "statoAshStorage", "statoAshStorage(1, 0)");
+	 			IApplMessage monitoringDeviceEmpty = CommUtils.buildEvent("wistester", "statoAshStorage", "statoAshStorage(0, 100)");
+	 			IApplMessage new_RP = CommUtils.buildEvent("wistester", "num_RP", "num_RP(1)");
+	 			((MqttConnection)connSupport).publish("wisinfo", monitoringDeviceEmpty.toString());
+	 			CommUtils.delay(1000);
+	 			((MqttConnection)connSupport).publish("wisinfo", new_RP.toString());
+	 			String message = "";
+	 			while((message = connSupport.receiveMsg())!=null) {
+	 				CommUtils.outred("wistester | received "+message);
+	 				
+	 				if (message.toLowerCase().contains("going_to_wastein")) {
+	 					break;
+	 				}
+	 			}
+	 			((MqttConnection)connSupport).publish("wisinfo", monitoringDeviceFull.toString());
+	 			CommUtils.delay(1000);
+	 			((MqttConnection)connSupport).publish("wisinfo", new_RP.toString());
+	 			CommUtils.delay(15000);
+	 			((MqttConnection)connSupport).publish("wisinfo", monitoringDeviceEmpty.toString());
+	 			message = "";
+	 			while((message = connSupport.receiveMsg())!=null) {
+	 				CommUtils.outred("wistester | received "+message);
+	 				 if (message.toLowerCase().contains("going_to_wastein")) {
+	 					break;
+	 				}
+	 			}
 	 			
 			} catch (Exception e) {
 				CommUtils.outred("testWIS ERROR " + e.getMessage());

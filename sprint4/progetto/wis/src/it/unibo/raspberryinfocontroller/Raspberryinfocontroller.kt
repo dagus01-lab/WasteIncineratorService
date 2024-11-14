@@ -11,12 +11,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
-//Sept2024
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory 
-import org.json.simple.parser.JSONParser
-import org.json.simple.JSONObject
-
 
 //User imports JAN2024
 
@@ -29,8 +23,8 @@ class Raspberryinfocontroller ( name: String, scope: CoroutineScope, isconfined:
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		
 				var RPs = 0;
-				var AshesLevel = 0;
-				var previousAshesLevel = 0;
+				var AshesLevel = -1;
+				var previousAshesLevel = -1;
 				var wisReady = 0;
 				var monitoringDeviceRunning = 0;
 		return { //this:ActionBasciFsm
@@ -38,7 +32,7 @@ class Raspberryinfocontroller ( name: String, scope: CoroutineScope, isconfined:
 					action { //it:State
 						delay(1000) 
 						CommUtils.outgray("$name | RUNS")
-						observeResource("localhost","8125","ctx_waste_incinerator_service","wis","waitingForNewRPs")
+						observeResource("localhost","8125","ctx_waste_incinerator_service","wis","waitingForUpdates")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -49,17 +43,15 @@ class Raspberryinfocontroller ( name: String, scope: CoroutineScope, isconfined:
 				state("wait") { //this:State
 					action { //it:State
 						CommUtils.outblack("$name | mdrunning=$monitoringDeviceRunning, wisReady=$wisReady, RPs=$RPs, AshesLevel=$AshesLevel")
+						if( wisReady == 1 && previousAshesLevel != AshesLevel 
+						 ){forward("ashesLevel", "ashesLevel($AshesLevel)" ,"wis" ) 
+						previousAshesLevel = AshesLevel 
+						}
 						if( monitoringDeviceRunning == 1 && wisReady == 1 && RPs>0 && AshesLevel==0 
 						 ){forward("arrived_RP", "arrived_RP(1)" ,"wis" ) 
 						CommUtils.outred("$name | sent wis a new RP")
 						wisReady = 0 
 						}
-						else
-						 {if( wisReady == 1 && previousAshesLevel != AshesLevel 
-						  ){forward("ashesLevel", "ashesLevel($AshesLevel)" ,"wis" ) 
-						 previousAshesLevel = AshesLevel 
-						 }
-						 }
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -68,7 +60,7 @@ class Raspberryinfocontroller ( name: String, scope: CoroutineScope, isconfined:
 					 transition(edgeName="t04",targetState="handleMonitoringDeviceOff",cond=whenDispatch("monitoringDeviceOff"))
 					transition(edgeName="t05",targetState="handleNewAshesLevel",cond=whenDispatch("ashesLevel"))
 					transition(edgeName="t06",targetState="handleNewScaleState",cond=whenDispatch("arrived_RP"))
-					transition(edgeName="t07",targetState="handleWISReady",cond=whenDispatch("waitingForNewRPs"))
+					transition(edgeName="t07",targetState="handleWISReady",cond=whenDispatch("waitingForUpdates"))
 				}	 
 				state("handleMonitoringDeviceOff") { //this:State
 					action { //it:State

@@ -11,12 +11,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
-//Sept2024
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory 
-import org.json.simple.parser.JSONParser
-import org.json.simple.JSONObject
-
 
 //User imports JAN2024
 
@@ -29,6 +23,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		 
 				var AshStorageStatus = 0 
+				var wisReady = 0
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -45,9 +40,12 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				}	 
 				state("waitingRP") { //this:State
 					action { //it:State
-						CommUtils.outgreen("$name waiting for new RPs")
-						updateResourceRep("waitingForNewRPs(1)" 
+						CommUtils.outgreen("$name waiting for updates")
+						if( wisReady == 0 
+						 ){updateResourceRep("waitingForUpdates(1)" 
 						)
+						wisReady = 1 
+						}
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -58,6 +56,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				}	 
 				state("handleRP") { //this:State
 					action { //it:State
+						wisReady = 0 
 						CommUtils.outgreen("New RP is arrived")
 						forward("arrived_RP", "arrived_RP(1)" ,"oprobot" ) 
 						//genTimer( actor, state )

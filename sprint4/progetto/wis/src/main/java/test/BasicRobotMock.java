@@ -45,14 +45,22 @@ public class BasicRobotMock {
             String message;
 
             // Read messages from the client
-            while ((message = in.readLine()) != null && message.contains("engage")) {
-                CommUtils.outblue("BasicRobotMock | Received: " + message);
-                
-                // Optionally, send a response to the client
-                IApplMessage response = CommUtils.buildReply("basicrobot", "engagedone", "engagedone(0)", "oprobot");
+            while ((message = in.readLine()) != null ) {
+        		CommUtils.outblue("BasicRobotMock | Received: " + message);
+            	if ( message.contains("engage")) {                    
+                    // Optionally, send a response to the client
+                    IApplMessage response = CommUtils.buildReply("basicrobot", "engagedone", "engagedone(0)", "oprobot");
 
-                // Stop if a certain keyword is received, e.g., "bye"
-                out.println(response.toString());
+                    // Stop if a certain keyword is received, e.g., "bye"
+                    out.println(response.toString());
+            	}
+            	else if(message.contains("moverobot")){
+            		// Optionally, send a response to the client
+                    IApplMessage response = CommUtils.buildReply("basicrobot", "moverobotdone", "moverobotdone(0)", "oprobot");
+
+                    // Stop if a certain keyword is received, e.g., "bye"
+                    out.println(response.toString());
+            	}
             }
 
         } catch (Exception e) {

@@ -1,14 +1,14 @@
 {"actor":"raspberryinfocontroller", "msgType":"dispatch", "curstate":"wait", "nextstate":"handleMonitoringDeviceOff", "msgId":"monitoringDeviceOff"}
 {"actor":"raspberryinfocontroller", "msgType":"dispatch", "curstate":"wait", "nextstate":"handleNewAshesLevel", "msgId":"ashesLevel"}
 {"actor":"raspberryinfocontroller", "msgType":"dispatch", "curstate":"wait", "nextstate":"handleNewScaleState", "msgId":"arrived_RP"}
-{"actor":"raspberryinfocontroller", "msgType":"dispatch", "curstate":"wait", "nextstate":"handleWISReady", "msgId":"waitingForNewRPs"}
+{"actor":"raspberryinfocontroller", "msgType":"dispatch", "curstate":"wait", "nextstate":"handleWISReady", "msgId":"waitingForUpdates"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"waitingRP", "nextstate":"handleUpdateAshesLevel", "msgId":"ashesLevel"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"waitingRP", "nextstate":"handleRP", "msgId":"arrived_RP"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"handleRP", "nextstate":"handleRPInBurnin", "msgId":"rpInBurnin"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"handleEndBurning", "nextstate":"endRoute", "msgId":"newAshes"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"waitingAshesToBeRemoved", "nextstate":"handleUpdateAshesLevel", "msgId":"ashesLevel"}
-{"actor":"oprobot", "msgType":"dispatch", "curstate":"waitingWorking", "nextstate":"takeRP", "msgId":"arrived_RP"}
+{"actor":"oprobot", "msgType":"dispatch", "curstate":"wait", "nextstate":"takeRP", "msgId":"arrived_RP"}
 {"actor":"oprobot", "msgType":"dispatch", "curstate":"restartJob", "nextstate":"takeRpBeforeFinishPlan", "msgId":"arrived_RP"}
 {"actor":"incinerator", "msgType":"dispatch", "curstate":"s0", "nextstate":"turnOn", "msgId":"activationCommand"}
-{"actor":"incinerator", "msgType":"dispatch", "curstate":"turnOn", "nextstate":"handleStartBurning", "msgId":"startBurning"}
+{"actor":"incinerator", "msgType":"dispatch", "curstate":"wait", "nextstate":"handleStartBurning", "msgId":"startBurning"}
 {"actor":"incinerator", "msgType":"dispatch", "curstate":"handleEndBurning", "nextstate":"handleStartBurning", "msgId":"startBurning"}
