@@ -59,7 +59,8 @@ services:
     command: [
       "sh", 
       "-c", 
-      " until nc -nz wis_broker 8081; do echo 'Waiting for wis_broker...'; sleep 5; done && ./scale"]
+      " until nc -nz wis_broker 8081; do echo 'Waiting for wis_broker...'; sleep 5; done &&\
+      gpioget /dev/gpiochip0 13 && ./scale"]
     configs:
       - source: scale_conf.json
         target: /scale-1.0/bin/scale_conf.json
@@ -89,7 +90,8 @@ services:
     command: [
       "sh", 
       "-c", 
-      "until nc -nz wis_broker 8081; do echo 'Waiting for wis_broker...'; sleep 5; done && ./monitoringdevice"]
+      "until nc -nz wis_broker 8081; do echo 'Waiting for wis_broker...'; sleep 5; done && \
+      gpioget /dev/gpiochip0 18 && ./monitoringdevice"]
     configs:
       - source: monitoringdevice_conf.json
         target: /monitoringdevice-1.0/bin/monitoringdevice_conf.json

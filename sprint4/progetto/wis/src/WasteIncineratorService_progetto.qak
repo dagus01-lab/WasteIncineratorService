@@ -205,11 +205,11 @@ QActor wis context ctx_waste_incinerator_service{
 	#]
 	
 	State s0 initial{
-		delay 1000
+		delay 2000
 		println("$name STARTS") color green
 		//mando messaggio di attivazione del Incinerator
 		forward incinerator -m activationCommand : activationCommand(1)
-		delay 1000
+		delay 2000
 	}
 	Goto waitingRP
 	//Stato che simula l'attesa di un nuovo RP nel WasteStorage

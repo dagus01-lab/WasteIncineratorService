@@ -32,10 +32,10 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						delay(1000) 
+						delay(2000) 
 						CommUtils.outgreen("$name STARTS")
 						forward("activationCommand", "activationCommand(1)" ,"incinerator" ) 
-						delay(1000) 
+						delay(2000) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
