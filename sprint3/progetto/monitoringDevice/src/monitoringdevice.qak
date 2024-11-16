@@ -13,43 +13,9 @@ Dispatch led_blink: led_blink(N) "messaggio di lampeggio del led"
 Dispatch led_off : led_off(N) "messaggio di spegnimento del led"
 
 //Messaggio per notificare lo stato del Incinerator al monitoringDevice
-Event statoIncinerator : statoIncinerator(N)  "Incinerator's burning status info: 0 is not burning, 1 otherwise"
-Dispatch incineratorState : incineratorState(N) 
+Dispatch statoIncinerator : statoIncinerator(N)  "Incinerator's burning status info: 0 is not burning, 1 otherwise" 
 //Definizione dei contesti
 Context ctxmonitoringdevice ip [ host= "localhost"      port= 8100 ] 
-  
-//--------------------------------Attore monitoring device proxy----------------------------------------------
-QActor monitoringdeviceproxy context ctxmonitoringdevice withobj config using "MonitoringDeviceConfigReader.loadMDConfig(\"monitoringdevice_conf.json\")"{
-	import "main.resources.MonitoringDeviceConfigReader"
-	import "main.resources.MonitoringDeviceConfig" 
-	[#
-		var Status = 0
-		val broker_url = config.broker_url
-	#]
-	State s0 initial{
-		connectToMqttBroker "$broker_url" clientid "monitoringdeviceproxynat"
-		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "monitoringdeviceproxynat"
- 		println("$name | CREATED  (and connected to mosquitto) ... ") color red
- 		subscribe "wisinfo"
-	}
-	Transition t0 whenEvent statoIncinerator->handleStatoIncinerator
-	State handleStatoIncinerator{
-		onMsg(statoIncinerator:statoIncinerator(N)){
-			[#
-				try{
-					Status = payloadArg(0).toInt()	
-				} catch(e:Exception){
-					Status = -1
-				}
-			#]
-			if [#Status == 0 || Status == 1#]{
-				forward monitoringdevice -m incineratorState:incineratorState($Status)
-			}			
-		}
-	}
-	Transition t0 whenEvent statoIncinerator->handleStatoIncinerator
-	
-}
  
 //--------------------------------Attore sonardevice----------------------------------------------------------
 QActor sonardevice context ctxmonitoringdevice{
@@ -175,13 +141,13 @@ QActor monitoringdevice context ctxmonitoringdevice withobj config using "Monito
 	State wait{
 		println("$name Waiting data from sonar or updates from Incinerator...") color blue
 	}
-	Transition t0 whenMsg incineratorState-> handleUpdateIncineratorState
+	Transition t0 whenMsg statoIncinerator-> handleUpdateIncineratorState
 				  whenEvent ashStorageLevel -> handleAshStorageLevel
 			
 	//Stato per gestire l'aggiornamento dello stato del Incinerator
 	State handleUpdateIncineratorState{
 		printCurrentMessage color green
-		onMsg(incineratorState : incineratorState(N)) {
+		onMsg(statoIncinerator : statoIncinerator(N)) {
 	      	[#IncineratorStatus = payloadArg(0).toInt()#]
 				println("$name Current incinerator state: $IncineratorStatus") color blue
 				
@@ -227,9 +193,15 @@ QActor monitoringdevice context ctxmonitoringdevice withobj config using "Monito
 			
 			//Aggiorno lo stato del AshStorage in base alla distanza misurata
 			if [#levelAshStorage==2#]{
-				publish "wisinfo" -m statoAshStorage:statoAshStorage(1, $D)
+				[# 
+					val msg = MsgUtil.buildDispatch("monitoringdevice", "statoAshStorage","statoAshStorage(1, $D)","raspberryinfocontroller")
+					publish(msg.toString(),"wisinfo")
+				#]
 			} else {
-				publish "wisinfo" -m statoAshStorage:statoAshStorage(0, $D)
+				[# 
+					val msg = MsgUtil.buildDispatch("monitoringdevice", "statoAshStorage","statoAshStorage(0, $D)","raspberryinfocontroller")
+					publish(msg.toString(),"wisinfo")
+				#]
 			}
 		}	
 	}

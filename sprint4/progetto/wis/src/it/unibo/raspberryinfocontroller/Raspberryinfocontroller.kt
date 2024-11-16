@@ -13,6 +13,8 @@ import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
 
 //User imports JAN2024
+import main.resources.WISConfigReader
+import main.resources.WISConfig
 
 class Raspberryinfocontroller ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : ActorBasicFsm( name, scope, confined=isconfined ){
 
@@ -21,17 +23,24 @@ class Raspberryinfocontroller ( name: String, scope: CoroutineScope, isconfined:
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
+		 val config = WISConfigReader.loadWISConfig("wis_conf.json")
 		
 				var RPs = 0;
 				var AshesLevel = -1;
 				var previousAshesLevel = -1;
 				var wisReady = 0;
-				var monitoringDeviceRunning = 0;
+				var broker_url = config.broker_url
+				var monitoringDeviceRunningTimeThreshold = 10000
+				var lastAshStorageStateUpdate = 0L
+				var monitoringDeviceRunning = 0
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
+						delay(500) 
+						connectToMqttBroker( "$broker_url", "wismonitoringdeviceproxynat" )
+						CommUtils.outcyan("$name | CREATED  (and connected to mosquitto) ... ")
 						delay(1000) 
-						CommUtils.outgray("$name | RUNS")
+						subscribe(  "wisinfo" ) //mqtt.subscribe(this,topic)
 						observeResource("localhost","8125","ctx_waste_incinerator_service","wis","waitingForUpdates")
 						//genTimer( actor, state )
 					}
@@ -42,12 +51,13 @@ class Raspberryinfocontroller ( name: String, scope: CoroutineScope, isconfined:
 				}	 
 				state("wait") { //this:State
 					action { //it:State
+						monitoringDeviceRunning = if((System.currentTimeMillis() - lastAshStorageStateUpdate) < monitoringDeviceRunningTimeThreshold) 1 else 0 
 						CommUtils.outblack("$name | mdrunning=$monitoringDeviceRunning, wisReady=$wisReady, RPs=$RPs, AshesLevel=$AshesLevel")
-						if( wisReady == 1 && previousAshesLevel != AshesLevel 
+						if(  monitoringDeviceRunning==1 && wisReady == 1 && previousAshesLevel != AshesLevel 
 						 ){forward("ashesLevel", "ashesLevel($AshesLevel)" ,"wis" ) 
 						previousAshesLevel = AshesLevel 
 						}
-						if( monitoringDeviceRunning == 1 && wisReady == 1 && RPs>0 && AshesLevel==0 
+						if( wisReady == 1 && RPs>0 && AshesLevel==0 
 						 ){forward("arrived_RP", "arrived_RP(1)" ,"wis" ) 
 						CommUtils.outred("$name | sent wis a new RP")
 						wisReady = 0 
@@ -57,14 +67,13 @@ class Raspberryinfocontroller ( name: String, scope: CoroutineScope, isconfined:
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t04",targetState="handleMonitoringDeviceOff",cond=whenDispatch("monitoringDeviceOff"))
-					transition(edgeName="t05",targetState="handleNewAshesLevel",cond=whenDispatch("ashesLevel"))
-					transition(edgeName="t06",targetState="handleNewScaleState",cond=whenDispatch("arrived_RP"))
-					transition(edgeName="t07",targetState="handleWISReady",cond=whenDispatch("waitingForUpdates"))
+					 transition(edgeName="t00",targetState="handleMonitoringDeviceOff",cond=whenDispatch("monitoringDeviceOff"))
+					transition(edgeName="t01",targetState="handleNewStatoAshStorage",cond=whenDispatch("statoAshStorage"))
+					transition(edgeName="t02",targetState="handleNewScaleState",cond=whenDispatch("num_RP"))
+					transition(edgeName="t03",targetState="handleWISReady",cond=whenDispatch("waitingForUpdates"))
 				}	 
 				state("handleMonitoringDeviceOff") { //this:State
 					action { //it:State
-						monitoringDeviceRunning=0 
 						CommUtils.outmagenta("$name | Waiting for monitoringDevice to run again..")
 						//genTimer( actor, state )
 					}
@@ -75,7 +84,7 @@ class Raspberryinfocontroller ( name: String, scope: CoroutineScope, isconfined:
 				}	 
 				state("handleNewScaleState") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("arrived_RP(N)"), Term.createTerm("arrived_RP(N)"), 
+						if( checkMsgContent( Term.createTerm("num_RP(N)"), Term.createTerm("num_RP(N)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								CommUtils.outmagenta("$name received new RP")
 								RPs = payloadArg(0).toInt() 
@@ -98,13 +107,19 @@ class Raspberryinfocontroller ( name: String, scope: CoroutineScope, isconfined:
 					}	 	 
 					 transition( edgeName="goto",targetState="wait", cond=doswitch() )
 				}	 
-				state("handleNewAshesLevel") { //this:State
+				state("handleNewStatoAshStorage") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("ashesLevel(N)"), Term.createTerm("ashesLevel(N)"), 
+						if( checkMsgContent( Term.createTerm("statoAshStorage(N,D)"), Term.createTerm("statoAshStorage(N,D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
-											AshesLevel = payloadArg(0).toInt()
-											monitoringDeviceRunning=1
+												try{
+													AshesLevel = payloadArg(0).toInt()
+													lastAshStorageStateUpdate = System.currentTimeMillis()
+												} catch(e:Exception){
+								CommUtils.outred("$name | received invalid payload for statoAshStorage:${payloadArg(0)}")
+								
+												}
+											
 						}
 						//genTimer( actor, state )
 					}

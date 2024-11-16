@@ -11,12 +11,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
-//Sept2024
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory 
-import org.json.simple.parser.JSONParser
-import org.json.simple.JSONObject
-
 
 //User imports JAN2024
 import main.resources.MonitoringDeviceConfigReader
@@ -60,14 +54,14 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t04",targetState="handleUpdateIncineratorState",cond=whenDispatch("incineratorState"))
-					transition(edgeName="t05",targetState="handleAshStorageLevel",cond=whenEvent("ashStorageLevel"))
+					 transition(edgeName="t02",targetState="handleUpdateIncineratorState",cond=whenDispatch("statoIncinerator"))
+					transition(edgeName="t03",targetState="handleAshStorageLevel",cond=whenEvent("ashStorageLevel"))
 				}	 
 				state("handleUpdateIncineratorState") { //this:State
 					action { //it:State
 						CommUtils.outgreen("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
 						 	   
-						if( checkMsgContent( Term.createTerm("incineratorState(N)"), Term.createTerm("incineratorState(N)"), 
+						if( checkMsgContent( Term.createTerm("statoIncinerator(N)"), Term.createTerm("statoIncinerator(N)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								IncineratorStatus = payloadArg(0).toInt() 
 								CommUtils.outblue("$name Current incinerator state: $IncineratorStatus")
@@ -108,12 +102,14 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 								previousLevelAshStorage = levelAshStorage 
 								}
 								if( levelAshStorage==2 
-								 ){//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(1,$D)" ) 
-								publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(1,$D)").toString(), "wisinfo" )   
+								 ){ 
+													val msg = MsgUtil.buildDispatch("monitoringdevice", "statoAshStorage","statoAshStorage(1, $D)","raspberryinfocontroller")
+													publish(msg.toString(),"wisinfo")
 								}
 								else
-								 {//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(0,$D)" ) 
-								 publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(0,$D)").toString(), "wisinfo" )   
+								 { 
+								 					val msg = MsgUtil.buildDispatch("monitoringdevice", "statoAshStorage","statoAshStorage(0, $D)","raspberryinfocontroller")
+								 					publish(msg.toString(),"wisinfo")
 								 }
 						}
 						//genTimer( actor, state )

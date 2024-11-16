@@ -11,12 +11,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
-//Sept2024
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory 
-import org.json.simple.parser.JSONParser
-import org.json.simple.JSONObject
-
 
 //User imports JAN2024
 import main.resources.ScaleConfigReader
@@ -39,8 +33,9 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 						CommUtils.outyellow("$name | STARTS")
 						connectToMqttBroker( "$broker_url", "scalenat" )
 						CommUtils.outcyan("$name | connected to MQTT broker $broker_url")
-						//val m = MsgUtil.buildEvent(name, "num_RP", "num_RP($RPs)" ) 
-						publish(MsgUtil.buildEvent(name,"num_RP","num_RP($RPs)").toString(), "wisinfo" )   
+						 
+									val msg = MsgUtil.buildDispatch("scale", "num_RP","num_RP($RPs)","raspberryinfocontroller")
+									publish(msg.toString(),"wisinfo")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -64,9 +59,10 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("num_RP(N)"), Term.createTerm("num_RP(N)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								RPs = payloadArg(0).toInt() 
-								//val m = MsgUtil.buildEvent(name, "num_RP", "num_RP($RPs)" ) 
-								publish(MsgUtil.buildEvent(name,"num_RP","num_RP($RPs)").toString(), "wisinfo" )   
+								
+												RPs = payloadArg(0).toInt()
+												val msg = MsgUtil.buildDispatch("scale", "num_RP","num_RP($RPs)","raspberryinfocontroller")
+												publish(msg.toString(),"wisinfo")
 						}
 						//genTimer( actor, state )
 					}
@@ -77,8 +73,9 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 				}	 
 				state("keepConnectionAlive") { //this:State
 					action { //it:State
-						//val m = MsgUtil.buildEvent(name, "num_RP", "num_RP($RPs)" ) 
-						publish(MsgUtil.buildEvent(name,"num_RP","num_RP($RPs)").toString(), "wisinfo" )   
+						 
+									val msg = MsgUtil.buildDispatch("scale", "num_RP","num_RP($RPs)","raspberryinfocontroller")
+									publish(msg.toString(),"wisinfo")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

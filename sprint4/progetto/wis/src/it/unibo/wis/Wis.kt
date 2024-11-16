@@ -51,8 +51,8 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t08",targetState="handleUpdateAshesLevel",cond=whenDispatch("ashesLevel"))
-					transition(edgeName="t09",targetState="handleRP",cond=whenDispatch("arrived_RP"))
+					 transition(edgeName="t04",targetState="handleUpdateAshesLevel",cond=whenDispatch("ashesLevel"))
+					transition(edgeName="t05",targetState="handleRP",cond=whenDispatch("arrived_RP"))
 				}	 
 				state("handleRP") { //this:State
 					action { //it:State
@@ -64,7 +64,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t010",targetState="handleRPInBurnin",cond=whenDispatch("rpInBurnin"))
+					 transition(edgeName="t06",targetState="handleRPInBurnin",cond=whenDispatch("rpInBurnin"))
 				}	 
 				state("handleRPInBurnin") { //this:State
 					action { //it:State
@@ -75,7 +75,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t011",targetState="handleEndBurning",cond=whenEvent("endBurning"))
+					 transition(edgeName="t07",targetState="handleEndBurning",cond=whenEvent("endBurning"))
 				}	 
 				state("handleEndBurning") { //this:State
 					action { //it:State
@@ -85,7 +85,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t012",targetState="endRoute",cond=whenDispatch("newAshes"))
+					 transition(edgeName="t08",targetState="endRoute",cond=whenDispatch("newAshes"))
 				}	 
 				state("endRoute") { //this:State
 					action { //it:State
@@ -122,7 +122,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t013",targetState="handleUpdateAshesLevel",cond=whenDispatch("ashesLevel"))
+					 transition(edgeName="t09",targetState="handleUpdateAshesLevel",cond=whenDispatch("ashesLevel"))
 				}	 
 			}
 		}

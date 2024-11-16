@@ -6,6 +6,7 @@ services:
       - 8090:8090 
       - 8091:8091/tcp
       - 8091:8091/udp
+    network_mode: "host"
   basicrobot24:
     #image: basicrobot24:1.0
     image: docker.io/natbodocker/basicrobot24:1.0 
@@ -13,6 +14,7 @@ services:
       - 8020:8020/tcp
       - 8020:8020/udp
       - 8085:8085
+    network_mode: "host"
     depends_on:
       - wenv
  

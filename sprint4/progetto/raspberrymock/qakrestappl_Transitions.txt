@@ -1,4 +1,2 @@
-{"actor":"monitoringdevice", "msgType":"dispatch", "curstate":"wait", "nextstate":"handleUpdateIncineratorState", "msgId":"incineratorState"}
-{"actor":"led", "msgType":"dispatch", "curstate":"wait", "nextstate":"handle_led_on", "msgId":"led_on"}
-{"actor":"led", "msgType":"dispatch", "curstate":"wait", "nextstate":"handle_led_off", "msgId":"led_off"}
-{"actor":"led", "msgType":"dispatch", "curstate":"wait", "nextstate":"handle_led_blink", "msgId":"led_blink"}
+{"actor":"raspberrymockproxy", "msgType":"dispatch", "curstate":"wait", "nextstate":"handleUpdateStatoAshStorage", "msgId":"ashStorageState"}
+{"actor":"raspberrymockproxy", "msgType":"dispatch", "curstate":"wait", "nextstate":"handleUpdateStatoWasteStorage", "msgId":"wasteStorageState"}

@@ -11,12 +11,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
-//Sept2024
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory 
-import org.json.simple.parser.JSONParser
-import org.json.simple.JSONObject
-
 
 //User imports JAN2024
 import main.resources.MonitoringDeviceConfigReader
@@ -41,8 +35,9 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 						CommUtils.outyellow("$name | STARTS")
 						connectToMqttBroker( "$broker_url", "monitoringdevicenat" )
 						CommUtils.outcyan("$name | connected to MQTT broker $broker_url")
-						//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(0)" ) 
-						publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(0)").toString(), "wisinfo" )   
+						 
+									val msg = MsgUtil.buildDispatch("monitoringdevice", "statoAshStorage","statoAshStorage(0, $DMIN)","raspberryinfocontroller")
+									publish(msg.toString(),"wisinfo")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -69,14 +64,14 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 								
 												State = payloadArg(0).toInt()
 												when(State){
-													0 ->  
-								//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(0,$DMIN)" ) 
-								publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(0,$DMIN)").toString(), "wisinfo" )   
-								
-													1 ->  
-								//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(1,$DLIMIT)" ) 
-								publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(1,$DLIMIT)").toString(), "wisinfo" )   
-								
+													0 -> {
+															val msg = MsgUtil.buildDispatch("monitoringdevice", "statoAshStorage","statoAshStorage(0, $DMIN)","raspberryinfocontroller")
+															publish(msg.toString(),"wisinfo")		
+													}
+													1 -> {
+															val msg = MsgUtil.buildDispatch("monitoringdevice", "statoAshStorage","statoAshStorage(1, $DLIMIT)","raspberryinfocontroller")
+															publish(msg.toString(),"wisinfo")		
+													}
 													else ->  
 								CommUtils.outgreen("Invalid input!")
 								
@@ -93,14 +88,14 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 					action { //it:State
 						
 									when(State){
-											0 ->  
-						//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(0,$DMIN)" ) 
-						publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(0,$DMIN)").toString(), "wisinfo" )   
-						
-											1 ->  
-						//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(1,$DLIMIT)" ) 
-						publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(1,$DLIMIT)").toString(), "wisinfo" )   
-						
+											0 -> {
+													val msg = MsgUtil.buildDispatch("monitoringdevice", "statoAshStorage","statoAshStorage(0, $DMIN)","raspberryinfocontroller")
+													publish(msg.toString(),"wisinfo")		
+											}
+											1 -> {
+													val msg = MsgUtil.buildDispatch("monitoringdevice", "statoAshStorage","statoAshStorage(1, $DLIMIT)","raspberryinfocontroller")
+													publish(msg.toString(),"wisinfo")		
+											}
 										}
 						//genTimer( actor, state )
 					}

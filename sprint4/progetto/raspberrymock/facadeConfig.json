@@ -1,1 +1,1 @@
-{"host":"localhost", "port":"8100", "context":"ctxraspberrymock", "facade": "raspberrymockproxy", "facadeport":"8095", "sysdescr":"raspberrymock" } // JAN24 GenInteract(fd)»
+{"host":"localhost", "port":"8100", "context":"ctxraspberrymock", "facade": "raspberrymockproxy", "facadeport":"8085", "sysdescr":"raspberrymock" } // JAN24 GenInteract(fd)»

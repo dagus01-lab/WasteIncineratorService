@@ -96,7 +96,7 @@ public class Test_WIS {
 				CommUtils.outmagenta("TestWIS activateBroker");
 				try {
 					//procWIS = Runtime.getRuntime().exec("./src/main/java/test/WISexec.bat");
-					procBroker = Runtime.getRuntime().exec("/usr/sbin/mosquitto -p 8081");
+					procBroker = Runtime.getRuntime().exec("/usr/sbin/mosquitto -p 1883");
 					showOutput(procBroker,ColorsOut.GREEN);
 				} catch ( Exception e) {
 					CommUtils.outred("TestWIS activateBroker ERROR " + e.getMessage());
@@ -163,7 +163,7 @@ public class Test_WIS {
  			Thread.sleep(6000);
   			 CommUtils.outmagenta("test_ArrivedRP_MDfull ======================================= ");
 			while( connSupport == null ) {
- 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:8081", "wistester");
+ 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:1883", "wistester");
  				CommUtils.outcyan("testWISSystem another connect attempt ");
  				Thread.sleep(1000);
  			}
@@ -171,8 +171,8 @@ public class Test_WIS {
  			((MqttConnection)connSupport).trace=true;
  			((MqttConnection)connSupport).setupConnectionForAnswer("wisinfo");
  			((MqttConnection)connSupport).subscribe("wisinfo");
- 			IApplMessage monitoringDeviceFull = CommUtils.buildEvent("wistester", "statoAshStorage", "statoAshStorage(1, 0)");
- 			IApplMessage new_RP = CommUtils.buildEvent("wistester", "num_RP", "num_RP(1)");
+ 			IApplMessage monitoringDeviceFull = CommUtils.buildDispatch("wistester", "statoAshStorage", "statoAshStorage(1, 0)", "raspberryinfocontroller");
+ 			IApplMessage new_RP = CommUtils.buildDispatch("wistester", "num_RP", "num_RP(1)", "raspberryinfocontroller");
  			((MqttConnection)connSupport).publish("wisinfo", monitoringDeviceFull.toString());
  			CommUtils.delay(1000);
  			((MqttConnection)connSupport).publish("wisinfo", new_RP.toString());
@@ -212,7 +212,7 @@ public class Test_WIS {
 	 			Thread.sleep(6000);
 	  			 CommUtils.outmagenta("test_ArrivedRP_MDok ======================================= ");
 				while( connSupport == null ) {
-	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:8081", "wistester");
+	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:1883", "wistester");
 	 				CommUtils.outcyan("testWISSystem another connect attempt ");
 	 				Thread.sleep(1000);
 	 			}
@@ -220,8 +220,8 @@ public class Test_WIS {
 	 			((MqttConnection)connSupport).trace=true;
 	 			((MqttConnection)connSupport).setupConnectionForAnswer("wisinfo");
 	 			((MqttConnection)connSupport).subscribe("wisinfo");
-	 			IApplMessage new_RP = CommUtils.buildEvent("wistester", "num_RP", "num_RP(1)");
-	 			IApplMessage monitoringDeviceEmpty = CommUtils.buildEvent("wistester", "statoAshStorage", "statoAshStorage(0, 100)");
+	 			IApplMessage new_RP = CommUtils.buildDispatch("wistester", "num_RP", "num_RP(1)", "raspberryinfocontroller");
+	 			IApplMessage monitoringDeviceEmpty = CommUtils.buildDispatch("wistester", "statoAshStorage", "statoAshStorage(0, 100)", "raspberryinfocontroller");
 	 			((MqttConnection)connSupport).publish("wisinfo", monitoringDeviceEmpty.toString());
 	 			((MqttConnection)connSupport).publish("wisinfo", new_RP.toString());
 	 			
@@ -246,7 +246,7 @@ public class Test_WIS {
 	 			Thread.sleep(6000);
 	  			 CommUtils.outmagenta("test_ArrivedRP_MDoff_after_one_round ======================================= ");
 				while( connSupport == null ) {
-	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:8081", "wistester");
+	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:1883", "wistester");
 	 				CommUtils.outcyan("testWISSystem another connect attempt ");
 	 				Thread.sleep(1000);
 	 			}
@@ -254,9 +254,9 @@ public class Test_WIS {
 	 			((MqttConnection)connSupport).setupConnectionForAnswer("wisinfo");
 	 			((MqttConnection)connSupport).subscribe("wisinfo");
 	 			CommUtils.outcyan("CONNECTED to mqtt broker " + connSupport);
-	 			IApplMessage monitoringDeviceFull = CommUtils.buildEvent("wistester", "statoAshStorage", "statoAshStorage(1, 0)");
-	 			IApplMessage monitoringDeviceEmpty = CommUtils.buildEvent("wistester", "statoAshStorage", "statoAshStorage(0, 100)");
-	 			IApplMessage new_RP = CommUtils.buildEvent("wistester", "num_RP", "num_RP(1)");
+	 			IApplMessage monitoringDeviceFull = CommUtils.buildDispatch("wistester", "statoAshStorage", "statoAshStorage(1, 0)", "raspberryinfocontroller");
+	 			IApplMessage monitoringDeviceEmpty = CommUtils.buildDispatch("wistester", "statoAshStorage", "statoAshStorage(0, 100)", "raspberryinfocontroller");
+	 			IApplMessage new_RP = CommUtils.buildDispatch("wistester", "num_RP", "num_RP(1)", "raspberryinfocontroller");
 	 			((MqttConnection)connSupport).publish("wisinfo", monitoringDeviceEmpty.toString());
 	 			CommUtils.delay(1000);
 	 			((MqttConnection)connSupport).publish("wisinfo", new_RP.toString());
@@ -300,7 +300,7 @@ public class Test_WIS {
 	 			Thread.sleep(6000);
 	  			 CommUtils.outmagenta("test_ArrivedRP_MDfull_after_one_round ======================================= ");
 				while( connSupport == null ) {
-	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:8081", "wistester");
+	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:1883", "wistester");
 	 				CommUtils.outcyan("testWISSystem another connect attempt ");
 	 				Thread.sleep(1000);
 	 			}
@@ -308,9 +308,9 @@ public class Test_WIS {
 	 			((MqttConnection)connSupport).setupConnectionForAnswer("wisinfo");
 	 			((MqttConnection)connSupport).subscribe("wisinfo");
 	 			CommUtils.outcyan("CONNECTED to mqtt broker " + connSupport);
-	 			IApplMessage monitoringDeviceFull = CommUtils.buildEvent("wistester", "statoAshStorage", "statoAshStorage(1, 0)");
-	 			IApplMessage monitoringDeviceEmpty = CommUtils.buildEvent("wistester", "statoAshStorage", "statoAshStorage(0, 100)");
-	 			IApplMessage new_RP = CommUtils.buildEvent("wistester", "num_RP", "num_RP(1)");
+	 			IApplMessage monitoringDeviceFull = CommUtils.buildDispatch("wistester", "statoAshStorage", "statoAshStorage(1, 0)", "raspberryinfocontroller");
+	 			IApplMessage monitoringDeviceEmpty = CommUtils.buildDispatch("wistester", "statoAshStorage", "statoAshStorage(0, 100)", "raspberryinfocontroller");
+	 			IApplMessage new_RP = CommUtils.buildDispatch("wistester", "num_RP", "num_RP(1)", "raspberryinfocontroller");
 	 			((MqttConnection)connSupport).publish("wisinfo", monitoringDeviceEmpty.toString());
 	 			CommUtils.delay(1000);
 	 			((MqttConnection)connSupport).publish("wisinfo", new_RP.toString());
@@ -355,7 +355,7 @@ public class Test_WIS {
 	 			Thread.sleep(6000);
 	  			 CommUtils.outmagenta("test_ArrivedRP_MDfull_after_one_round ======================================= ");
 				while( connSupport == null ) {
-	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:8081", "wistester");
+	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:1883", "wistester");
 	 				CommUtils.outcyan("testWISSystem another connect attempt ");
 	 				Thread.sleep(1000);
 	 			}
@@ -363,9 +363,9 @@ public class Test_WIS {
 	 			((MqttConnection)connSupport).setupConnectionForAnswer("wisinfo");
 	 			((MqttConnection)connSupport).subscribe("wisinfo");
 	 			CommUtils.outcyan("CONNECTED to mqtt broker " + connSupport);
-	 			IApplMessage monitoringDeviceFull = CommUtils.buildEvent("wistester", "statoAshStorage", "statoAshStorage(1, 0)");
-	 			IApplMessage monitoringDeviceEmpty = CommUtils.buildEvent("wistester", "statoAshStorage", "statoAshStorage(0, 100)");
-	 			IApplMessage new_RP = CommUtils.buildEvent("wistester", "num_RP", "num_RP(1)");
+	 			IApplMessage monitoringDeviceFull = CommUtils.buildDispatch("wistester", "statoAshStorage", "statoAshStorage(1, 0)", "raspberryinfocontroller");
+	 			IApplMessage monitoringDeviceEmpty = CommUtils.buildDispatch("wistester", "statoAshStorage", "statoAshStorage(0, 100)", "raspberryinfocontroller");
+	 			IApplMessage new_RP = CommUtils.buildDispatch("wistester", "num_RP", "num_RP(1)", "raspberryinfocontroller");
 	 			((MqttConnection)connSupport).publish("wisinfo", monitoringDeviceEmpty.toString());
 	 			CommUtils.delay(1000);
 	 			((MqttConnection)connSupport).publish("wisinfo", new_RP.toString());

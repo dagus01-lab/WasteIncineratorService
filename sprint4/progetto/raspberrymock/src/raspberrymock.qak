@@ -58,7 +58,10 @@ QActor monitoringdevice context ctxraspberrymock withobj config using "Monitorin
 		println("$name | STARTS") color yellow
 		connectToMqttBroker "$broker_url" clientid "monitoringdevicenat"
 		println("$name | connected to MQTT broker $broker_url") color cyan
-		publish "wisinfo" -m statoAshStorage:statoAshStorage(0)
+		[# 
+			val msg = MsgUtil.buildDispatch("monitoringdevice", "statoAshStorage","statoAshStorage(0, $DMIN)","raspberryinfocontroller")
+			publish(msg.toString(),"wisinfo")
+		#]
 	}
 	Goto wait
 	State wait{
@@ -71,8 +74,14 @@ QActor monitoringdevice context ctxraspberrymock withobj config using "Monitorin
 			[#
 				State = payloadArg(0).toInt()
 				when(State){
-					0 -> #]publish "wisinfo" -m statoAshStorage:statoAshStorage(0,$DMIN) [#
-					1 -> #]publish "wisinfo" -m statoAshStorage:statoAshStorage(1,$DLIMIT)[#
+					0 -> {
+							val msg = MsgUtil.buildDispatch("monitoringdevice", "statoAshStorage","statoAshStorage(0, $DMIN)","raspberryinfocontroller")
+							publish(msg.toString(),"wisinfo")		
+					}
+					1 -> {
+							val msg = MsgUtil.buildDispatch("monitoringdevice", "statoAshStorage","statoAshStorage(1, $DLIMIT)","raspberryinfocontroller")
+							publish(msg.toString(),"wisinfo")		
+					}
 					else -> #]println("Invalid input!") color green[#
 				}
 			#]
@@ -82,8 +91,14 @@ QActor monitoringdevice context ctxraspberrymock withobj config using "Monitorin
 	State keepConnectionAlive{
 		[#
 			when(State){
-					0 -> #]publish "wisinfo" -m statoAshStorage:statoAshStorage(0, $DMIN) [#
-					1 -> #]publish "wisinfo" -m statoAshStorage:statoAshStorage(1, $DLIMIT)[#
+					0 -> {
+							val msg = MsgUtil.buildDispatch("monitoringdevice", "statoAshStorage","statoAshStorage(0, $DMIN)","raspberryinfocontroller")
+							publish(msg.toString(),"wisinfo")		
+					}
+					1 -> {
+							val msg = MsgUtil.buildDispatch("monitoringdevice", "statoAshStorage","statoAshStorage(1, $DLIMIT)","raspberryinfocontroller")
+							publish(msg.toString(),"wisinfo")		
+					}
 				}
 		#]
 	}
@@ -102,7 +117,10 @@ QActor scale context ctxraspberrymock withobj config using "ScaleConfigReader.lo
 		println("$name | STARTS") color yellow
 		connectToMqttBroker "$broker_url" clientid "scalenat"
 		println("$name | connected to MQTT broker $broker_url") color cyan
-		publish "wisinfo" -m num_RP:num_RP($RPs)
+		[# 
+			val msg = MsgUtil.buildDispatch("scale", "num_RP","num_RP($RPs)","raspberryinfocontroller")
+			publish(msg.toString(),"wisinfo")
+		#]
 	}
 	Goto wait
 	State wait{
@@ -112,13 +130,19 @@ QActor scale context ctxraspberrymock withobj config using "ScaleConfigReader.lo
 					whenEvent num_RP->notifyNewRP
 	State notifyNewRP{
 		onMsg(num_RP:num_RP(N)){
-			[#RPs = payloadArg(0).toInt()#]
-			publish "wisinfo" -m num_RP:num_RP($RPs)
+			[#
+				RPs = payloadArg(0).toInt()
+				val msg = MsgUtil.buildDispatch("scale", "num_RP","num_RP($RPs)","raspberryinfocontroller")
+				publish(msg.toString(),"wisinfo")
+			#]
 		}
 	}
 	Goto wait
 	State keepConnectionAlive{
-		publish "wisinfo" -m num_RP:num_RP($RPs)
+		[# 
+			val msg = MsgUtil.buildDispatch("scale", "num_RP","num_RP($RPs)","raspberryinfocontroller")
+			publish(msg.toString(),"wisinfo")
+		#]
 	}
 	Goto wait
 }

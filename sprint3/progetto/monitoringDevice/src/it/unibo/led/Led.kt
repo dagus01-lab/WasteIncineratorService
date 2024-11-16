@@ -11,12 +11,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
-//Sept2024
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory 
-import org.json.simple.parser.JSONParser
-import org.json.simple.JSONObject
-
 
 //User imports JAN2024
 
@@ -52,9 +46,9 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t06",targetState="handle_led_on",cond=whenDispatch("led_on"))
-					transition(edgeName="t07",targetState="handle_led_off",cond=whenDispatch("led_off"))
-					transition(edgeName="t08",targetState="handle_led_blink",cond=whenDispatch("led_blink"))
+					 transition(edgeName="t04",targetState="handle_led_on",cond=whenDispatch("led_on"))
+					transition(edgeName="t05",targetState="handle_led_off",cond=whenDispatch("led_off"))
+					transition(edgeName="t06",targetState="handle_led_blink",cond=whenDispatch("led_blink"))
 				}	 
 				state("handle_led_on") { //this:State
 					action { //it:State
