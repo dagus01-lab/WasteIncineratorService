@@ -11,6 +11,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
 import main.resources.WISConfigReader
@@ -32,7 +38,6 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					action { //it:State
 						delay(1000) 
 						CommUtils.outred("$name STARTS")
-						connectToMqttBroker( "$broker_url", "incineratornat" )
 						CommUtils.outgreen("$name | CREATED  (and connected to mosquitto) ... ")
 						 
 									val msg = MsgUtil.buildDispatch("incinerator", "statoIncinerator","statoIncinerator(OFF)","monitoringdevice")
@@ -42,7 +47,7 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t032",targetState="turnOn",cond=whenDispatch("activationCommand"))
+					 transition(edgeName="t031",targetState="turnOn",cond=whenDispatch("activationCommand"))
 				}	 
 				state("turnOn") { //this:State
 					action { //it:State
@@ -63,8 +68,8 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 				 	 		stateTimer = TimerActor("timer_wait", 
 				 	 					  scope, context!!, "local_tout_"+name+"_wait", 10000.toLong() )  //OCT2023
 					}	 	 
-					 transition(edgeName="t033",targetState="keepConnectionAlive",cond=whenTimeout("local_tout_"+name+"_wait"))   
-					transition(edgeName="t034",targetState="handleStartBurning",cond=whenDispatch("startBurning"))
+					 transition(edgeName="t032",targetState="keepConnectionAlive",cond=whenTimeout("local_tout_"+name+"_wait"))   
+					transition(edgeName="t033",targetState="handleStartBurning",cond=whenDispatch("startBurning"))
 				}	 
 				state("keepConnectionAlive") { //this:State
 					action { //it:State
@@ -91,7 +96,7 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 				 	 		stateTimer = TimerActor("timer_handleStartBurning", 
 				 	 					  scope, context!!, "local_tout_"+name+"_handleStartBurning", BTIME )  //OCT2023
 					}	 	 
-					 transition(edgeName="t035",targetState="handleEndBurning",cond=whenTimeout("local_tout_"+name+"_handleStartBurning"))   
+					 transition(edgeName="t034",targetState="handleEndBurning",cond=whenTimeout("local_tout_"+name+"_handleStartBurning"))   
 				}	 
 				state("handleEndBurning") { //this:State
 					action { //it:State
@@ -104,7 +109,7 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t036",targetState="handleStartBurning",cond=whenDispatch("startBurning"))
+					 transition(edgeName="t035",targetState="handleStartBurning",cond=whenDispatch("startBurning"))
 				}	 
 			}
 		}

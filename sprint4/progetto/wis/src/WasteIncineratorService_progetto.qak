@@ -1,5 +1,6 @@
 /** Modello per l'architettura logica dello SPRINT2 del WasteIncineratorService */
 System waste_incinerator_service
+mqttBroker "localhost" : 8081 eventTopic "wisevents" 
 //Messaggio per la ricezione di un nuovo RP
 Dispatch num_RP : num_RP(N) "message that represents the number of a RPs in Waste Storage"
 Dispatch arrived_RP : arrived_RP(N) 
@@ -30,7 +31,7 @@ Dispatch monitoringDeviceOff:monitoringDeviceOff(N) "message that represents the
 
 //Messaggi per ingaggiare e muovere il BasicRobot
 Request engage        : engage(OWNER, STEPTIME)	 
-Dispatch engagedone	  : engagedone(ARG)
+//Dispatch engagedone	  : engagedone(ARG)
 Reply   engagedone    : engagedone(ARG)    for engage
 Reply   engagerefused : engagerefused(ARG) for engage 
 Dispatch disengage    : disengage(ARG) 
@@ -62,7 +63,7 @@ QActor raspberryinfocontroller context ctx_waste_incinerator_service withobj con
 	#]
 	State s0 initial{
 		delay 500
-		connectToMqttBroker "$broker_url" clientid "wismonitoringdeviceproxynat"
+		//connectToMqttBroker "$broker_url" clientid "wismonitoringdeviceproxynat"
 		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "wismonitoringdevicenat"
  		println("$name | CREATED  (and connected to mosquitto) ... ") color cyan
  		delay 1000
@@ -221,7 +222,7 @@ QActor oprobot context ctx_waste_incinerator_service withobj config using "WISCo
 	#]
 	State s0 initial{
 		println("$name | STARTS") color yellow
-		connectToMqttBroker "$broker_url" clientid "oprobotnat"
+		//connectToMqttBroker "$broker_url" clientid "oprobotnat"
 		delay 1000
 		subscribe "robotevents"
 		println("$name | connected to MQTT server")
@@ -235,10 +236,11 @@ QActor oprobot context ctx_waste_incinerator_service withobj config using "WISCo
 			val msg = MsgUtil.buildRequest("oprobot", "engage","engage($MyName,$StepTime)","basicrobot")
 			publish(msg.toString(),"robotevents")
 		#]
+		subscribe "answ_engage_oprobot"
 		//request basicrobot -m engage : engage($MyName,$StepTime) //pc Emanuele 112, fisso Gabriele 260, portatile Gabriele 330
 	}
 	Transition t0 whenTime 5000 -> noResponse
-				  whenMsg engagedone -> waitingWorking
+				  //whenMsg engagedone -> waitingWorking
 				  whenReply engagedone   -> waitingWorking
  	              whenReply engagerefused -> end
  	          
@@ -274,6 +276,7 @@ QActor oprobot context ctx_waste_incinerator_service withobj config using "WISCo
 			val msg = MsgUtil.buildRequest("oprobot", "moverobot","moverobot($WASTEINx,$WASTEINy)","basicrobot")
 			publish(msg.toString(),"robotevents")
 		#]
+		subscribe "answ_moverobot_oprobot"
 //		request basicrobot -m moverobot:moverobot($WASTEINx,$WASTEINy)
 	}
 	Transition t0 whenReply moverobotdone -> bringRPtoBURNIN
@@ -399,7 +402,7 @@ QActor incinerator context ctx_waste_incinerator_service withobj config using "W
 	State s0 initial{
 		delay 1000
 		println("$name STARTS") color red 
-		connectToMqttBroker "$broker_url" clientid "incineratornat"
+		//connectToMqttBroker "$broker_url" clientid "incineratornat"
 		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "incineratornat" 
  		println("$name | CREATED  (and connected to mosquitto) ... ") color green
 		[# 

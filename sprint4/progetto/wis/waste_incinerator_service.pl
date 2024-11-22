@@ -1,6 +1,7 @@
 %====================================================================================
 % waste_incinerator_service description   
 %====================================================================================
+mqttBroker("localhost", "8081", "wisevents").
 dispatch( num_RP, num_RP(N) ). %message that represents the number of a RPs in Waste Storage
 dispatch( arrived_RP, arrived_RP(N) ).
 dispatch( statoIncinerator, statoIncinerator(N) ). %Incinerator's burning status info: 0 is not burning, 1 otherwise
@@ -17,7 +18,6 @@ dispatch( ashesLevel, ashesLevel(N) ). %Event that simulates the level of the as
 dispatch( statoAshStorage, statoAshStorage(N,D) ). %AshStorage info: 0 is not empty, 1 otherwise
 dispatch( monitoringDeviceOff, monitoringDeviceOff(N) ). %message that represents the level of the ash storage (1 if it is up, 0 otherwise)
 request( engage, engage(OWNER,STEPTIME) ).
-dispatch( engagedone, engagedone(ARG) ).
 reply( engagedone, engagedone(ARG) ).  %%for engage
 reply( engagerefused, engagerefused(ARG) ).  %%for engage
 dispatch( disengage, disengage(ARG) ).

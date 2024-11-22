@@ -11,6 +11,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
 import main.resources.WISConfigReader
@@ -43,7 +49,6 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outyellow("$name | STARTS")
-						connectToMqttBroker( "$broker_url", "oprobotnat" )
 						delay(1000) 
 						subscribe(  "robotevents" ) //mqtt.subscribe(this,topic)
 						CommUtils.outblack("$name | connected to MQTT server")
@@ -60,6 +65,7 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 						 
 									val msg = MsgUtil.buildRequest("oprobot", "engage","engage($MyName,$StepTime)","basicrobot")
 									publish(msg.toString(),"robotevents")
+						subscribe(  "answ_engage_oprobot" ) //mqtt.subscribe(this,topic)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -68,9 +74,8 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 				 	 					  scope, context!!, "local_tout_"+name+"_engage", 5000.toLong() )  //OCT2023
 					}	 	 
 					 transition(edgeName="t010",targetState="noResponse",cond=whenTimeout("local_tout_"+name+"_engage"))   
-					transition(edgeName="t011",targetState="waitingWorking",cond=whenDispatch("engagedone"))
-					transition(edgeName="t012",targetState="waitingWorking",cond=whenReply("engagedone"))
-					transition(edgeName="t013",targetState="end",cond=whenReply("engagerefused"))
+					transition(edgeName="t011",targetState="waitingWorking",cond=whenReply("engagedone"))
+					transition(edgeName="t012",targetState="end",cond=whenReply("engagerefused"))
 				}	 
 				state("noResponse") { //this:State
 					action { //it:State
@@ -107,8 +112,8 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 				 	 		stateTimer = TimerActor("timer_wait", 
 				 	 					  scope, context!!, "local_tout_"+name+"_wait", 10000.toLong() )  //OCT2023
 					}	 	 
-					 transition(edgeName="t014",targetState="keepConnectionAlive",cond=whenTimeout("local_tout_"+name+"_wait"))   
-					transition(edgeName="t015",targetState="takeRP",cond=whenDispatch("arrived_RP"))
+					 transition(edgeName="t013",targetState="keepConnectionAlive",cond=whenTimeout("local_tout_"+name+"_wait"))   
+					transition(edgeName="t014",targetState="takeRP",cond=whenDispatch("arrived_RP"))
 				}	 
 				state("keepConnectionAlive") { //this:State
 					action { //it:State
@@ -131,13 +136,14 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 						 
 									val msg = MsgUtil.buildRequest("oprobot", "moverobot","moverobot($WASTEINx,$WASTEINy)","basicrobot")
 									publish(msg.toString(),"robotevents")
+						subscribe(  "answ_moverobot_oprobot" ) //mqtt.subscribe(this,topic)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t016",targetState="bringRPtoBURNIN",cond=whenReply("moverobotdone"))
-					transition(edgeName="t017",targetState="exit",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t015",targetState="bringRPtoBURNIN",cond=whenReply("moverobotdone"))
+					transition(edgeName="t016",targetState="exit",cond=whenReply("moverobotfailed"))
 				}	 
 				state("bringRPtoBURNIN") { //this:State
 					action { //it:State
@@ -154,8 +160,8 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t018",targetState="returnHOME",cond=whenReply("moverobotdone"))
-					transition(edgeName="t019",targetState="exit",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t017",targetState="returnHOME",cond=whenReply("moverobotdone"))
+					transition(edgeName="t018",targetState="exit",cond=whenReply("moverobotfailed"))
 				}	 
 				state("returnHOME") { //this:State
 					action { //it:State
@@ -174,8 +180,8 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t020",targetState="waitingForIncinerator",cond=whenReply("moverobotdone"))
-					transition(edgeName="t021",targetState="exit",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t019",targetState="waitingForIncinerator",cond=whenReply("moverobotdone"))
+					transition(edgeName="t020",targetState="exit",cond=whenReply("moverobotfailed"))
 				}	 
 				state("waitingForIncinerator") { //this:State
 					action { //it:State
@@ -189,7 +195,7 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t022",targetState="takeAshFromBURNOUT",cond=whenEvent("endBurning"))
+					 transition(edgeName="t021",targetState="takeAshFromBURNOUT",cond=whenEvent("endBurning"))
 				}	 
 				state("takeAshFromBURNOUT") { //this:State
 					action { //it:State
@@ -203,8 +209,8 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t023",targetState="bringAshtoASHOUT",cond=whenReply("moverobotdone"))
-					transition(edgeName="t024",targetState="exit",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t022",targetState="bringAshtoASHOUT",cond=whenReply("moverobotdone"))
+					transition(edgeName="t023",targetState="exit",cond=whenReply("moverobotfailed"))
 				}	 
 				state("bringAshtoASHOUT") { //this:State
 					action { //it:State
@@ -221,8 +227,8 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t025",targetState="restartJob",cond=whenReply("moverobotdone"))
-					transition(edgeName="t026",targetState="exit",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t024",targetState="restartJob",cond=whenReply("moverobotdone"))
+					transition(edgeName="t025",targetState="exit",cond=whenReply("moverobotfailed"))
 				}	 
 				state("restartJob") { //this:State
 					action { //it:State
@@ -241,9 +247,9 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t027",targetState="takeRpBeforeFinishPlan",cond=whenDispatch("arrived_RP"))
-					transition(edgeName="t028",targetState="waitingWorking",cond=whenReply("moverobotdone"))
-					transition(edgeName="t029",targetState="exit",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t026",targetState="takeRpBeforeFinishPlan",cond=whenDispatch("arrived_RP"))
+					transition(edgeName="t027",targetState="waitingWorking",cond=whenReply("moverobotdone"))
+					transition(edgeName="t028",targetState="exit",cond=whenReply("moverobotfailed"))
 				}	 
 				state("takeRpBeforeFinishPlan") { //this:State
 					action { //it:State
@@ -255,8 +261,8 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t030",targetState="testko",cond=whenReply("moverobotdone"))
-					transition(edgeName="t031",targetState="takeRP",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t029",targetState="testko",cond=whenReply("moverobotdone"))
+					transition(edgeName="t030",targetState="takeRP",cond=whenReply("moverobotfailed"))
 				}	 
 				state("testko") { //this:State
 					action { //it:State
