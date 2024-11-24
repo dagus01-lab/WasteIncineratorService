@@ -11,12 +11,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
-//Sept2024
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory 
-import org.json.simple.parser.JSONParser
-import org.json.simple.JSONObject
-
 
 //User imports JAN2024
 import main.resources.ScaleConfigReader
@@ -46,8 +40,6 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 						connectToMqttBroker( "$broker_url", "scalenat" )
 						CommUtils.outblue("$name | CREATED  (and connected to mosquitto) ... ")
 						subscribe(  "wisinfo" ) //mqtt.subscribe(this,topic)
-						//val m = MsgUtil.buildEvent(name, "num_RP", "num_RP(0)" ) 
-						publish(MsgUtil.buildEvent(name,"num_RP","num_RP(0)").toString(), "wisinfo" )   
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -63,8 +55,9 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 									      		var W = payloadArg(0).toInt() 
 									      		RPs = (W/WRP).toInt()
 								if( previous_RPs != RPs 
-								 ){//val m = MsgUtil.buildEvent(name, "num_RP", "num_RP($RPs)" ) 
-								publish(MsgUtil.buildEvent(name,"num_RP","num_RP($RPs)").toString(), "wisinfo" )   
+								 ){ 
+													val msg = MsgUtil.buildDispatch("scale", "num_RP","num_RP($RPs)","raspberryinfocontroller")
+													publish(msg.toString(),"wisinfo")
 								}
 								 previous_RPs = RPs;  
 						}

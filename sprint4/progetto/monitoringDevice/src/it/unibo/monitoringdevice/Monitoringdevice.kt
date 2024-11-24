@@ -11,12 +11,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
-//Sept2024
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory 
-import org.json.simple.parser.JSONParser
-import org.json.simple.JSONObject
-
 
 //User imports JAN2024
 import main.resources.MonitoringDeviceConfigReader
@@ -108,12 +102,14 @@ class Monitoringdevice ( name: String, scope: CoroutineScope, isconfined: Boolea
 								previousLevelAshStorage = levelAshStorage 
 								}
 								if( levelAshStorage==2 
-								 ){//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(1,$D)" ) 
-								publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(1,$D)").toString(), "wisinfo" )   
+								 ){ 
+													val msg = MsgUtil.buildDispatch("monitoringdevice", "statoAshStorage","statoAshStorage(1, $D)","raspberryinfocontroller")
+													publish(msg.toString(),"wisinfo")
 								}
 								else
-								 {//val m = MsgUtil.buildEvent(name, "statoAshStorage", "statoAshStorage(0,$D)" ) 
-								 publish(MsgUtil.buildEvent(name,"statoAshStorage","statoAshStorage(0,$D)").toString(), "wisinfo" )   
+								 { 
+								 					val msg = MsgUtil.buildDispatch("monitoringdevice", "statoAshStorage","statoAshStorage(0, $D)","raspberryinfocontroller")
+								 					publish(msg.toString(),"wisinfo")
 								 }
 						}
 						//genTimer( actor, state )

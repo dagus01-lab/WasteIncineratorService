@@ -229,9 +229,15 @@ QActor monitoringdevice context ctxmonitoringdevice withobj config using "Monito
 			
 			//Aggiorno lo stato del AshStorage in base alla distanza misurata
 			if [#levelAshStorage==2#]{
-				publish "wisinfo" -m statoAshStorage:statoAshStorage(1, $D)
+				[# 
+					val msg = MsgUtil.buildDispatch("monitoringdevice", "statoAshStorage","statoAshStorage(1, $D)","raspberryinfocontroller")
+					publish(msg.toString(),"wisinfo")
+				#]
 			} else {
-				publish "wisinfo" -m statoAshStorage:statoAshStorage(0, $D)
+				[# 
+					val msg = MsgUtil.buildDispatch("monitoringdevice", "statoAshStorage","statoAshStorage(0, $D)","raspberryinfocontroller")
+					publish(msg.toString(),"wisinfo")
+				#]
 			}
 		}	
 	}

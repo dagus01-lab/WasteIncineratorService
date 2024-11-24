@@ -11,12 +11,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
-//Sept2024
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory 
-import org.json.simple.parser.JSONParser
-import org.json.simple.JSONObject
-
 
 //User imports JAN2024
 import main.resources.WISConfigReader
@@ -43,6 +37,7 @@ class Raspberryinfocontroller ( name: String, scope: CoroutineScope, isconfined:
 				state("s0") { //this:State
 					action { //it:State
 						delay(500) 
+						connectToMqttBroker( "$broker_url", "wismonitoringdeviceproxynat" )
 						CommUtils.outcyan("$name | CREATED  (and connected to mosquitto) ... ")
 						delay(1000) 
 						subscribe(  "wisinfo" ) //mqtt.subscribe(this,topic)

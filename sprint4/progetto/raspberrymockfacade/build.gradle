@@ -1,7 +1,9 @@
 plugins {
+	id 'application'
 	id 'java'
-	id 'org.springframework.boot' version '3.3.5'
-	id 'io.spring.dependency-management' version '1.1.6'
+    id 'eclipse'
+	id 'org.springframework.boot' version '2.7.16'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
 
 group = 'unibo'
@@ -9,8 +11,9 @@ version = '0.0.1-SNAPSHOT'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+		languageVersion = JavaLanguageVersion.of(11)
 	}
+	sourceCompatibility = '1.8'
 }
 
 repositories {
@@ -43,12 +46,6 @@ dependencies {
 	implementation group: 'org.eclipse.californium', name: 'californium-core', version: '3.5.0'
 	implementation group: 'org.eclipse.californium', name: 'californium-proxy2', version: '3.5.0'
 	implementation group: 'org.eclipse.paho', name: 'org.eclipse.paho.client.mqttv3', version: '1.2.5'
-	
-	// Spring Integration MQTT
-    implementation 'org.springframework.integration:spring-integration-mqtt:5.5.16'
-
-    // MQTT Client (Eclipse Paho)
-    implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5'
 }
 
 tasks.named('test') {

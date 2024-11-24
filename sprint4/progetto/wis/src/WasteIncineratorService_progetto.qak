@@ -1,6 +1,6 @@
 /** Modello per l'architettura logica dello SPRINT2 del WasteIncineratorService */
 System waste_incinerator_service
-mqttBroker "localhost" : 8081 eventTopic "wisevents" 
+//mqttBroker "localhost" : 1883 eventTopic "wisevents" 
 //Messaggio per la ricezione di un nuovo RP
 Dispatch num_RP : num_RP(N) "message that represents the number of a RPs in Waste Storage"
 Dispatch arrived_RP : arrived_RP(N) 
@@ -63,8 +63,7 @@ QActor raspberryinfocontroller context ctx_waste_incinerator_service withobj con
 	#]
 	State s0 initial{
 		delay 500
-		//connectToMqttBroker "$broker_url" clientid "wismonitoringdeviceproxynat"
-		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "wismonitoringdevicenat"
+		connectToMqttBroker "$broker_url" clientid "wismonitoringdeviceproxynat"
  		println("$name | CREATED  (and connected to mosquitto) ... ") color cyan
  		delay 1000
  		subscribe "wisinfo"
@@ -219,10 +218,11 @@ QActor oprobot context ctx_waste_incinerator_service withobj config using "WISCo
 		var ASHOUTy = config.ASHOUTy
 		var StepTime = config.step_time
 		var broker_url = config.broker_url
+		var msg = MsgUtil.buildRequest("oprobot", "engage","engage($MyName,$StepTime)","basicrobot")
 	#]
 	State s0 initial{
 		println("$name | STARTS") color yellow
-		//connectToMqttBroker "$broker_url" clientid "oprobotnat"
+		connectToMqttBroker "$broker_url" clientid "oprobotnat"
 		delay 1000
 		subscribe "robotevents"
 		println("$name | connected to MQTT server")
@@ -233,7 +233,7 @@ QActor oprobot context ctx_waste_incinerator_service withobj config using "WISCo
 	State engage{
 		println("$name | $MyName engaging ... ") color yellow 
 		[# 
-			val msg = MsgUtil.buildRequest("oprobot", "engage","engage($MyName,$StepTime)","basicrobot")
+			msg = MsgUtil.buildRequest("oprobot", "engage","engage($MyName,$StepTime)","basicrobot")
 			publish(msg.toString(),"robotevents")
 		#]
 		subscribe "answ_engage_oprobot"
@@ -250,6 +250,7 @@ QActor oprobot context ctx_waste_incinerator_service withobj config using "WISCo
  	}
  	Goto end
 	
+	//Stato che rappresenta il robot in attesa di lavoro
 	//Stato che rappresenta il robot in attesa di lavoro
 	State waitingWorking{
 		printCurrentMessage color red
@@ -402,11 +403,10 @@ QActor incinerator context ctx_waste_incinerator_service withobj config using "W
 	State s0 initial{
 		delay 1000
 		println("$name STARTS") color red 
-		//connectToMqttBroker "$broker_url" clientid "incineratornat"
-		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "incineratornat" 
+		connectToMqttBroker "$broker_url" clientid "incineratornat"
  		println("$name | CREATED  (and connected to mosquitto) ... ") color green
 		[# 
-			val msg = MsgUtil.buildDispatch("incinerator", "statoIncinerator","statoIncinerator(OFF)","monitoringdevice")
+			var msg = MsgUtil.buildDispatch("incinerator", "statoIncinerator","statoIncinerator(OFF)","monitoringdevice")
 			publish(msg.toString(),"wisinfo")
 		#]
 	}
@@ -423,7 +423,7 @@ QActor incinerator context ctx_waste_incinerator_service withobj config using "W
 					whenMsg startBurning -> handleStartBurning
 	State keepConnectionAlive{
 		[# 
-			val msg = MsgUtil.buildDispatch("incinerator", "statoIncinerator","statoIncinerator(OFF)","monitoringdevice")
+			var msg = MsgUtil.buildDispatch("incinerator", "statoIncinerator","statoIncinerator(OFF)","monitoringdevice")
 			publish(msg.toString(),"wisinfo")
 		#]
 	}
@@ -432,7 +432,7 @@ QActor incinerator context ctx_waste_incinerator_service withobj config using "W
 	State handleStartBurning{
 		println("Incinerator is burning...") color red
 		[# 
-			val msg = MsgUtil.buildDispatch("incinerator", "statoIncinerator","statoIncinerator(BURNING)","monitoringdevice")
+			var msg = MsgUtil.buildDispatch("incinerator", "statoIncinerator","statoIncinerator(BURNING)","monitoringdevice")
 			publish(msg.toString(),"wisinfo")
 		#]
 	}
@@ -442,7 +442,7 @@ QActor incinerator context ctx_waste_incinerator_service withobj config using "W
 	State handleEndBurning{
 		emit endBurning : endBurning(1) //emette il segnale di fine burning
 		[# 
-			val msg = MsgUtil.buildDispatch("incinerator", "statoIncinerator","statoIncinerator(OFF)","monitoringdevice")
+			var msg = MsgUtil.buildDispatch("incinerator", "statoIncinerator","statoIncinerator(OFF)","monitoringdevice")
 			publish(msg.toString(),"wisinfo")
 		#]
 	}

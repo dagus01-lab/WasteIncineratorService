@@ -11,12 +11,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
-//Sept2024
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory 
-import org.json.simple.parser.JSONParser
-import org.json.simple.JSONObject
-
 
 //User imports JAN2024
 import main.resources.WISConfigReader
@@ -38,9 +32,10 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					action { //it:State
 						delay(1000) 
 						CommUtils.outred("$name STARTS")
+						connectToMqttBroker( "$broker_url", "incineratornat" )
 						CommUtils.outgreen("$name | CREATED  (and connected to mosquitto) ... ")
 						 
-									val msg = MsgUtil.buildDispatch("incinerator", "statoIncinerator","statoIncinerator(OFF)","monitoringdevice")
+									var msg = MsgUtil.buildDispatch("incinerator", "statoIncinerator","statoIncinerator(OFF)","monitoringdevice")
 									publish(msg.toString(),"wisinfo")
 						//genTimer( actor, state )
 					}
@@ -74,7 +69,7 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 				state("keepConnectionAlive") { //this:State
 					action { //it:State
 						 
-									val msg = MsgUtil.buildDispatch("incinerator", "statoIncinerator","statoIncinerator(OFF)","monitoringdevice")
+									var msg = MsgUtil.buildDispatch("incinerator", "statoIncinerator","statoIncinerator(OFF)","monitoringdevice")
 									publish(msg.toString(),"wisinfo")
 						//genTimer( actor, state )
 					}
@@ -87,7 +82,7 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					action { //it:State
 						CommUtils.outred("Incinerator is burning...")
 						 
-									val msg = MsgUtil.buildDispatch("incinerator", "statoIncinerator","statoIncinerator(BURNING)","monitoringdevice")
+									var msg = MsgUtil.buildDispatch("incinerator", "statoIncinerator","statoIncinerator(BURNING)","monitoringdevice")
 									publish(msg.toString(),"wisinfo")
 						//genTimer( actor, state )
 					}
@@ -102,7 +97,7 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					action { //it:State
 						emit("endBurning", "endBurning(1)" ) 
 						 
-									val msg = MsgUtil.buildDispatch("incinerator", "statoIncinerator","statoIncinerator(OFF)","monitoringdevice")
+									var msg = MsgUtil.buildDispatch("incinerator", "statoIncinerator","statoIncinerator(OFF)","monitoringdevice")
 									publish(msg.toString(),"wisinfo")
 						//genTimer( actor, state )
 					}

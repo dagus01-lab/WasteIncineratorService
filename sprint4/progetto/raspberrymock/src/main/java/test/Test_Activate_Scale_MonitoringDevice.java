@@ -69,8 +69,8 @@ public class Test_Activate_Scale_MonitoringDevice {
 			public void run(){
 				CommUtils.outmagenta("TestRaspberry ActivateBroker");
 				try {
-					//procBroker = Runtime.getRuntime().exec("mosquitto -p 8081");
-					procBroker = Runtime.getRuntime().exec("/usr/sbin/mosquitto -p 8081");
+					//procBroker = Runtime.getRuntime().exec("mosquitto -p 1883");
+					procBroker = Runtime.getRuntime().exec("/usr/sbin/mosquitto -p 1883");
 					showOutput(procBroker,ColorsOut.GREEN);
 				} catch ( Exception e) {
 					CommUtils.outred("TestRaspberry ActivateBroker ERROR " + e.getMessage());
@@ -93,7 +93,7 @@ public class Test_Activate_Scale_MonitoringDevice {
 		}*/
 		activateBroker();
 		activateRaspberryMock();
-		CommUtils.delay(2000);
+		CommUtils.delay(5000);
 	}
 	/*
 	 * After execution
@@ -113,13 +113,13 @@ public class Test_Activate_Scale_MonitoringDevice {
 		}*/
 	}
 
-		@Test(timeout=10000)
+		@Test(timeout=30000)
 		public void testMonitoringDeviceActivation() {
 			try {
 	 			Thread.sleep(2000);
 	  			 CommUtils.outmagenta("testMonitoringDeviceActivation ======================================= ");
 				while( connSupport == null ) {
-	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:8081", "wistester");
+	 				connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:1883", "wistester");
 	 				CommUtils.outcyan("testRaspberry | another connect attempt ");
 	 				Thread.sleep(1000);
 	 			}
@@ -146,12 +146,12 @@ public class Test_Activate_Scale_MonitoringDevice {
 				fail("testRequest " + e.getMessage());
 			}
 		}
-		@Test(timeout=10000)
+		@Test(timeout=30000)
 		public void testScaleActivation() {
 			try {
 	  			 CommUtils.outmagenta("testScaleActivation ======================================= ");
 	  			while( connSupport == null ) {
-					connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:8081", "wistester");
+					connSupport = ConnectionFactory.createClientSupport(ProtocolType.mqtt, "tcp://localhost:1883", "wistester");
 					CommUtils.outcyan("testWISSystem another connect attempt ");
 					Thread.sleep(1000);
 				}

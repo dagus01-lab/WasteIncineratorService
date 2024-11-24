@@ -11,12 +11,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
-//Sept2024
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory 
-import org.json.simple.parser.JSONParser
-import org.json.simple.JSONObject
-
 
 //User imports JAN2024
 import main.resources.WISConfigReader
@@ -45,10 +39,12 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 				var ASHOUTy = config.ASHOUTy
 				var StepTime = config.step_time
 				var broker_url = config.broker_url
+				var msg = MsgUtil.buildRequest("oprobot", "engage","engage($MyName,$StepTime)","basicrobot")
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outyellow("$name | STARTS")
+						connectToMqttBroker( "$broker_url", "oprobotnat" )
 						delay(1000) 
 						subscribe(  "robotevents" ) //mqtt.subscribe(this,topic)
 						CommUtils.outblack("$name | connected to MQTT server")
@@ -63,7 +59,7 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					action { //it:State
 						CommUtils.outyellow("$name | $MyName engaging ... ")
 						 
-									val msg = MsgUtil.buildRequest("oprobot", "engage","engage($MyName,$StepTime)","basicrobot")
+									msg = MsgUtil.buildRequest("oprobot", "engage","engage($MyName,$StepTime)","basicrobot")
 									publish(msg.toString(),"robotevents")
 						subscribe(  "answ_engage_oprobot" ) //mqtt.subscribe(this,topic)
 						//genTimer( actor, state )

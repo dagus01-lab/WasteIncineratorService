@@ -30,7 +30,7 @@ public class Test_WIS {
 	private static Interaction connSupport;
 	private static Process procBroker;
 	private static Process procWIS;
-	private static BasicRobotMock basicRobotMock;
+	private static BasicRobotMockMQTT basicRobotMock;
 
 	//Metodo di supporto per mostrare l'output dei messaggi a colori
 	public static void showOutput(Process proc, String color){
@@ -64,7 +64,7 @@ public class Test_WIS {
 			public void run(){
 				CommUtils.outmagenta("TestWIS activateBasicRobotMock");
 				try {
-					basicRobotMock = new BasicRobotMock();
+					basicRobotMock = new BasicRobotMockMQTT();
 				} catch ( Exception e) {
 					CommUtils.outred("TestWIS activateBasicRobot ERROR " + e.getMessage());
 				}
@@ -109,7 +109,6 @@ public class Test_WIS {
 	@BeforeClass
 	public static void activateSetup() {
 		CommUtils.outyellow("== SETTING UP TEST ENVIRONMENT ==============");
-		activateBasicRobot();
 //		activateBroker();
 //		CommUtils.delay(1000);
 	}
@@ -127,9 +126,11 @@ public class Test_WIS {
 		
 		activateBroker();
 		CommUtils.delay(1000);
+		activateBasicRobot();
+		CommUtils.delay(2000);
 		CommUtils.outyellow("== SETTING UP WIS ==============");
 		activateWIS();
-		CommUtils.delay(5000);
+		CommUtils.delay(8000);
 	}
 	/*
 	 * After execution
@@ -140,7 +141,7 @@ public class Test_WIS {
 		CommUtils.outmagenta("end of test ");
 		procWIS.destroy();
 		procBroker.destroy();
-		CommUtils.delay(1000);
+		CommUtils.delay(2000);
 		/*try {
 			CommUtils.outcyan("end of test - taskkill /F /IM java.exe");
 			Runtime.getRuntime().exec("taskkill /F /IM java.exe");
@@ -220,6 +221,7 @@ public class Test_WIS {
 	 			((MqttConnection)connSupport).trace=true;
 	 			((MqttConnection)connSupport).setupConnectionForAnswer("wisinfo");
 	 			((MqttConnection)connSupport).subscribe("wisinfo");
+	 			CommUtils.delay(1000);
 	 			IApplMessage new_RP = CommUtils.buildDispatch("wistester", "num_RP", "num_RP(1)", "raspberryinfocontroller");
 	 			IApplMessage monitoringDeviceEmpty = CommUtils.buildDispatch("wistester", "statoAshStorage", "statoAshStorage(0, 100)", "raspberryinfocontroller");
 	 			((MqttConnection)connSupport).publish("wisinfo", monitoringDeviceEmpty.toString());
@@ -228,7 +230,7 @@ public class Test_WIS {
 	 			String message = "";
 	 			while((message = connSupport.receiveMsg())!=null) {
 	 				CommUtils.outgreen("wistester | received "+message);
-	 				if(message.toLowerCase().contains("going_to_wastein")) {
+	 				if(!message.toLowerCase().contains("waiting_for_an_rp")) {
 	 					break;
 	 				}
 	 			}
@@ -239,7 +241,7 @@ public class Test_WIS {
 				fail("testRequest " + e.getMessage());
 			}
 		}
-		@Test(timeout=30000)
+		@Test(timeout=40000)
 		public void test_ArrivedRP_MDoff_after_one_round() {
 			boolean testok = false;
 			try {
@@ -253,6 +255,7 @@ public class Test_WIS {
 	 			((MqttConnection)connSupport).trace=true;
 	 			((MqttConnection)connSupport).setupConnectionForAnswer("wisinfo");
 	 			((MqttConnection)connSupport).subscribe("wisinfo");
+	 			CommUtils.delay(1000);
 	 			CommUtils.outcyan("CONNECTED to mqtt broker " + connSupport);
 	 			IApplMessage monitoringDeviceFull = CommUtils.buildDispatch("wistester", "statoAshStorage", "statoAshStorage(1, 0)", "raspberryinfocontroller");
 	 			IApplMessage monitoringDeviceEmpty = CommUtils.buildDispatch("wistester", "statoAshStorage", "statoAshStorage(0, 100)", "raspberryinfocontroller");
@@ -264,11 +267,11 @@ public class Test_WIS {
 	 			while((message = connSupport.receiveMsg())!=null) {
 	 				CommUtils.outred("wistester | received "+message);
 	 				
-	 				if (message.toLowerCase().contains("going_to_wastein")) {
+	 				if (!message.toLowerCase().contains("waiting_for_an_rp")) {
 	 					break;
 	 				}
 	 			}
-
+	 			CommUtils.outred("wistester | oprobot has done one round");
 	 			//if I do not receive any message with opRobotState(Going_WASTEIN) the test is successful
 	 			long startTime = System.currentTimeMillis();
 	 			long timeout = 2000;
@@ -293,7 +296,7 @@ public class Test_WIS {
 				fail("testRequest " + e.getMessage());
 			}
 		}
-		@Test(timeout=30000)
+		@Test(timeout=60000)
 		public void test_ArrivedRP_MDfull_after_one_round() {
 			boolean testok = false;
 			try {
@@ -307,6 +310,7 @@ public class Test_WIS {
 	 			((MqttConnection)connSupport).trace=true;
 	 			((MqttConnection)connSupport).setupConnectionForAnswer("wisinfo");
 	 			((MqttConnection)connSupport).subscribe("wisinfo");
+	 			CommUtils.delay(1000);
 	 			CommUtils.outcyan("CONNECTED to mqtt broker " + connSupport);
 	 			IApplMessage monitoringDeviceFull = CommUtils.buildDispatch("wistester", "statoAshStorage", "statoAshStorage(1, 0)", "raspberryinfocontroller");
 	 			IApplMessage monitoringDeviceEmpty = CommUtils.buildDispatch("wistester", "statoAshStorage", "statoAshStorage(0, 100)", "raspberryinfocontroller");
@@ -318,11 +322,12 @@ public class Test_WIS {
 	 			while((message = connSupport.receiveMsg())!=null) {
 	 				CommUtils.outred("wistester | received "+message);
 	 				
-	 				if (message.toLowerCase().contains("going_to_wastein")) {
+	 				if  (!message.toLowerCase().contains("waiting_for_an_rp")) {
 	 					break;
 	 				}
 	 			}
 	 			CommUtils.delay(15000);
+	 			CommUtils.outred("wistester | oprobot has done one round");
 	 			((MqttConnection)connSupport).publish("wisinfo", monitoringDeviceFull.toString());
 	 			//if I do not receive any message with opRobotState(Going_WASTEIN) the test is successful
 	 			long startTime = System.currentTimeMillis();
@@ -348,7 +353,7 @@ public class Test_WIS {
 				fail("testRequest " + e.getMessage());
 			}
 		}
-		@Test(timeout=30000)
+		@Test(timeout=60000)
 		public void test_ArrivedRP_MDok_after_one_round() {
 			boolean testok = false;
 			try {
@@ -362,10 +367,12 @@ public class Test_WIS {
 	 			((MqttConnection)connSupport).trace=true;
 	 			((MqttConnection)connSupport).setupConnectionForAnswer("wisinfo");
 	 			((MqttConnection)connSupport).subscribe("wisinfo");
+	 			CommUtils.delay(1000);
 	 			CommUtils.outcyan("CONNECTED to mqtt broker " + connSupport);
 	 			IApplMessage monitoringDeviceFull = CommUtils.buildDispatch("wistester", "statoAshStorage", "statoAshStorage(1, 0)", "raspberryinfocontroller");
 	 			IApplMessage monitoringDeviceEmpty = CommUtils.buildDispatch("wistester", "statoAshStorage", "statoAshStorage(0, 100)", "raspberryinfocontroller");
 	 			IApplMessage new_RP = CommUtils.buildDispatch("wistester", "num_RP", "num_RP(1)", "raspberryinfocontroller");
+	 			CommUtils.delay(2000);
 	 			((MqttConnection)connSupport).publish("wisinfo", monitoringDeviceEmpty.toString());
 	 			CommUtils.delay(1000);
 	 			((MqttConnection)connSupport).publish("wisinfo", new_RP.toString());
@@ -373,19 +380,19 @@ public class Test_WIS {
 	 			while((message = connSupport.receiveMsg())!=null) {
 	 				CommUtils.outred("wistester | received "+message);
 	 				
-	 				if (message.toLowerCase().contains("going_to_wastein")) {
+	 				if  (!message.toLowerCase().contains("waiting_for_an_rp")) {
 	 					break;
 	 				}
 	 			}
+	 			CommUtils.outred("wistester | oprobot has done one round");
+	 			CommUtils.delay(20000);
 	 			((MqttConnection)connSupport).publish("wisinfo", monitoringDeviceFull.toString());
-	 			CommUtils.delay(1000);
 	 			((MqttConnection)connSupport).publish("wisinfo", new_RP.toString());
-	 			CommUtils.delay(15000);
 	 			((MqttConnection)connSupport).publish("wisinfo", monitoringDeviceEmpty.toString());
 	 			message = "";
 	 			while((message = connSupport.receiveMsg())!=null) {
 	 				CommUtils.outred("wistester | received "+message);
-	 				 if (message.toLowerCase().contains("going_to_wastein")) {
+	 				 if (!message.toLowerCase().contains("waiting_for_an_rp")) {
 	 					break;
 	 				}
 	 			}

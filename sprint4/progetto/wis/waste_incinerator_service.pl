@@ -1,7 +1,6 @@
 %====================================================================================
 % waste_incinerator_service description   
 %====================================================================================
-mqttBroker("localhost", "8081", "wisevents").
 dispatch( num_RP, num_RP(N) ). %message that represents the number of a RPs in Waste Storage
 dispatch( arrived_RP, arrived_RP(N) ).
 dispatch( statoIncinerator, statoIncinerator(N) ). %Incinerator's burning status info: 0 is not burning, 1 otherwise

@@ -77,7 +77,6 @@ QActor scale context ctxscale withobj config using "ScaleConfigReader.loadScaleC
 		//connectToMqttBroker "tcp://test.mosquitto.org" clientid "scalenat"
  		println("$name | CREATED  (and connected to mosquitto) ... ") color blue
  		subscribe "wisinfo"
- 		publish "wisinfo" -m num_RP:num_RP(0)
 	}
 	Transition t0 whenEvent scaledata -> filter
 	
@@ -103,7 +102,10 @@ QActor scale context ctxscale withobj config using "ScaleConfigReader.loadScaleC
 	      		#]
 	     	} */
 			if[#previous_RPs != RPs#]{
-				publish "wisinfo" -m num_RP:num_RP($RPs)
+				[# 
+					val msg = MsgUtil.buildDispatch("scale", "num_RP","num_RP($RPs)","raspberryinfocontroller")
+					publish(msg.toString(),"wisinfo")
+				#]
 			}
 	      	[# previous_RPs = RPs; #]
      	}
