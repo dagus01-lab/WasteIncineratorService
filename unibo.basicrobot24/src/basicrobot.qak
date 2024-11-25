@@ -4,8 +4,8 @@
  * ================================================================================
  */  
    
-System /* -trace -msglog  */ basicrobot24     
-   
+System /* -trace -msglog  */ basicrobot24  
+mqttBroker "localhost" : 1883 eventTopic "robotevents"  
 Dispatch cmd       	: cmd(MOVE)        
 Dispatch end       	: end(ARG)     
  

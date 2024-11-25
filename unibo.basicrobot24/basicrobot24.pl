@@ -1,6 +1,7 @@
 %====================================================================================
 % basicrobot24 description   
 %====================================================================================
+mqttBroker("localhost", "1883", "robotevents").
 dispatch( cmd, cmd(MOVE) ).
 dispatch( end, end(ARG) ).
 request( step, step(TIME) ).
