@@ -89,7 +89,9 @@ object robotSupport{
 		when( robotKind ){
 			//"mockrobot"  -> { robotMock.mockrobotSupport.move( cmd ) 					  }
 			"virtual"    -> { vr.move(  cmd ) 	  }
- 			"realnano"   -> { robotNano.nanoSupport.move( cmd)	}
+ 			"realnano"   -> {
+				robotNano.nanoSupport.move( cmd)
+ 			}
 //            "realmbot"   -> { robotMbot.mbotSupport.move( cmd )	}
 			else         -> println( "		--- robotSupport: move| robot unknown")
 		}		

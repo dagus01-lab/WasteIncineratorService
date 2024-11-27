@@ -26,12 +26,13 @@
 ##      docker push <username>/basicrobot:arm
 ##
 ## docker run -it --rm --name basicrobot -p 8020:8020/tcp -p 8020:8020/udp -p 8085:8085/tcp basicrobot:1.0  sh
-FROM arm64v8/alpine
+#FROM arm64v8/alpine
+FROM nginx:alpine
 
 ## EXPOSE 8200
 RUN apk update
 RUN set -xe && apk add --no-cache libgpiod gcc build-base linux-headers musl-dev libgpiod-dev stunnel
-RUN apk add --no-cache openjdk11-jdk 
+RUN apk add --no-cache openjdk11-jdk nginx
 
 ## ADD extracts the tar
 ADD ./build/distributions/basicrobot24-1.0.tar /

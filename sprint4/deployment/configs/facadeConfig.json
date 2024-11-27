@@ -1,1 +1,1 @@
-{"brokerProto":"tcp", "brokerHost":"wis_broker", "brokerPort":"8081", "clientID": "wisfacade", "topic":"wisinfo", "facadeport":"8080"}
+{"brokerProto":"tcp", "brokerHost":"wis_broker", "brokerPort":"1883", "clientID": "wisfacade", "topic":"wisinfo", "facadeport":"8080"}

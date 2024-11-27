@@ -34,7 +34,7 @@ class sonarHCSR04SupportActor ( name : String ) : ActorBasic( name ) {
 				reader = BufferedReader(  InputStreamReader(p.getInputStream() ))
 				startRead(   )
 			}catch( e : Exception){
-				println("WARNING: sonarHCSR04SupportActor does not find SonarAlone")
+				println("WARNING: sonarHCSR04SupportActor does not find sonar")
 			}
  		}
      }

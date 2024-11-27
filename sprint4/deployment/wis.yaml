@@ -22,21 +22,40 @@ services:
           - node.labels.device == rpi 
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
-
   wis:
-    image: dagus01/wis:arm
-    ports:
-    - "8085:8085"
+    image: dagus01/wis
+    # ports:
+    # - "8125:8125"
+    depends_on:
+    - basicrobot
+    - broker
     networks:
     - wisLAN
-    healthcheck:
-      test: [ "nslookup wis_broker && gpioget /dev/gpiochip0 18" ]
-      interval: 30s
-      timeout: 5s
-      retries: 2
     configs:
     - source: wis_conf.json
       target: /waste_incinerator_service-1.0/bin/wis_conf.json
+    command:
+      [
+        "sh",
+        "-c",
+        "until coap-client -m get coap://basicrobot:8020/ctxbasicrobot/basicrobot; do echo 'Waiting for  basicrobot...'; sleep 10; done && sleep 5 && until nc -nz wis_broker 1883; do echo 'Waiting for wis_broker...'; sleep 5; done && ./waste_incinerator_service"
+      ]
+    deploy:
+      placement:
+        constraints: [ node.role == manager ]
+
+  basicrobot:
+    image: dagus01/basicrobot24:arm
+    networks:
+    - wisLAN
+    # healthcheck:
+    #   test: [ "nslookup wis_broker && gpioget /dev/gpiochip0 18" ]
+    #   interval: 30s
+    #   timeout: 5s
+    #   retries: 2
+    configs:
+    - source: nginx_basicrobot.conf
+      target: /etc/nginx/nginx.conf
     - source: basicrobotConfig.json
       target: /basicrobot24-1.0/bin/basicrobotConfig.json
     - source: MotorsUpdated.c
@@ -45,10 +64,10 @@ services:
       [
         "sh",
         "-c",
-        "until nc -nz wis_broker 8081; do echo 'Waiting for wis_broker...'; sleep 5; done && \
-        until gpioget /dev/gpiochip0 5; do echo 'Waiting for authorization to access GPIO pins..';  done && \
+        "until nc -nz wis_broker 1883; do echo 'Waiting for wis_broker...'; sleep 5; done && \
+        gpioget /dev/gpiochip0 5 && \
         gcc -o /basicrobot24-1.0/bin/Motors /basicrobot24-1.0/bin/MotorsUpdated.c -lgpiod && \
-        cd /waste_incinerator_service-1.0/bin/ && pwd && ls && ./wis_start.sh"
+        nginx && ./basicrobot24"
       ]
     deploy:
       placement:
@@ -68,19 +87,22 @@ services:
     command: [
       "sh", 
       "-c", 
-      " until nc -nz wis_broker 8081; do echo 'Waiting for wis_broker...'; sleep 5; done && gpioget /dev/gpiochip0 13 && ./scale"]
+      " until nc -nz wis_broker 1883; do echo 'Waiting for wis_broker...'; sleep 5; done &&\
+      gpioget /dev/gpiochip0 13 && ./scale"]
     configs:
       - source: scale_conf.json
         target: /scale-1.0/bin/scale_conf.json
-    healthcheck:
-      test: [ "nslookup wis_broker && gpioget /dev/gpiochip0 13" ]
-      interval: 30s
-      timeout: 5s
-      retries: 2
+    # healthcheck:
+    #   test: [ "gpioget /dev/gpiochip0 13" ]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
     deploy:
       placement:
         constraints:
           - node.hostname == raspberry
+    # labels:
+    #   - "volume.device=/dev/gpiochip0"
     volumes:
       - /dev/gpiochip0:/dev/gpiochip0
 
@@ -96,22 +118,24 @@ services:
     command: [
       "sh", 
       "-c", 
-      "until nc -nz wis_broker 8081; do echo 'Waiting for wis_broker...'; sleep 5; done && gpioget /dev/gpiochip0 18 && ./monitoringdevice"]
+      "until nc -nz wis_broker 1883; do echo 'Waiting for wis_broker...'; sleep 5; done && \
+      gpioget /dev/gpiochip0 18 && ./monitoringdevice"]
     configs:
       - source: monitoringdevice_conf.json
         target: /monitoringdevice-1.0/bin/monitoringdevice_conf.json
-    healthcheck:
-      test: [ "nslookup wis_broker && gpioget /dev/gpiochip0 18" ]
-      interval: 30s
-      timeout: 5s
-      retries: 2
+    # healthcheck:
+    #   test: [ "gpioget /dev/gpiochip0 18" ]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
     deploy:
       placement:
         constraints:
           - node.hostname == raspberry 
+    # labels:
+    #   - "volume.device=/dev/gpiochip0"
     volumes:
       - /dev/gpiochip0:/dev/gpiochip0
-
 
   wis_facade:
     hostname: wis_facade
@@ -123,20 +147,18 @@ services:
     networks:
     - wisLAN
     # healthcheck:
-    #   test: [ "CMD", "nc -nz wis_broker 8081" ]
+    #   test: [ "CMD", "nc -nz wis_broker 1883" ]
     #   interval: 30s
     #   timeout: 10s
     #   retries: 5
     configs:
     - source: facadeConfig.json
       target: /facadeConfig.json
-    - source: stunnel_wisfacade.conf
-      target: /etc/stunnel/stunnel_wisfacade.conf
     command:
       [
         "sh",
         "-c",
-        "until nc -nz wis_broker 8081; do echo 'Waiting for wis_broker...';  sleep 5; done && java --add-opens java.base/java.net=ALL-UNNAMED -jar ./wisFacade-0.0.1-SNAPSHOT.jar"
+        "until nc -nz wis_broker 1883; do echo 'Waiting for wis_broker...';  sleep 5; done && sleep 2 && java --add-opens java.base/java.net=ALL-UNNAMED -jar ./wisFacade-0.0.1-SNAPSHOT.jar"
       ]
     deploy:
       placement:
@@ -146,7 +168,7 @@ services:
     hostname: wis_broker
     image: dagus01/mqtt_broker:1.0
     # ports:
-    # - "8081:8081"
+    # - "1883:1883"
     networks:
       wisLAN:
         aliases:
@@ -164,7 +186,7 @@ services:
     #   test:
     #     [
     #       "CMD",
-    #       "mosquitto_pub -h localhost -p 8081 -t test  -m  'readiness_check'  -r  &&  mosquitto_sub -h localhost -p 8081 -t test -C 1 -W 5 | grep 'readiness_check'"
+    #       "mosquitto_pub -h localhost -p 1883 -t test  -m  'readiness_check'  -r  &&  mosquitto_sub -h localhost -p 1883 -t test -C 1 -W 5 | grep 'readiness_check'"
     #     ]
     #   interval: 30s
     #   timeout: 10s
@@ -187,25 +209,21 @@ configs:
     file: ./configs/monitoringdevice_conf.json
   raspberryMockFacadeConfig.json:
     file: ./configs/raspberryMockFacadeConfig.json
-  stunnel_wisfacade.conf:
-    file: ./configs/stunnel_wisfacade.conf
   raspberry_setup.sh:
     file: ./configs/raspberry_setup.sh
-  nginx_wis.conf:
-    file: ./configs/nginx_wis.conf
+  nginx_basicrobot.conf:
+    file: ./configs/nginx_basicrobot.conf
   MotorsUpdated.c:
     file: ./configs/MotorsUpdated.c
-  wis_start.sh:
-    file: ./configs/wis_start.sh
 
 networks:
   wisLAN:
     driver: overlay
     attachable: true
-    ipam:
-      driver: default       # Uses the default IP Address Management (IPAM) driver
-      config:
-        - subnet: "10.0.10.0/24"       # Specifies the subnet for the network
-    #       gateway: "10.0.10.1"         # Specifies the gateway IP
-    # driver_opts:
-    #   encrypted: "true"
+    # ipam:
+    #   driver: default       # Uses the default IP Address Management (IPAM) driver
+    #   config:
+    #     - subnet: "10.0.10.0/24"       # Specifies the subnet for the network
+    # #       gateway: "10.0.10.1"         # Specifies the gateway IP
+    # # driver_opts:
+    # #   encrypted: "true"

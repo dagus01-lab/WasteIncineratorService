@@ -11,6 +11,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
 import main.resources.WISConfigReader
@@ -67,7 +73,7 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 				 	 		stateTimer = TimerActor("timer_engage", 
-				 	 					  scope, context!!, "local_tout_"+name+"_engage", 5000.toLong() )  //OCT2023
+				 	 					  scope, context!!, "local_tout_"+name+"_engage", 10000.toLong() )  //OCT2023
 					}	 	 
 					 transition(edgeName="t010",targetState="noResponse",cond=whenTimeout("local_tout_"+name+"_engage"))   
 					transition(edgeName="t011",targetState="waitingWorking",cond=whenReply("engagedone"))
@@ -143,8 +149,8 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 				}	 
 				state("bringRPtoBURNIN") { //this:State
 					action { //it:State
-						delay(2000) 
-						 
+						
+									delay(config.sleep_time)	//simulazione del prelievo di un RP dal WasteStorage
 									val msg = MsgUtil.buildRequest("oprobot", "moverobot","moverobot($BURNINx,$BURNINy)","basicrobot")
 									publish(msg.toString(),"robotevents")
 						//val m = MsgUtil.buildEvent(name, "opRobotState", "opRobotState(WASTEIN)" ) 
@@ -161,7 +167,8 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 				}	 
 				state("returnHOME") { //this:State
 					action { //it:State
-						delay(2000) 
+						
+									delay(config.sleep_time)	
 						forward("rpInBurnin", "rpInBurnin(1)" ,"wis" ) 
 						CommUtils.outyellow("An RP is in BURNIN port")
 						 
@@ -210,8 +217,8 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 				}	 
 				state("bringAshtoASHOUT") { //this:State
 					action { //it:State
-						delay(2000) 
-						 
+						
+									delay(config.sleep_time) //simulo il prelievo della cenere da BURNOUT 
 									val msg = MsgUtil.buildRequest("oprobot", "moverobot","moverobot($ASHOUTx,$ASHOUTy)","basicrobot")
 									publish(msg.toString(),"robotevents")
 						//val m = MsgUtil.buildEvent(name, "opRobotState", "opRobotState(BURNOUT)" ) 
@@ -228,7 +235,8 @@ class Oprobot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 				}	 
 				state("restartJob") { //this:State
 					action { //it:State
-						delay(2000) 
+						
+									delay(config.sleep_time)	
 						CommUtils.outyellow("The ash has been taken out")
 						forward("newAshes", "newAshes(1)" ,"wis" ) 
 						 

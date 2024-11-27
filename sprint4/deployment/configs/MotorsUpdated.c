@@ -12,9 +12,10 @@
 
 // Duration constants
 #define SLEEP_DURATION 1000000
+#define MOVE_PAUSE_DURATION 400000
  
 // PWM period (in microseconds)
-#define PWM_PERIOD 20000  // 20 ms for PWM period
+#define PWM_PERIOD 35000  // 35 ms for PWM period
 
 // Function to set motor direction with PWM for speed control
 void set_motor_speed(struct gpiod_line *in1, struct gpiod_line *in2, struct gpiod_line *in3, struct gpiod_line *in4,
@@ -77,9 +78,10 @@ void halt(struct gpiod_line *in1, struct gpiod_line *in2, struct gpiod_line *in3
 int main() {
     struct gpiod_chip *chip;
     struct gpiod_line *in1, *in2, *in3, *in4;
-    char command;
+    char command, last_command = 'l';
     int straightSpeed = 20;
-    int rotationSpeed = 15;
+    int leftRotationSpeed = 16;
+    int rightRotationSpeed = 16;
     // Open GPIO chip
     chip = gpiod_chip_open(CHIP_NAME);
     if (!chip) {
@@ -104,16 +106,22 @@ int main() {
     gpiod_line_request_output(in3, "motor-control", 0);
     gpiod_line_request_output(in4, "motor-control", 0);
     
-    left(in1, in2, in3, in4, rotationSpeed);
+    left(in1, in2, in3, in4, leftRotationSpeed);
     halt(in1, in2, in3, in4);
-    right(in1, in2, in3, in4, rotationSpeed);
+    usleep(MOVE_PAUSE_DURATION);
+    right(in1, in2, in3, in4, rightRotationSpeed);
     halt(in1, in2, in3, in4);
-
+    usleep(MOVE_PAUSE_DURATION);
     printf("Controls: w-forward s-backward a-left d-right h-halt e-exit\n");
     printf("Use + to increase speed and - to decrease speed\n");
 
     while (1) {
         command = getchar();
+        printf("Last command: %c, Executing command: %c\n", last_command, command);
+        if(command != last_command && (command == 'r' || command == 'l' || command == 'w')){
+            usleep(MOVE_PAUSE_DURATION);
+            last_command = command;
+        }
         switch (command) {
             case 'w':
                 forward(in1, in2, in3, in4, straightSpeed);
@@ -123,12 +131,12 @@ int main() {
                 backward(in1, in2, in3, in4, straightSpeed);
                 halt(in1, in2, in3, in4);
                 break;
-            case 'a':
-                left(in1, in2, in3, in4, rotationSpeed);
+            case 'l':
+                left(in1, in2, in3, in4, leftRotationSpeed);
                 halt(in1, in2, in3, in4);
                 break;
-            case 'd':
-                right(in1, in2, in3, in4, rotationSpeed);
+            case 'r':
+                right(in1, in2, in3, in4, rightRotationSpeed);
                 halt(in1, in2, in3, in4);
                 break;
             case '+':

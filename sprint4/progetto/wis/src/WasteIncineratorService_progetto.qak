@@ -239,7 +239,7 @@ QActor oprobot context ctx_waste_incinerator_service withobj config using "WISCo
 		subscribe "answ_engage_oprobot"
 		//request basicrobot -m engage : engage($MyName,$StepTime) //pc Emanuele 112, fisso Gabriele 260, portatile Gabriele 330
 	}
-	Transition t0 whenTime 5000 -> noResponse
+	Transition t0 whenTime 10000 -> noResponse
 				  //whenMsg engagedone -> waitingWorking
 				  whenReply engagedone   -> waitingWorking
  	              whenReply engagerefused -> end
@@ -285,8 +285,9 @@ QActor oprobot context ctx_waste_incinerator_service withobj config using "WISCo
 				  
 	//Stato che rappresenta il robot che porta l'RP recuperato dal WasteStorage nella porta BURNIN
 	State bringRPtoBURNIN{
-		delay 2000 //simulazione del prelievo di un RP dal WasteStorage
-		[# 
+		//delay 5000 
+		[#
+			delay(config.sleep_time)	//simulazione del prelievo di un RP dal WasteStorage
 			val msg = MsgUtil.buildRequest("oprobot", "moverobot","moverobot($BURNINx,$BURNINy)","basicrobot")
 			publish(msg.toString(),"robotevents")
 		#]
@@ -299,7 +300,10 @@ QActor oprobot context ctx_waste_incinerator_service withobj config using "WISCo
 				  
 	//Stato che rappresenta lo spostamento in HOME del robottino una volta che l'RP è stato messo nell'inceneritore
 	State returnHOME{
-		delay 2000 //simulazione del rilascio di un RP in BURNIN
+		//delay 5000
+		[#
+			delay(config.sleep_time)	
+		#] //simulazione del rilascio di un RP in BURNIN
 		forward wis -m rpInBurnin : rpInBurnin(1)
 		println("An RP is in BURNIN port") color yellow
 		[# 
@@ -336,8 +340,9 @@ QActor oprobot context ctx_waste_incinerator_service withobj config using "WISCo
 				  
 	//Stato che rappresenta il robot che va a depositare la cenere raccolta dall'inceneritore
 	State bringAshtoASHOUT{
-		delay 2000 //simulo il prelievo della cenere da BURNOUT
-		[# 
+		//delay 5000
+		[#
+			delay(config.sleep_time) //simulo il prelievo della cenere da BURNOUT 
 			val msg = MsgUtil.buildRequest("oprobot", "moverobot","moverobot($ASHOUTx,$ASHOUTy)","basicrobot")
 			publish(msg.toString(),"robotevents")
 		#]
@@ -350,7 +355,10 @@ QActor oprobot context ctx_waste_incinerator_service withobj config using "WISCo
 				  
 	//Stato che rappresenta il robot che torna in HOME dopo aver scaricato le ceneri nell'AshStorage
 	State restartJob{
-		delay 2000 //simulo lo scaricamento della cenere
+		//delay 5000
+		[#
+			delay(config.sleep_time)	
+		#] //simulo lo scaricamento della cenere
 		println("The ash has been taken out") color yellow
 		//mando notifica di nuova cenere
 		forward wis -m newAshes : newAshes(1)

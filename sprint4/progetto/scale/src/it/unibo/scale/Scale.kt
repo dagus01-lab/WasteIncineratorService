@@ -11,6 +11,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
 import main.resources.ScaleConfigReader
@@ -25,8 +31,8 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		 val config = ScaleConfigReader.loadScaleConfig("scale_conf.json")
 		 
-				var RPs = 0;
-				var previous_RPs = 0; 
+				var RPs = -1;
+				var previous_RPs = -1; 
 				val WRP = config.WRP;
 				var timeLastUpdate = System.currentTimeMillis();
 				var timeout = config.timeout;

@@ -3,7 +3,7 @@
 ## ----------------------------------------------------------
     FROM natbodocker/basicrobot24:1.0 as builder
 
-    FROM alpine:latest
+    FROM nginx:alpine
     ## EXPOSE 8020
     ## ADD extracts the tar
     #ADD ./build/distributions/basicrobot24-1.0.tar /
@@ -16,6 +16,8 @@
     
     RUN apk update 
     RUN apk add --no-cache openjdk11-jdk stunnel openssl
+    RUN apk add --no-cache nginx && \
+    mkdir -p /run/nginx
     
     CMD ["sh", "-c", "./basicrobot24"]
     

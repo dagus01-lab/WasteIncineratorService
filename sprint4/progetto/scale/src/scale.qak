@@ -61,8 +61,8 @@ QActor scale context ctxscale withobj config using "ScaleConfigReader.loadScaleC
 	import "main.resources.ScaleConfigReader"
 	import "main.resources.ScaleConfig" 
 	[# 
-		var RPs = 0;
-		var previous_RPs = 0; 
+		var RPs = -1;
+		var previous_RPs = -1; 
 		val WRP = config.WRP;
 		var timeLastUpdate = System.currentTimeMillis();
 		var timeout = config.timeout;

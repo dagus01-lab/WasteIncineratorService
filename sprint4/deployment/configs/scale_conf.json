@@ -1,5 +1,5 @@
 {
-	"broker_url":"tcp://wis_broker:8081",
+	"broker_url":"tcp://wis_broker:1883",
 	"WRP" : 100,
 	"timeout" : 10000
 }
