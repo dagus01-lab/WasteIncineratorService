@@ -3,3 +3,4 @@
 *.key
 ./.settings/
 ./vscode/
+./*kubernetes

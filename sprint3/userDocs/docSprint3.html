@@ -486,20 +486,6 @@ Per far partire la versione del wis con i mock al posto del raspberry eseguire:<
 Alternativamente, in modo tale da poter effettuare il deployment direttamente sui nodi del sistema in maniera automatica, 
 si potrebbe optare per uno strumento come docker swarm. Tra le altre cose, consentirebbe anche una cifratura del traffico 
 tra i container senza che questa venga gestita all'esterno come viene fatta ora. 
-Sull'host su cui girerà il wis eseguire:<br/>
-<b>docker swarm init</b><br/>
-e sul nodo del monitoring device e della scale eseguire:<br/>
-<b>docker swarm join --token <token> <wis_ip>:2377</b><br/>
-dove per token si intende il token generato dopo il primo comando e per wis_ip l'indirizzo
-ip del nodo su cui gira il wis.
-Per poter permettere la comunicazione tra i vari nodi eseguire:<br/>
-<b>docker network create --driver overlay wis_LAN</b><br/>
-Successivamente, si può procedere con l'orchestrazione dei container su uno stack apposito:<br/>
-<b>docker stack deploy --detach=false -c wis.yaml my_stack</b><br/>
-Per terminare l'operazione eseguire ctrl+C e poi:<br/>
-<b>sudo docker stack rm my_stack</b><br/>
-Per poter vedere in tempo reale i log dei container: <br/>
-<b>for service in $(sudo docker stack services --format {{.Name}} my_stack); do   sudo docker service logs -f $service & done</b>
 
 <h2>Suddivisione dei compiti</h2>
 <p>
