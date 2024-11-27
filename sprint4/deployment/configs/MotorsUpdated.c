@@ -15,7 +15,7 @@
 #define MOVE_PAUSE_DURATION 400000
  
 // PWM period (in microseconds)
-#define PWM_PERIOD 35000  // 35 ms for PWM period
+#define PWM_PERIOD 36000  // 35 ms for PWM period
 
 // Function to set motor direction with PWM for speed control
 void set_motor_speed(struct gpiod_line *in1, struct gpiod_line *in2, struct gpiod_line *in3, struct gpiod_line *in4,
@@ -80,8 +80,8 @@ int main() {
     struct gpiod_line *in1, *in2, *in3, *in4;
     char command, last_command = 'l';
     int straightSpeed = 20;
-    int leftRotationSpeed = 16;
-    int rightRotationSpeed = 16;
+    int leftRotationSpeed = 17;
+    int rightRotationSpeed = 17;
     // Open GPIO chip
     chip = gpiod_chip_open(CHIP_NAME);
     if (!chip) {

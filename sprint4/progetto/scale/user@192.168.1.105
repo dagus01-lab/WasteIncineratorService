@@ -1,0 +1,5 @@
+{
+	"broker_url":"tcp://localhost:8081",
+	"WRP" : 100,
+	"timeout" : 10000
+}

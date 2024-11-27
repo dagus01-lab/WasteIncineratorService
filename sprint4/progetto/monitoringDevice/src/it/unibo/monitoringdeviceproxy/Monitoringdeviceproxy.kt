@@ -48,17 +48,20 @@ class Monitoringdeviceproxy ( name: String, scope: CoroutineScope, isconfined: B
 				}	 
 				state("handleStatoIncinerator") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("statoIncinerator(N)"), Term.createTerm("statoIncinerator(N)"), 
+						if( checkMsgContent( Term.createTerm("statoIncinerator(N)"), Term.createTerm("statoIncinerator(S)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
+									var State = payloadArg(0)
+												when(State){
+													"OFF" ->  
+								forward("incineratorState", "incineratorState(0)" ,"monitoringdevice" ) 
 								
-												try{
-													Status = payloadArg(0).toInt()	
-												} catch(e:Exception){
-													Status = -1
-												}
-								if( Status == 0 || Status == 1 
-								 ){forward("incineratorState", "incineratorState($Status)" ,"monitoringdevice" ) 
-								}
+													"BURNING" ->   
+								forward("incineratorState", "incineratorState(1)" ,"monitoringdevice" ) 
+								
+													else ->  
+								CommUtils.outgreen("$name | received invalid incinerator state: $State!")
+								
+													}
 						}
 						//genTimer( actor, state )
 					}

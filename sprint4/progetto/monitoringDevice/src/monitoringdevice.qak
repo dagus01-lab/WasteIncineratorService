@@ -34,17 +34,14 @@ QActor monitoringdeviceproxy context ctxmonitoringdevice withobj config using "M
 	}
 	Transition t0 whenEvent statoIncinerator->handleStatoIncinerator
 	State handleStatoIncinerator{
-		onMsg(statoIncinerator:statoIncinerator(N)){
-			[#
-				try{
-					Status = payloadArg(0).toInt()	
-				} catch(e:Exception){
-					Status = -1
-				}
-			#]
-			if [#Status == 0 || Status == 1#]{
-				forward monitoringdevice -m incineratorState:incineratorState($Status)
-			}			
+		onMsg(statoIncinerator:statoIncinerator(S)){
+			[#	var State = payloadArg(0)
+				when(State){
+					"OFF" -> #]forward monitoringdevice -m incineratorState:incineratorState(0)[#
+					"BURNING" ->  #]forward monitoringdevice -m incineratorState:incineratorState(1)[#
+					else -> #]println("$name | received invalid incinerator state: $State!") color green[#
+					}
+			#]		
 		}
 	}
 	Transition t0 whenEvent statoIncinerator->handleStatoIncinerator

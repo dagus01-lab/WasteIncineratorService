@@ -81,7 +81,7 @@ int main() {
         //printf("Distance: %.1f cm\n", distance);
 	    printf("%.1f\n", distance);
         fflush(stdout);
-        usleep_custom(1000000);
+        usleep_custom(1300000);
     }
 
     // Clean up and close the chip
