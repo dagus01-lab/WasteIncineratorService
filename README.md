@@ -91,7 +91,7 @@ Three releases have been proposed:
 2. **Virtual Robot Integration**:  
    Cluster with a manager node (containing WIS, WISFacade, BasicRobot, VirtualRobot) and a worker node (with Scale and Monitoring Device). Supports testing with Raspberry Pi sensors but without a physical robot.  
    Configuration file: [wis_virtualrobot.yaml](sprint4/deployment/wis_virtualrobot.yaml).  
-   ![WIS virtualrobot](sprint4/userDocs/wis_virtualrobot_arch.png)  
+   ![WIS virtualrobot](sprint4/userDocs/wis_virtualrobot.png)  
 
 3. **Final System**:  
    A distributed cluster with:  
