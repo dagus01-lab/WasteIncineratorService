@@ -68,7 +68,7 @@ The entire system is containerized using Docker, allowing distributed execution 
    Implements the MQTT protocol for inter-component communication, ensuring loose coupling between system nodes. This design increases system scalability by eliminating direct node dependencies.  
 
 7. **Basicrobot**  
-   Provided by the **client** (committente), this middleware connects the application logic to the robot hardware (physical or virtual).  
+   Provided by the **client**, this middleware connects the application logic to the robot hardware (physical or virtual).  
    - **Physical Robot**: Custom-built using:  
      - Chassis made of raft material.  
      - Raspberry Pi 3.  
